@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tatame · Performance Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1a1a1a;
+    --surface-3: #1f1f1f;
+    --border: #222;
+    --border-2: #2a2a2a;
+    --text: #fff;
+    --text-2: #888;
+    --text-3: #555;
+    --text-4: #666;
+    --primary: #ff4444;
+    --primary-dark: #cc3333;
+    --green: #6ee06e;
+    --green-bg: #1f3a1f;
+    --red: #ff6b6b;
+    --red-bg: #3a1f1f;
+    --amber: #ffaa33;
+    --amber-bg: #2a1f00;
+    --blue: #4488ff;
+    --purple: #aa66ff;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 14px; overflow-x: hidden; }
+  body { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+  #app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg); position: relative; padding-bottom: 80px; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font-family: inherit; font-size: 14px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text); border-radius: var(--radius-md); padding: 10px 12px; width: 100%; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+  .display-font { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+  .screen { padding: 20px; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 0.02em; }
+  .header .label { font-size: 12px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
+  .avatar-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; padding: 0; }
+  .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+  .toggle { display: flex; gap: 6px; background: var(--surface); padding: 4px; border-radius: 24px; border: 1px solid var(--surface-3); margin-bottom: 16px; }
+  .toggle button { flex: 1; background: transparent; color: var(--text-2); padding: 10px; border-radius: 20px; font-size: 12px; transition: all 0.15s; }
+  .toggle button.active { background: var(--primary); color: #fff; font-weight: 500; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 12px; }
+  .card-label { font-size: 11px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .stat-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .stat-head i { font-size: 18px; }
+  .stat-head .label { font-size: 10px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
+  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; font-weight: 400; line-height: 1; letter-spacing: 0.02em; }
+  .stat-sub { font-size: 10px; color: var(--text-4); margin-top: 4px; }
+  .stat-sub.positive { color: var(--green); }
+  .stat-sub.negative { color: var(--red); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+  .pill-green { background: var(--green-bg); color: var(--green); }
+  .pill-red { background: var(--red-bg); color: var(--red); }
+  .pill-amber { background: var(--amber-bg); color: var(--amber); }
+  .btn-primary { width: 100%; background: var(--primary); color: #fff; padding: 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; transition: background 0.15s; }
+  .btn-primary:active { background: var(--primary-dark); }
+  .btn-secondary { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--border-2); padding: 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; }
+  .btn-dashed { width: 100%; background: transparent; color: var(--text-2); border: 1px dashed var(--border-2); padding: 10px; border-radius: var(--radius-md); font-size: 12px; }
+  .input-row { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 8px; }
+  .input-row label { display: block; font-size: 10px; color: var(--text-4); margin-bottom: 2px; }
+  .input-row input, .input-row select { background: transparent; border: none; padding: 0; font-size: 14px; }
+  .input-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .nav-bottom { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: rgba(10,10,10,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); z-index: 50; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-3); font-size: 10px; }
+  .nav-item.active { color: var(--primary); }
+  .nav-item i { font-size: 22px; }
+  .progress-bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s; }
+  .belt-bar { display: flex; gap: 3px; }
+  .belt-stripe { height: 6px; flex: 0 0 18px; border-radius: 1px; background: var(--border-2); }
+  /* LOGIN */
+  .auth-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px 28px; }
+  .auth-logo { text-align: center; margin-bottom: 40px; }
+  .auth-logo .mark { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--primary); letter-spacing: 0.04em; line-height: 1; }
+  .auth-logo .tagline { font-size: 11px; color: var(--text-2); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .auth-form { display: flex; flex-direction: column; gap: 14px; }
+  .auth-form h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .auth-form .subtitle { font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
+  .auth-toggle { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-2); }
+  .auth-toggle a { color: var(--primary); cursor: pointer; font-weight: 500; }
+  .error-msg { background: var(--red-bg); color: var(--red); padding: 10px; border-radius: var(--radius-md); font-size: 12px; text-align: center; }
+  /* CALENDAR */
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+  .cal-nav { display: flex; gap: 8px; }
+  .cal-nav button { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow { text-align: center; font-size: 10px; color: var(--text-3); padding: 6px 0; letter-spacing: 1px; }
+  .cal-day { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; color: var(--text-2); position: relative; cursor: pointer; transition: all 0.15s; }
+  .cal-day.today { border-color: var(--primary); color: var(--text); }
+  .cal-day.has-session { background: var(--surface-2); color: var(--text); }
+  .cal-day.has-session::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
+  .cal-day.has-comp::after { background: var(--amber); }
+  .cal-day.empty { background: transparent; border: none; cursor: default; }
+  .cal-day.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .cal-day.future { opacity: 0.3; cursor: default; }
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 100; animation: fadeOverlay 0.2s; }
+  @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+  .modal { width: 100%; max-width: 480px; max-height: 90vh; background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 20px; overflow-y: auto; animation: slideUp 0.25s ease; }
+  @keyframes slideUp { from { transform: translateY(20%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-title { font-size: 18px; font-weight: 500; }
+  .close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; }
+  /* Submission card */
+  .sub-card { background: var(--surface-2); padding: 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .sub-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .sub-card-head .num { font-size: 11px; color: var(--text-2); letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .sub-card-head .num::before { content: ''; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
+  .sub-card-head.sofrida .num::before { background: var(--blue); }
+  /* Counter */
+  .counter { display: flex; align-items: center; gap: 12px; }
+  .counter button { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; }
+  .counter .minus { background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text); }
+  .counter .plus { background: var(--primary); color: #fff; }
+  .counter .value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; min-width: 50px; text-align: center; }
+  /* Partner item */
+  .partner-item { display: flex; align-items: center; gap: 10px; background: var(--surface-2); padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .partner-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .partner-info { flex: 1; min-width: 0; }
+  .partner-info .name { font-size: 13px; line-height: 1.2; }
+  .partner-info .meta { font-size: 11px; color: var(--text-4); margin-top: 1px; }
+  /* List item */
+  .list-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 8px; cursor: pointer; }
+  /* Empty state */
+  .empty { text-align: center; padding: 40px 20px; color: var(--text-3); }
+  .empty i { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .empty p { font-size: 13px; }
+  /* Belt colors */
+  .belt-branca { background: #fff; }
+  .belt-azul { background: #4488ff; }
+  .belt-roxa { background: #6644aa; }
+  .belt-marrom { background: #8b4513; }
+  .belt-preta { background: #000; border: 1px solid #444; }
+  /* Result colors for comp matches */
+  .match-win { border-left: 3px solid var(--green); }
+  .match-loss { border-left: 3px solid var(--red); }
+  .match-bg { background: var(--surface-2); padding: 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .insight-card { background: linear-gradient(135deg, rgba(255,68,68,0.08), var(--surface)); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  .day-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .day-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+  .day-header .back { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; }
+  .session-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .session-summary > div { background: var(--surface-2); padding: 10px; border-radius: var(--radius-md); text-align: center; }
+  .session-summary .val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+  .session-summary .lbl { font-size: 9px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
+  /* Toast */
+  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--green); color: var(--green); padding: 12px 20px; border-radius: var(--radius-md); font-size: 13px; z-index: 200; animation: toastIn 0.3s ease; }
+  .toast.toast-error { border-color: var(--red); color: var(--red); }
+  /* Recap (Wrapped) */
+  .recap-overlay { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: #000; }
+  .recap-slide { width: 100%; max-width: 480px; height: 100vh; max-height: 100vh; padding: 40px 24px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; cursor: pointer; user-select: none; }
+  .recap-slide::before { content: ''; position: absolute; inset: 0; background: inherit; z-index: -1; }
+  .recap-progress { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; gap: 4px; z-index: 10; }
+  .recap-progress-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; overflow: hidden; }
+  .recap-progress-bar.done { background: rgba(255,255,255,1); }
+  .recap-progress-bar.active::after { content: ''; display: block; height: 100%; background: #fff; animation: progressFill 4s linear forwards; }
+  @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
+  .recap-close { position: absolute; top: 24px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: #fff; z-index: 11; }
+  .recap-nav-zone { position: absolute; top: 0; bottom: 0; width: 30%; z-index: 9; }
+  .recap-nav-prev { left: 0; }
+  .recap-nav-next { right: 0; }
+  .recap-content { animation: recapSlideIn 0.4s ease; text-align: center; color: #fff; }
+  @keyframes recapSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .recap-emoji { font-size: 80px; margin-bottom: 16px; line-height: 1; }
+  .recap-label { font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; margin-bottom: 16px; }
+  .recap-big { font-family: 'Bebas Neue', sans-serif; font-size: 96px; line-height: 0.9; letter-spacing: 0.02em; margin-bottom: 8px; }
+  .recap-big-sub { font-size: 18px; font-weight: 500; opacity: 0.9; margin-bottom: 16px; }
+  .recap-headline { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; letter-spacing: 0.02em; margin-bottom: 12px; }
+  .recap-body { font-size: 16px; line-height: 1.5; opacity: 0.9; max-width: 320px; margin: 0 auto; }
+  .recap-share-btn { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.3); z-index: 11; }
+  .recap-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+  /* Recap card on home */
+  .recap-cta { background: linear-gradient(135deg, #ff4444, #ff8833); border: none; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; color: #fff; cursor: pointer; width: 100%; text-align: left; box-shadow: 0 4px 20px rgba(255,68,68,0.3); }
+  .recap-cta .ico { font-size: 32px; }
+  .recap-cta .info { flex: 1; }
+  .recap-cta .ttl { font-size: 14px; font-weight: 600; }
+  .recap-cta .sub { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  .ranking-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+  .ranking-row .name { font-size: 13px; }
+  .ranking-row .count { font-size: 12px; color: var(--text-2); }
+  .progress-track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .progress-track .fill { height: 100%; background: var(--primary); border-radius: 4px; }
+  .combo-row { display: flex; align-items: center; gap: 8px; background: var(--surface-2); padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .combo-tag { padding: 3px 8px; border-radius: 8px; font-size: 10px; }
+  .combo-tag.pos { background: var(--border-2); color: var(--text-2); }
+  .combo-tag.fin { background: var(--red-bg); color: var(--red); }
+  .combo-row .count { margin-left: auto; font-size: 13px; font-weight: 500; }
+  .week-grid { display: flex; gap: 6px; margin-top: 14px; }
+  .week-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .week-day .box { width: 100%; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; border: none; }
+  .week-day .box.done { background: var(--green); }
+  .week-day .box.planned { background: rgba(255,68,68,0.15); border: 2px solid var(--primary); }
+  .week-day .box.empty-day { background: var(--surface-2); border: 1px dashed var(--border-2); }
+  .week-day .box.today-ring { box-shadow: 0 0 0 2px rgba(255,255,255,0.4); }
+  .week-day .lbl { font-size: 9px; color: var(--text-3); text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// =================== DATA & STATE ===================
+const STORAGE_KEY = 'jjtracker_v1';
+
+// Belts (adult)
+const BELTS_ADULT = ['Branca', 'Azul', 'Roxa', 'Marrom', 'Preta'];
+
+// Belts (kids - IBJJF complete with gradations) - applies if age < 16
+const BELTS_KIDS = [
+  'Branca',
+  'Cinza/Branca', 'Cinza', 'Cinza/Preta',
+  'Amarela/Branca', 'Amarela', 'Amarela/Preta',
+  'Laranja/Branca', 'Laranja', 'Laranja/Preta',
+  'Verde/Branca', 'Verde', 'Verde/Preta'
+];
+
+function getBelts(age) {
+  return (age && age < 16) ? BELTS_KIDS : BELTS_ADULT;
+}
+
+// Belt colors for visual rendering
+function getBeltVisual(beltName) {
+  const b = (beltName || '').toLowerCase();
+  if (b.includes('branca') && !b.includes('/')) return { bg: '#ffffff', stripe: null, border: '#444' };
+  if (b === 'azul') return { bg: '#4488ff', stripe: null };
+  if (b === 'roxa') return { bg: '#6644aa', stripe: null };
+  if (b === 'marrom') return { bg: '#8b4513', stripe: null };
+  if (b === 'preta') return { bg: '#000', stripe: null, border: '#444' };
+  // Kids
+  if (b === 'cinza/branca') return { bg: '#888', stripe: '#fff' };
+  if (b === 'cinza') return { bg: '#888', stripe: null };
+  if (b === 'cinza/preta') return { bg: '#888', stripe: '#000' };
+  if (b === 'amarela/branca') return { bg: '#f5d800', stripe: '#fff' };
+  if (b === 'amarela') return { bg: '#f5d800', stripe: null };
+  if (b === 'amarela/preta') return { bg: '#f5d800', stripe: '#000' };
+  if (b === 'laranja/branca') return { bg: '#ff7a00', stripe: '#fff' };
+  if (b === 'laranja') return { bg: '#ff7a00', stripe: null };
+  if (b === 'laranja/preta') return { bg: '#ff7a00', stripe: '#000' };
+  if (b === 'verde/branca') return { bg: '#2e9e44', stripe: '#fff' };
+  if (b === 'verde') return { bg: '#2e9e44', stripe: null };
+  if (b === 'verde/preta') return { bg: '#2e9e44', stripe: '#000' };
+  return { bg: '#fff', stripe: null, border: '#444' };
+}
+
+const WEIGHT_CLASSES_GI_MALE = [
+  { name: 'Galo', limit: 57.5 },
+  { name: 'Pluma', limit: 64.0 },
+  { name: 'Pena', limit: 70.0 },
+  { name: 'Leve', limit: 76.0 },
+  { name: 'Médio', limit: 82.3 },
+  { name: 'Meio-pesado', limit: 88.3 },
+  { name: 'Pesado', limit: 94.3 },
+  { name: 'Super-pesado', limit: 100.5 },
+  { name: 'Pesadíssimo', limit: 999 }
+];
+
+const WEIGHT_CLASSES_GI_FEMALE = [
+  { name: 'Galo', limit: 48.5 },
+  { name: 'Pluma', limit: 53.5 },
+  { name: 'Pena', limit: 58.5 },
+  { name: 'Leve', limit: 64.0 },
+  { name: 'Médio', limit: 69.0 },
+  { name: 'Meio-pesado', limit: 74.0 },
+  { name: 'Pesado', limit: 79.3 },
+  { name: 'Pesadíssimo', limit: 999 }
+];
+
+// Posições (origem da finalização ou onde sofreu)
+const POSITIONS_GI = [
+  'Costas','Montada','Montada técnica','Cem quilos (side control)','Joelho na barriga',
+  'Norte-sul','Guarda fechada','Guarda aberta','Meia-guarda',
+  'Guarda aranha','Guarda laçada','Guarda De La Riva','Guarda X','Guarda borboleta',
+  'Guarda 50/50','Em pé','Crucifixo','Tartaruga'
+];
+
+const POSITIONS_NOGI = [
+  'Costas','Montada','Cem quilos (side control)','Joelho na barriga',
+  'Norte-sul','Guarda fechada','Guarda aberta','Meia-guarda',
+  'Guarda borboleta','Guarda 50/50','Saddle (inside heel hook position)',
+  'Guarda Z','Single leg X','Em pé','Crucifixo','Tartaruga'
+];
+
+// Finalizações
+const SUBMISSIONS_GI = [
+  // Estrangulamentos
+  'Mata-leão','Estrangulamento de lapela (cross choke)','Estrangulamento de Ezequiel',
+  'Estrangulamento Brabo','Loop choke','Baseball choke','Bow and arrow',
+  'Triângulo','Triângulo de braço','Triângulo invertido',
+  'Clock choke','Estrangulamento norte-sul',
+  // Chaves de braço
+  'Armlock','Kimura','Americana','Omoplata','Chave de pulso',
+  // Chaves de perna (legal no gi sem 50/50 reaping)
+  'Chave de joelho (straight ankle lock)',
+  // Outras
+  'Estrangulamento de gola',
+];
+
+const SUBMISSIONS_NOGI = [
+  // Estrangulamentos sem lapela
+  'Mata-leão','Guilhotina','D\'arce (brabo)','Anaconda','Peruvian necktie',
+  'Triângulo','Triângulo de braço','Triângulo invertido',
+  'Norte-sul choke','Von Flue choke',
+  // Chaves de braço
+  'Armlock','Kimura','Americana','Omoplata','Chave de pulso',
+  // Chaves de perna (mais liberais no no-gi)
+  'Heel hook interno','Heel hook externo','Chave de joelho','Toe hold','Estrela (calf slicer)','Bicep slicer'
+];
+
+const RESULT_TYPES = ['Vitória por finalização','Vitória por pontos','Vitória por vantagem','Vitória por DQ','Derrota por finalização','Derrota por pontos','Derrota por vantagem','Derrota por DQ','Empate (draw)'];
+
+// Application state
+let state = {
+  currentUser: null,
+  data: null, // { profile, partners, sessions, comps, plan }
+  currentTab: 'home', // home | calendar | stats | comps | partners | profile
+  mode: 'gi', // gi | no-gi
+  selectedDate: null,
+  selectedSessionId: null,
+  cal: { year: new Date().getFullYear(), month: new Date().getMonth() }
+};
+
+// =================== STORAGE ===================
+function loadAll() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { users: {}, currentEmail: null };
+  } catch { return { users: {}, currentEmail: null }; }
+}
+function saveAll(db) { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+
+// Simple password hash (NOT cryptographically secure - for local-only demo)
+async function hashPassword(pw) {
+  const enc = new TextEncoder().encode(pw + ':tatame-salt-2026');
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function newUserData() {
+  return {
+    profile: { name: '', gender: 'male', age: 28, belt: 'Branca', degrees: 0, weight: 80, gym: '', startedAt: new Date().getFullYear() - 1, photo: null },
+    weekPlans: {},
+    partners: [],
+    sessions: [],
+    comps: [],
+  };
+}
+
+// =================== AUTH ===================
+async function tryLogin(email, password) {
+  const db = loadAll();
+  const u = db.users[email];
+  if (!u) return { error: 'Conta não encontrada' };
+  const hash = await hashPassword(password);
+  if (u.passwordHash !== hash) return { error: 'Senha incorreta' };
+  db.currentEmail = email;
+  saveAll(db);
+  state.currentUser = email;
+  state.data = u.data;
+  migrate(state.data);
+  return { ok: true };
+}
+
+async function tryRegister(email, password, name) {
+  if (!email.includes('@')) return { error: 'Email inválido' };
+  if (password.length < 6) return { error: 'Senha deve ter 6+ caracteres' };
+  const db = loadAll();
+  if (db.users[email]) return { error: 'Email já cadastrado' };
+  const hash = await hashPassword(password);
+  const data = newUserData();
+  data.profile.name = name || email.split('@')[0];
+  db.users[email] = { passwordHash: hash, data };
+  db.currentEmail = email;
+  saveAll(db);
+  state.currentUser = email;
+  state.data = data;
+  return { ok: true };
+}
+
+function logout() {
+  const db = loadAll();
+  db.currentEmail = null;
+  saveAll(db);
+  state.currentUser = null;
+  state.data = null;
+  render();
+}
+
+function persistUser() {
+  if (!state.currentUser) return;
+  const db = loadAll();
+  if (db.users[state.currentUser]) {
+    db.users[state.currentUser].data = state.data;
+    saveAll(db);
+  }
+}
+
+function migrate(data) {
+  if (!data.weekPlans) data.weekPlans = {};
+  if (data.profile.weeklyGoal !== undefined) delete data.profile.weeklyGoal;
+  if (data.profile.age === undefined) data.profile.age = null;
+  if (data.profile.photo === undefined) data.profile.photo = null;
+  if (!data.recapsDismissed) data.recapsDismissed = {}; // { "2026-04": true }
+  // Migrate weekPlans: old array format → new {gi, 'no-gi'} format
+  for (const k in data.weekPlans) {
+    if (Array.isArray(data.weekPlans[k])) {
+      data.weekPlans[k] = { gi: data.weekPlans[k].slice(), 'no-gi': [false,false,false,false,false,false,false] };
+    }
+  }
+  data.sessions.forEach(s => {
+    if (!s.rollDetails) s.rollDetails = null;
+    if (s.mood === undefined) s.mood = null;
+  });
+}
+
+function tryAutoLogin() {
+  const db = loadAll();
+  if (db.currentEmail && db.users[db.currentEmail]) {
+    state.currentUser = db.currentEmail;
+    state.data = db.users[db.currentEmail].data;
+    migrate(state.data);
+    return true;
+  }
+  return false;
+}
+
+// =================== HELPERS ===================
+function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+function parseLocalISO(iso) {
+  // "2026-05-11" → new Date(2026, 4, 11) - local midnight, no UTC shift
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function fmtDate(iso) {
+  return parseLocalISO(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+}
+function fmtDateLong(iso) {
+  return parseLocalISO(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+function todayISO() { return localISO(new Date()); }
+function localISO(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase();
+}
+
+function headerAvatar() {
+  const p = state.data.profile;
+  return `<button class="avatar-btn" data-action="goto:profile">${p.photo ? `<img src="${p.photo}" alt="foto">` : initials(p.name)}</button>`;
+}
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function showToast(msg, kind = 'success') {
+  const t = document.createElement('div');
+  t.className = 'toast' + (kind === 'error' ? ' toast-error' : '');
+  const icon = kind === 'error' ? 'alert-triangle' : 'check';
+  t.innerHTML = `<i class="ti ti-${icon}" style="vertical-align:-2px"></i> ${escapeHtml(msg)}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2400);
+}
+
+function moodEmoji(v) {
+  if (v == null) return '🤔';
+  if (v <= 1) return '😩';
+  if (v <= 3) return '😞';
+  if (v <= 4) return '😕';
+  if (v <= 6) return '😐';
+  if (v <= 7) return '🙂';
+  if (v <= 8) return '😊';
+  if (v <= 9) return '😄';
+  return '🤩';
+}
+function moodLabel(v) {
+  if (v == null) return 'Toque pra registrar';
+  if (v <= 2) return 'Horrível';
+  if (v <= 4) return 'Ruim';
+  if (v <= 6) return 'Mediano';
+  if (v <= 8) return 'Bom';
+  return 'Excelente';
+}
+function moodColor(v) {
+  if (v == null) return 'var(--text-3)';
+  if (v <= 3) return '#ff6b6b';
+  if (v <= 5) return '#ffaa33';
+  if (v <= 7) return '#ffd633';
+  return '#6ee06e';
+}
+function renderMoodSlider(value) {
+  const v = value == null ? 5 : value;
+  const dimmed = value == null;
+  return `<div style="text-align:center">
+    <div id="mood-emoji" style="font-size:64px;line-height:1;margin-bottom:6px">${moodEmoji(value)}</div>
+    <div id="mood-score" style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:${moodColor(value)};margin-bottom:18px;letter-spacing:0.02em">${value != null ? `${value}<span style="font-size:18px;opacity:0.6">/10</span>` : '<span style="font-size:18px;opacity:0.6">Toque pra registrar</span>'}</div>
+    <input type="range" id="m-mood" min="0" max="10" step="1" value="${v}" style="width:100%;accent-color:${moodColor(value)};${dimmed ? 'opacity:0.6' : ''}">
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px;letter-spacing:0.5px">
+      <span>0 · HORRÍVEL</span>
+      <span>10 · EXCELENTE</span>
+    </div>
+  </div>`;
+}
+
+function renderBeltBadge(beltName, degrees = 0) {
+  const v = getBeltVisual(beltName);
+  // The belt graphic: a colored bar with optional contrasting stripe at the right
+  return `<div style="display:inline-flex;align-items:center;gap:10px;background:var(--surface-2);padding:8px 14px 8px 8px;border-radius:24px;border:1px solid var(--border-2);margin-top:12px">
+    <div style="position:relative;width:64px;height:16px;background:${v.bg};border-radius:3px;${v.border ? `border:1px solid ${v.border};` : ''}overflow:hidden">
+      ${v.stripe ? `<div style="position:absolute;right:0;top:0;bottom:0;width:18px;background:${v.stripe};${v.stripe === '#fff' ? 'border-left:1px solid #ddd' : ''}"></div>` : ''}
+      ${degrees > 0 ? `<div style="position:absolute;right:${v.stripe ? '22px' : '4px'};top:50%;transform:translateY(-50%);display:flex;gap:2px">${Array.from({length: degrees}).map(() => `<div style="width:3px;height:8px;background:${v.bg === '#000' || v.bg === '#888' ? '#fff' : '#000'};border-radius:1px"></div>`).join('')}</div>` : ''}
+    </div>
+    <span style="font-size:12px;font-weight:500">Faixa ${escapeHtml(beltName)}${degrees ? ` · ${degrees}º grau` : ''}</span>
+  </div>`;
+}
+
+function getSessionsForMode() { return state.data.sessions.filter(s => s.mode === state.mode); }
+function getCompsForMode() { return state.data.comps.filter(c => c.mode === state.mode); }
+
+function getMonthStats(year, month) {
+  const sessions = getSessionsForMode().filter(s => {
+    const d = parseLocalISO(s.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+  let rolls = 0, applied = 0, suffered = 0, minutes = 0;
+  sessions.forEach(s => {
+    rolls += s.rolls || 0;
+    applied += (s.applied || []).length;
+    suffered += (s.suffered || []).length;
+    minutes += s.duration || 0;
+  });
+  return { sessionsCount: sessions.length, rolls, applied, suffered, hours: Math.round(minutes/60*10)/10 };
+}
+
+function getWeekKey(date) {
+  // ISO week key: YYYY-Www
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - dayNum + 3);
+  const firstThursday = d.valueOf();
+  d.setUTCMonth(0, 1);
+  if (d.getUTCDay() !== 4) {
+    d.setUTCMonth(0, 1 + ((4 - d.getUTCDay()) + 7) % 7);
+  }
+  const weekNum = 1 + Math.ceil((firstThursday - d) / 604800000);
+  return `${date.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
+}
+
+function getCurrentWeekProgress() {
+  const now = new Date();
+  const day = now.getDay();
+  const offset = day === 0 ? 6 : day - 1;
+  const monday = new Date(now); monday.setDate(now.getDate() - offset); monday.setHours(0,0,0,0);
+  const days = [];
+  for (let i=0; i<7; i++) {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+  const sessions = state.data.sessions.filter(s => s.mode === state.mode);
+  const sessionsByDay = days.map(d => {
+    const iso = localISO(d);
+    return sessions.some(s => s.date === iso);
+  });
+  const weekKey = getWeekKey(now);
+  if (!state.data.weekPlans) state.data.weekPlans = {};
+  if (!state.data.weekPlans[weekKey]) state.data.weekPlans[weekKey] = { gi: [false,false,false,false,false,false,false], 'no-gi': [false,false,false,false,false,false,false] };
+  if (Array.isArray(state.data.weekPlans[weekKey])) {
+    state.data.weekPlans[weekKey] = { gi: state.data.weekPlans[weekKey].slice(), 'no-gi': [false,false,false,false,false,false,false] };
+  }
+  const plan = state.data.weekPlans[weekKey][state.mode];
+  // Total marked = days that are either planned OR trained (union)
+  const markedDays = plan.map((p, i) => p || sessionsByDay[i]);
+  const goal = markedDays.filter(Boolean).length;
+  const done = sessionsByDay.filter(Boolean).length;
+  return { days, sessionsByDay, plan, weekKey, done, goal, now };
+}
+
+function computeStats(periodDays = 90) {
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - periodDays);
+  const sessions = getSessionsForMode().filter(s => parseLocalISO(s.date) >= cutoff);
+  const positionCount = {}, subCount = {}, comboCount = {}, sufferedCombos = {};
+  let totalApplied = 0, totalSuffered = 0;
+  sessions.forEach(s => {
+    (s.applied || []).forEach(a => {
+      totalApplied++;
+      if (a.position) positionCount[a.position] = (positionCount[a.position] || 0) + 1;
+      if (a.submission) subCount[a.submission] = (subCount[a.submission] || 0) + 1;
+      if (a.position && a.submission) {
+        const k = `${a.position} → ${a.submission}`;
+        comboCount[k] = (comboCount[k] || 0) + 1;
+      }
+    });
+    (s.suffered || []).forEach(x => {
+      totalSuffered++;
+      if (x.position && x.submission) {
+        const k = `${x.position} → ${x.submission}`;
+        sufferedCombos[k] = (sufferedCombos[k] || 0) + 1;
+      }
+    });
+  });
+  function topN(obj, n=5) {
+    return Object.entries(obj).sort((a,b) => b[1] - a[1]).slice(0, n);
+  }
+  return { totalApplied, totalSuffered, positions: topN(positionCount), subs: topN(subCount), combos: topN(comboCount, 5), suffered: topN(sufferedCombos, 5) };
+}
+
+function computeMonthlyRecap(year, month) {
+  // Considera ambos modos (Gi + No-Gi) - retrospectiva é do atleta no mês inteiro
+  const allSessions = state.data.sessions.filter(s => {
+    const d = parseLocalISO(s.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+  const allComps = state.data.comps.filter(c => {
+    const d = parseLocalISO(c.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+
+  // Mês anterior para comparações
+  const prevMonth = month === 0 ? 11 : month - 1;
+  const prevYear = month === 0 ? year - 1 : year;
+  const prevSessions = state.data.sessions.filter(s => {
+    const d = parseLocalISO(s.date);
+    return d.getFullYear() === prevYear && d.getMonth() === prevMonth;
+  });
+
+  let rolls = 0, applied = 0, suffered = 0, minutes = 0;
+  const positionCount = {}, subCount = {}, comboCount = {}, sufferedCombos = {}, partnerCount = {};
+  const moodValues = [];
+  const trainingDays = new Set();
+  const giCount = { gi: 0, 'no-gi': 0 };
+
+  allSessions.forEach(s => {
+    rolls += s.rolls || 0;
+    applied += (s.applied || []).length;
+    suffered += (s.suffered || []).length;
+    minutes += s.duration || 0;
+    trainingDays.add(s.date);
+    giCount[s.mode] = (giCount[s.mode] || 0) + 1;
+    if (s.mood != null) moodValues.push(s.mood);
+    (s.applied || []).forEach(a => {
+      if (a.position) positionCount[a.position] = (positionCount[a.position] || 0) + 1;
+      if (a.submission) subCount[a.submission] = (subCount[a.submission] || 0) + 1;
+      if (a.position && a.submission) {
+        const k = `${a.position} → ${a.submission}`;
+        comboCount[k] = (comboCount[k] || 0) + 1;
+      }
+    });
+    (s.suffered || []).forEach(x => {
+      if (x.position && x.submission) {
+        const k = `${x.position} → ${x.submission}`;
+        sufferedCombos[k] = (sufferedCombos[k] || 0) + 1;
+      }
+    });
+    (s.partners || []).forEach(pid => {
+      partnerCount[pid] = (partnerCount[pid] || 0) + 1;
+    });
+  });
+
+  let prevRolls = 0, prevMinutes = 0, prevApplied = 0;
+  prevSessions.forEach(s => {
+    prevRolls += s.rolls || 0;
+    prevMinutes += s.duration || 0;
+    prevApplied += (s.applied || []).length;
+  });
+
+  const topByCount = (obj) => {
+    const sorted = Object.entries(obj).sort((a,b) => b[1] - a[1]);
+    return sorted[0] || null;
+  };
+  const topPosition = topByCount(positionCount);
+  const topSub = topByCount(subCount);
+  const topCombo = topByCount(comboCount);
+  const topVulnerability = topByCount(sufferedCombos);
+  const topPartnerEntry = topByCount(partnerCount);
+  const topPartner = topPartnerEntry ? state.data.partners.find(p => p.id === topPartnerEntry[0]) : null;
+
+  const avgMood = moodValues.length ? (moodValues.reduce((a,b) => a+b, 0) / moodValues.length) : null;
+
+  // Streak: max consecutive days with training
+  const sortedDays = Array.from(trainingDays).sort();
+  let maxStreak = 0, currentStreak = 0, lastDate = null;
+  for (const isoDate of sortedDays) {
+    const d = parseLocalISO(isoDate);
+    if (lastDate && (d - lastDate) === 86400000) {
+      currentStreak++;
+    } else {
+      currentStreak = 1;
+    }
+    maxStreak = Math.max(maxStreak, currentStreak);
+    lastDate = d;
+  }
+
+  const monthName = new Date(year, month, 1).toLocaleDateString('pt-BR', { month: 'long' });
+  const totalAppliedPlusSuffered = applied + suffered;
+
+  return {
+    year, month, monthName,
+    sessions: allSessions.length,
+    comps: allComps.length,
+    rolls, applied, suffered, minutes,
+    hours: Math.round(minutes/60*10)/10,
+    trainingDays: trainingDays.size,
+    giCount: giCount.gi, nogiCount: giCount['no-gi'],
+    avgMood,
+    moodCount: moodValues.length,
+    topPosition, topSub, topCombo, topVulnerability, topPartner,
+    partnerCount: Object.keys(partnerCount).length,
+    maxStreak,
+    submissionRate: totalAppliedPlusSuffered > 0 ? Math.round(applied / totalAppliedPlusSuffered * 100) : 0,
+    // Comparisons with previous month
+    prev: { rolls: prevRolls, hours: Math.round(prevMinutes/60*10)/10, applied: prevApplied, sessions: prevSessions.length },
+    hasData: allSessions.length > 0,
+  };
+}
+
+function getAvailableRecaps() {
+  // Returns list of {year, month} pairs that have at least 1 session and are in the past (fully completed months)
+  const today = new Date();
+  today.setDate(1); today.setHours(0,0,0,0);
+  const months = new Set();
+  state.data.sessions.forEach(s => {
+    const d = parseLocalISO(s.date);
+    if (d < today) {
+      months.add(`${d.getFullYear()}-${d.getMonth()}`);
+    }
+  });
+  return Array.from(months).map(k => {
+    const [y, m] = k.split('-').map(Number);
+    return { year: y, month: m };
+  }).sort((a, b) => (b.year - a.year) || (b.month - a.month));
+}
+
+function getCurrentUnseenRecap() {
+  // Returns the latest unseen recap key, or null
+  const recaps = getAvailableRecaps();
+  for (const r of recaps) {
+    const key = `${r.year}-${String(r.month + 1).padStart(2, '0')}`;
+    if (!state.data.recapsDismissed || !state.data.recapsDismissed[key]) {
+      return r;
+    }
+  }
+  return null;
+}
+
+// =================== RENDER ===================
+function render() {
+  const root = document.getElementById('app');
+  if (!state.currentUser) { root.innerHTML = renderAuth(); attachAuthListeners(); return; }
+  let content = '';
+  switch (state.currentTab) {
+    case 'home': content = renderHome(); break;
+    case 'calendar': content = renderCalendar(); break;
+    case 'day': content = renderDay(); break;
+    case 'stats': content = renderStats(); break;
+    case 'comps': content = renderComps(); break;
+    case 'partners': content = renderPartners(); break;
+    case 'profile': content = renderProfile(); break;
+    default: content = renderHome();
+  }
+  root.innerHTML = content + renderNav();
+  attachListeners();
+}
+
+// ---------- AUTH SCREEN ----------
+let authMode = 'login';
+let authError = '';
+function renderAuth() {
+  const isLogin = authMode === 'login';
+  return `
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="mark">TATAME</div>
+      <div class="tagline">Performance Tracker</div>
+    </div>
+    <div class="auth-form">
+      <h2>${isLogin ? 'Entrar' : 'Criar conta'}</h2>
+      <div class="subtitle">${isLogin ? 'Acesse sua conta' : 'Comece a registrar seus treinos'}</div>
+      ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" placeholder="Como podemos te chamar?"></div>` : ''}
+      <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" placeholder="seu@email.com"></div>
+      <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
+      ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
+      <button class="btn-primary" id="auth-submit">${isLogin ? 'Entrar' : 'Criar conta'}</button>
+      <div class="auth-toggle">${isLogin ? 'Novo no Tatame?' : 'Já tem conta?'} <a id="auth-toggle">${isLogin ? 'Criar conta' : 'Entrar'}</a></div>
+    </div>
+    <p style="text-align:center; margin-top: 32px; font-size: 10px; color: var(--text-3); line-height: 1.5;">Os dados ficam salvos neste navegador.<br>Versão demo · sem servidor remoto.</p>
+  </div>`;
+}
+
+function attachAuthListeners() {
+  document.getElementById('auth-toggle').onclick = () => {
+    authMode = authMode === 'login' ? 'register' : 'login';
+    authError = '';
+    render();
+  };
+  document.getElementById('auth-submit').onclick = async () => {
+    const email = document.getElementById('auth-email').value.trim().toLowerCase();
+    const pw = document.getElementById('auth-pw').value;
+    if (!email || !pw) { authError = 'Preencha email e senha'; render(); return; }
+    let res;
+    if (authMode === 'login') {
+      res = await tryLogin(email, pw);
+    } else {
+      const name = document.getElementById('auth-name').value.trim();
+      res = await tryRegister(email, pw, name);
+    }
+    if (res.error) { authError = res.error; render(); }
+    else { authError = ''; state.currentTab = 'home'; render(); }
+  };
+  // Enter key submit
+  ['auth-email','auth-pw','auth-name'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('auth-submit').click(); });
+  });
+}
+
+// ---------- HOME ----------
+function renderHome() {
+  const p = state.data.profile;
+  const month = getMonthStats(state.cal.year, state.cal.month);
+  const week = getCurrentWeekProgress();
+  const stats = computeStats(30);
+
+  const weekDaysHtml = week.days.map((d, i) => {
+    const isToday = d.toDateString() === new Date().toDateString();
+    const trained = week.sessionsByDay[i];
+    const planned = week.plan[i];
+    let cls, inner;
+    if (trained) {
+      cls = 'done';
+      inner = '<i class="ti ti-check" style="color:#0a0a0a;font-size:14px"></i>';
+    } else if (planned) {
+      cls = 'planned';
+      inner = '';
+    } else {
+      cls = 'empty-day';
+      inner = '';
+    }
+    if (isToday && !trained) cls += ' today-ring';
+    const lbl = ['SEG','TER','QUA','QUI','SEX','SAB','DOM'][i];
+    const displayLbl = isToday ? 'HOJE' : lbl;
+    return `<div class="week-day">
+      <button class="box ${cls}" data-action="toggle-plan:${i}" title="${planned ? 'Planejado' : 'Clique para planejar'}">${inner}</button>
+      <div class="lbl" style="${isToday ? 'color:var(--text);font-weight:600' : ''}">${displayLbl}</div>
+    </div>`;
+  }).join('');
+
+  const topSubsHtml = stats.subs.length ? stats.subs.map(([name, count]) => {
+    const pct = Math.round(count / stats.totalApplied * 100);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span>${escapeHtml(name)}</span>
+        <span style="color:var(--text-2)">${count} · <span style="color:var(--primary);font-weight:500">${pct}%</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('') : `<div style="text-align:center;color:var(--text-3);font-size:12px;padding:20px 0">Sem finalizações nos últimos 30 dias</div>`;
+
+  return `
+  <div class="screen">
+    <div class="header">
+      <div>
+        <div class="label">${getGreeting()}, ${escapeHtml(p.name)}</div>
+        <h1>Tatame</h1>
+      </div>
+      ${headerAvatar()}
+    </div>
+
+    <div class="toggle">
+      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+    </div>
+
+    ${(() => {
+      const unseen = getCurrentUnseenRecap();
+      if (!unseen) return '';
+      const recap = computeMonthlyRecap(unseen.year, unseen.month);
+      if (!recap.hasData) return '';
+      const monthCap = recap.monthName.charAt(0).toUpperCase() + recap.monthName.slice(1);
+      return `<button class="recap-cta" data-action="recap-open:${unseen.year}-${unseen.month}">
+        <div class="ico">🎁</div>
+        <div class="info">
+          <div class="ttl">Sua retrospectiva de ${monthCap} chegou!</div>
+          <div class="sub">${recap.sessions} treinos · ${recap.hours}h no tatame · Toque pra ver</div>
+        </div>
+        <i class="ti ti-chevron-right" style="font-size:20px"></i>
+      </button>`;
+    })()}
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div class="card-label">Frequência semanal · ${state.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
+          ${week.goal > 0 ? `
+            <div style="font-family:'Bebas Neue';font-size:36px;line-height:1">${week.done}<span style="font-size:18px;color:var(--text-4)">/${week.goal}</span></div>
+            <div style="font-size:11px;color:${week.done >= week.goal ? 'var(--green)' : 'var(--text-2)'};margin-top:4px">${
+              week.done >= week.goal
+                ? (week.done > week.goal ? `Meta cumprida +${week.done - week.goal} bônus!` : 'Meta semanal cumprida!')
+                : `Faltam ${week.goal - week.done} ${week.goal - week.done === 1 ? 'treino' : 'treinos'}`
+            }</div>
+          ` : `
+            <div style="font-family:'Bebas Neue';font-size:28px;line-height:1;color:var(--text-2)">Sem plano</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:4px">Toque nos dias abaixo pra planejar</div>
+          `}
+        </div>
+        ${week.goal > 0 ? `<span class="pill ${week.done >= week.goal ? 'pill-green' : 'pill-amber'}">${Math.round(week.done/week.goal*100)}%</span>` : ''}
+      </div>
+      <div class="week-grid">${weekDaysHtml}</div>
+      <p style="font-size:10px;color:var(--text-3);margin-top:10px;text-align:center">Plano de ${state.mode === 'gi' ? 'Gi' : 'No-Gi'} · troque o modo no topo pra ver o outro</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-head"><i class="ti ti-flame" style="color:var(--primary)"></i><span class="label">Rolas</span></div>
+        <div class="stat-value">${month.rolls}</div>
+        <div class="stat-sub">este mês</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><i class="ti ti-trophy" style="color:var(--amber)"></i><span class="label">Finalizações</span></div>
+        <div class="stat-value">${month.applied}</div>
+        <div class="stat-sub">este mês</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><i class="ti ti-shield" style="color:var(--blue)"></i><span class="label">Sofridas</span></div>
+        <div class="stat-value">${month.suffered}</div>
+        <div class="stat-sub">este mês</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><i class="ti ti-clock" style="color:var(--purple)"></i><span class="label">Tatame</span></div>
+        <div class="stat-value">${month.hours}<span style="font-size:16px;color:var(--text-4)">h</span></div>
+        <div class="stat-sub">este mês</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:500">Composição do meu jogo</div>
+        <span style="font-size:10px;color:var(--text-4)">${state.mode === 'gi' ? 'Gi' : 'No-Gi'} · 30 dias</span>
+      </div>
+      ${stats.totalApplied > 0 ? `<div style="font-size:11px;color:var(--text-2);margin-bottom:12px">Das suas <span style="color:var(--text)">${stats.totalApplied} finalizações</span>:</div>` : ''}
+      ${topSubsHtml}
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-primary" data-action="open:new-session"><i class="ti ti-plus" style="vertical-align:-2px"></i> Novo treino</button>
+      <button class="btn-secondary" data-action="open:new-comp"><i class="ti ti-trophy" style="vertical-align:-2px"></i> Competição</button>
+    </div>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:18px;letter-spacing:1px">TATAME · build v12</p>
+  </div>`;
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Bom dia';
+  if (h < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
+// ---------- CALENDAR ----------
+function renderCalendar() {
+  const { year, month } = state.cal;
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startOffset = (firstDay.getDay() + 6) % 7; // Monday first
+  const sessions = getSessionsForMode();
+  const compsList = getCompsForMode();
+  const sessionDates = new Set(sessions.map(s => s.date));
+  const compDates = new Set(compsList.map(c => c.date));
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let cells = '';
+  for (let i = 0; i < startOffset; i++) cells += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const date = new Date(year, month, d);
+    const iso = localISO(date);
+    const isToday = date.getTime() === today.getTime();
+    const isFuture = date > today;
+    const hasSession = sessionDates.has(iso);
+    const hasComp = compDates.has(iso);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (hasSession) cls += ' has-session';
+    if (hasComp) cls += ' has-comp';
+    if (isFuture && !hasSession && !hasComp) cls += ' future';
+    cells += `<div class="${cls}" data-action="select-day:${iso}">${d}</div>`;
+  }
+
+  const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+  return `
+  <div class="screen">
+    <div class="header">
+      <h1>Histórico</h1>
+      ${headerAvatar()}
+    </div>
+
+    <div class="toggle">
+      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+    </div>
+
+    <div class="cal-header">
+      <div class="cal-month" style="text-transform:capitalize">${monthName}</div>
+      <div class="cal-nav">
+        <button data-action="cal:prev"><i class="ti ti-chevron-left"></i></button>
+        <button data-action="cal:next"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="cal-grid" style="margin-bottom:8px">
+      <div class="cal-dow">SEG</div>
+      <div class="cal-dow">TER</div>
+      <div class="cal-dow">QUA</div>
+      <div class="cal-dow">QUI</div>
+      <div class="cal-dow">SEX</div>
+      <div class="cal-dow">SÁB</div>
+      <div class="cal-dow">DOM</div>
+    </div>
+    <div class="cal-grid">${cells}</div>
+
+    <div style="display:flex;gap:14px;justify-content:center;margin:18px 0;font-size:11px;color:var(--text-2)">
+      <span><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;vertical-align:1px;margin-right:6px"></span>Treino</span>
+      <span><span style="display:inline-block;width:6px;height:6px;background:var(--amber);border-radius:50%;vertical-align:1px;margin-right:6px"></span>Competição</span>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Resumo do mês</div>
+      ${(() => {
+        const m = getMonthStats(year, month);
+        return `<div class="session-summary">
+          <div><div class="val">${m.sessionsCount}</div><div class="lbl">Treinos</div></div>
+          <div><div class="val">${m.rolls}</div><div class="lbl">Rolas</div></div>
+          <div><div class="val">${m.applied}</div><div class="lbl">Finalizações</div></div>
+        </div>`;
+      })()}
+    </div>
+  </div>`;
+}
+
+// ---------- DAY DETAIL ----------
+function renderDay() {
+  const date = state.selectedDate;
+  const sessions = getSessionsForMode().filter(s => s.date === date);
+  const comps = getCompsForMode().filter(c => c.date === date);
+
+  let body = '';
+  if (sessions.length === 0 && comps.length === 0) {
+    body = `<div class="empty"><i class="ti ti-calendar-off"></i><p>Sem atividades neste dia</p></div>`;
+  } else {
+    sessions.forEach(s => {
+      body += renderSessionCard(s);
+    });
+    comps.forEach(c => {
+      body += renderCompCard(c);
+    });
+  }
+
+  const isFutureDate = date > todayISO();
+  return `
+  <div class="screen">
+    <div class="day-header">
+      <button class="back" data-action="goto:calendar"><i class="ti ti-arrow-left" style="font-size:18px"></i></button>
+      <h2 style="text-transform:capitalize">${fmtDateLong(date)}</h2>
+      <div style="width:32px"></div>
+    </div>
+    ${body}
+    ${isFutureDate
+      ? `<div class="empty" style="padding:20px;margin-top:16px"><i class="ti ti-lock"></i><p>Datas futuras não podem ter treinos registrados</p></div>`
+      : `<button class="btn-primary" style="margin-top:16px" data-action="open:new-session-date:${date}"><i class="ti ti-plus" style="vertical-align:-2px"></i> Adicionar treino neste dia</button>`}
+  </div>`;
+}
+
+function renderSessionCard(s) {
+  const partnersById = Object.fromEntries(state.data.partners.map(p => [p.id, p]));
+
+  // Partners list (visible badges)
+  const partnersList = (s.partners || []).map(pid => partnersById[pid]).filter(Boolean);
+  const partnersHtml = partnersList.length ? `
+    <div style="margin-top:12px">
+      <div style="font-size:11px;color:var(--text-2);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase"><i class="ti ti-users" style="vertical-align:-2px;font-size:13px"></i> Parceiros desta sessão</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${partnersList.map(p => {
+          const v = getBeltVisual(p.belt);
+          return `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);padding:5px 10px 5px 5px;border-radius:14px">
+            <div style="width:22px;height:22px;border-radius:50%;background:${v.bg};${v.border ? `border:1px solid ${v.border};` : ''}display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:${v.bg === '#fff' || v.bg === '#f5d800' ? '#000' : '#fff'}">${initials(p.name)}</div>
+            <span style="font-size:11px">${escapeHtml(p.name.split(' ')[0])}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  // Per-roll breakdown if available
+  let rollDetailHtml = '';
+  if (s.rollDetails && s.rollDetails.length) {
+    rollDetailHtml = `<div style="margin-top:14px">
+      <div style="font-size:11px;color:var(--text-2);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase">Por rola</div>
+      ${s.rollDetails.map((r, ri) => {
+        const partner = r.partnerId ? partnersById[r.partnerId] : null;
+        const appliedC = (r.applied || []).filter(a => a.position && a.submission);
+        const sufferedC = (r.suffered || []).filter(x => x.position && x.submission);
+        return `<div style="background:var(--surface-2);padding:10px 12px;border-radius:var(--radius-md);margin-bottom:6px;border-left:2px solid var(--border-2)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${appliedC.length || sufferedC.length || r.notes ? '6px' : '0'}">
+            <div style="font-size:12px;font-weight:500">Rola ${ri+1}${partner ? ` · ${escapeHtml(partner.name.split(' ')[0])}` : ''}</div>
+            <div style="font-size:10px;color:var(--text-3)">${appliedC.length ? `<span style="color:var(--green)">${appliedC.length} aplic</span>` : ''}${appliedC.length && sufferedC.length ? ' · ' : ''}${sufferedC.length ? `<span style="color:var(--red)">${sufferedC.length} sofr</span>` : ''}</div>
+          </div>
+          ${appliedC.map(a => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--green);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(a.position)}</span><i class="ti ti-arrow-right" style="font-size:10px;color:var(--text-4)"></i><span>${escapeHtml(a.submission)}</span></div>`).join('')}
+          ${sufferedC.map(x => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--red);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(x.position)}</span><i class="ti ti-arrow-right" style="font-size:10px;color:var(--text-4)"></i><span style="color:var(--red)">${escapeHtml(x.submission)}</span></div>`).join('')}
+          ${r.notes ? `<div style="margin-top:6px;font-size:11px;color:var(--text-3);font-style:italic">"${escapeHtml(r.notes)}"</div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else {
+    // Legacy: flat applied/suffered
+    rollDetailHtml = `
+      ${(s.applied || []).length ? `<div style="font-size:11px;color:var(--text-2);margin-top:8px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Finalizações aplicadas</div>` : ''}
+      ${(s.applied || []).map(a => `<div class="combo-row">
+        <span class="combo-tag pos">${escapeHtml(a.position)}</span>
+        <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
+        <span class="combo-tag fin">${escapeHtml(a.submission)}</span>
+        ${a.partnerId && partnersById[a.partnerId] ? `<span style="margin-left:auto;font-size:11px;color:var(--text-4)">${escapeHtml(partnersById[a.partnerId].name.split(' ')[0])}</span>` : ''}
+      </div>`).join('')}
+      ${(s.suffered || []).length ? `<div style="font-size:11px;color:var(--text-2);margin-top:10px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Finalizações sofridas</div>` : ''}
+      ${(s.suffered || []).map(x => `<div class="combo-row" style="background:var(--surface-2);border-left:3px solid var(--blue)">
+        <span class="combo-tag pos">${escapeHtml(x.position)}</span>
+        <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
+        <span class="combo-tag" style="background:rgba(68,136,255,0.15);color:var(--blue)">${escapeHtml(x.submission)}</span>
+      </div>`).join('')}`;
+  }
+
+  return `
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <i class="ti ti-flame" style="color:var(--primary);font-size:18px"></i>
+        <div>
+          <div style="font-size:14px;font-weight:500">Treino</div>
+          <div style="font-size:11px;color:var(--text-3)">${s.duration} min · ${s.rolls} rolas · ${s.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${s.mood != null ? `<div style="display:flex;align-items:center;gap:4px;background:var(--surface-2);padding:4px 10px;border-radius:14px" title="Como se sentiu: ${moodLabel(s.mood)} · ${s.mood}/10"><span style="font-size:16px">${moodEmoji(s.mood)}</span><span style="font-size:11px;color:${moodColor(s.mood)};font-weight:500">${s.mood}</span></div>` : ''}
+        <button class="close-btn" data-action="edit-session:${s.id}" title="Editar"><i class="ti ti-edit" style="font-size:14px;color:var(--text-3)"></i></button>
+        <button class="close-btn" data-action="del-session:${s.id}" title="Deletar"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+      </div>
+    </div>
+    <div class="session-summary">
+      <div><div class="val">${s.rolls}</div><div class="lbl">Rolas</div></div>
+      <div><div class="val" style="color:var(--green)">${(s.applied || []).length}</div><div class="lbl">Aplicadas</div></div>
+      <div><div class="val" style="color:var(--red)">${(s.suffered || []).length}</div><div class="lbl">Sofridas</div></div>
+    </div>
+    ${partnersHtml}
+    ${rollDetailHtml}
+    ${s.notes ? `<div style="margin-top:10px;padding:10px;background:var(--surface-2);border-radius:var(--radius-md);font-size:12px;color:var(--text-2);font-style:italic">${escapeHtml(s.notes)}</div>` : ''}
+  </div>`;
+}
+
+function renderCompCard(c) {
+  const wins = c.matches.filter(m => m.result === 'win').length;
+  const losses = c.matches.filter(m => m.result === 'loss').length;
+  return `
+  <div class="card" style="border-left:3px solid var(--amber)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <i class="ti ti-trophy" style="color:var(--amber);font-size:18px"></i>
+          <div style="font-size:14px;font-weight:500">${escapeHtml(c.name || 'Competição')}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3)">${escapeHtml(c.category || '')}${c.weightClass ? ' · ' + escapeHtml(c.weightClass) : ''}</div>
+      </div>
+      <button class="close-btn" data-action="del-comp:${c.id}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+    </div>
+    <div class="session-summary">
+      <div><div class="val" style="color:var(--green)">${wins}</div><div class="lbl">Vitórias</div></div>
+      <div><div class="val" style="color:var(--red)">${losses}</div><div class="lbl">Derrotas</div></div>
+      <div><div class="val">${c.result || '—'}</div><div class="lbl">Resultado</div></div>
+    </div>
+    ${c.matches.map(m => `<div class="match-bg ${m.result === 'win' ? 'match-win' : 'match-loss'}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px">${escapeHtml(m.round || 'Luta')}</span>
+        <span style="font-size:12px;font-weight:500;color:${m.result === 'win' ? 'var(--green)' : 'var(--red)'}">${m.result === 'win' ? 'VITÓRIA' : 'DERROTA'}</span>
+      </div>
+      <div style="font-size:13px;margin-bottom:4px">vs ${escapeHtml(m.opponent || 'oponente')}${m.team ? `<span style="color:var(--text-3);font-size:11px"> · ${escapeHtml(m.team)}</span>` : ''}</div>
+      <div style="font-size:11px;color:var(--text-2)">${escapeHtml(m.type || '')}${m.submission ? ' · ' + escapeHtml(m.submission) : ''}${m.score ? ' · ' + escapeHtml(m.score) : ''}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ---------- STATS ----------
+let statsPeriod = 90;
+let statsChart = 'bar'; // 'bar' | 'pie'
+
+const PIE_COLORS = ['#ff4444','#ffaa33','#6ee06e','#4488ff','#aa66ff','#ff8866','#66c2c2','#ff66a3','#88cc44','#cc88ff'];
+
+function renderPie(entries, total, opts = {}) {
+  // entries: [[name, count], ...]
+  if (!entries.length || !total) return '';
+  const size = opts.size || 200;
+  const cx = size/2, cy = size/2, r = size/2 - 10, innerR = opts.innerR || 0;
+  let angle = -Math.PI/2; // start at top
+  const slices = entries.map(([name, count], i) => {
+    const frac = count / total;
+    const a2 = angle + frac * Math.PI * 2;
+    const x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+    let path;
+    if (entries.length === 1 || frac >= 0.9999) {
+      // Full circle - draw as two semicircles to avoid degenerate arc
+      path = `M ${cx-r},${cy} A ${r},${r} 0 1 1 ${cx+r},${cy} A ${r},${r} 0 1 1 ${cx-r},${cy} Z`;
+    } else if (frac >= 0.5) {
+      // Large slice - split into 2 arcs to avoid SVG quirks at exactly 50%
+      const mid = angle + Math.PI * frac / 2;
+      const xm = cx + r * Math.cos(mid), ym = cy + r * Math.sin(mid);
+      path = `M ${cx},${cy} L ${x1},${y1} A ${r},${r} 0 0 1 ${xm},${ym} A ${r},${r} 0 0 1 ${x2},${y2} Z`;
+    } else {
+      path = `M ${cx},${cy} L ${x1},${y1} A ${r},${r} 0 0 1 ${x2},${y2} Z`;
+    }
+    const color = PIE_COLORS[i % PIE_COLORS.length];
+    // label position
+    const labelAngle = angle + frac * Math.PI;
+    const lx = cx + (r * 0.6) * Math.cos(labelAngle);
+    const ly = cy + (r * 0.6) * Math.sin(labelAngle);
+    const result = { path, color, name, count, frac, lx, ly };
+    angle = a2;
+    return result;
+  });
+
+  return `<div style="display:flex;flex-direction:column;align-items:center">
+    <svg viewBox="0 0 ${size} ${size}" style="width:${size}px;max-width:100%;height:auto">
+      ${slices.map(sl => `<path d="${sl.path}" fill="${sl.color}" stroke="var(--bg)" stroke-width="2"></path>`).join('')}
+      ${innerR > 0 ? `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="var(--surface)"/>` : ''}
+      ${slices.filter(sl => sl.frac > 0.06).map(sl => `<text x="${sl.lx}" y="${sl.ly}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="11" font-weight="600" font-family="Inter">${Math.round(sl.frac * 100)}%</text>`).join('')}
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;width:100%">
+      ${slices.map(sl => `<div style="display:flex;align-items:center;gap:8px;font-size:12px">
+        <div style="width:10px;height:10px;border-radius:2px;background:${sl.color};flex-shrink:0"></div>
+        <span style="flex:1;color:var(--text)">${escapeHtml(sl.name)}</span>
+        <span style="color:var(--text-2)">${sl.count} · ${Math.round(sl.frac * 100)}%</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderBars(entries, total) {
+  return entries.map(([name, c]) => {
+    const pct = total ? Math.round(c / total * 100) : 0;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px">${escapeHtml(name)}</span>
+        <span style="font-size:13px;font-weight:500">${c} · <span style="color:var(--primary)">${pct}%</span></span>
+      </div>
+      <div class="progress-track"><div class="fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const s = computeStats(statsPeriod);
+  const periodLabel = { 7: '7d', 30: '30d', 90: '90d', 9999: 'Tudo' };
+
+  function renderChart(entries, total) {
+    if (!entries.length) return `<div style="text-align:center;color:var(--text-3);padding:24px 16px;font-size:12px">
+      <i class="ti ti-chart-bar" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>
+      <div>Sem finalizações aplicadas no período</div>
+      <div style="margin-top:6px;font-size:11px;opacity:0.7">Registre um treino com finalização aplicada pra ver o gráfico</div>
+    </div>`;
+    return statsChart === 'pie' ? renderPie(entries, total) : renderBars(entries, total);
+  }
+
+  const combosHtml = s.combos.length ? s.combos.map(([k, c]) => {
+    const [pos, sub] = k.split(' → ');
+    return `<div class="combo-row">
+      <span class="combo-tag pos">${escapeHtml(pos)}</span>
+      <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
+      <span class="combo-tag fin">${escapeHtml(sub)}</span>
+      <span class="count">${c}×</span>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text-3);padding:20px;font-size:12px">Sem combinações registradas</div>';
+
+  const sufferedHtml = s.suffered.length ? s.suffered.map(([k, c]) => {
+    const [pos, sub] = k.split(' → ');
+    return `<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);padding:12px 14px;border-radius:var(--radius-md);border-left:3px solid var(--primary);margin-bottom:8px">
+      <div>
+        <div style="font-size:13px">${escapeHtml(pos)} → ${escapeHtml(sub)}</div>
+        <div style="font-size:10px;color:var(--text-2);margin-top:2px">Sofrido ${c} ${c === 1 ? 'vez' : 'vezes'}</div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text-3);padding:20px;font-size:12px">Sem vulnerabilidades registradas — ótimo sinal!</div>';
+
+  return `
+  <div class="screen">
+    <div class="header">
+      <h1>Stats</h1>
+      ${headerAvatar()}
+    </div>
+    <div class="toggle">
+      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px">
+      <div style="display:flex;gap:6px;overflow-x:auto;flex:1">
+        ${[7,30,90,9999].map(d => `<button style="${statsPeriod === d ? 'background:var(--primary);color:#fff;border:none;' : 'background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-2);'}padding:8px 14px;border-radius:16px;font-size:11px;white-space:nowrap" data-action="period:${d}">${periodLabel[d]}</button>`).join('')}
+      </div>
+      <div style="display:flex;gap:4px;background:var(--surface-2);padding:3px;border-radius:14px;border:1px solid var(--border-2)">
+        <button style="background:${statsChart === 'bar' ? 'var(--primary)' : 'transparent'};color:${statsChart === 'bar' ? '#fff' : 'var(--text-2)'};border:none;padding:6px 8px;border-radius:11px;display:flex;align-items:center" data-action="chart:bar" title="Barras"><i class="ti ti-chart-bar" style="font-size:14px"></i></button>
+        <button style="background:${statsChart === 'pie' ? 'var(--primary)' : 'transparent'};color:${statsChart === 'pie' ? '#fff' : 'var(--text-2)'};border:none;padding:6px 8px;border-radius:11px;display:flex;align-items:center" data-action="chart:pie" title="Pizza"><i class="ti ti-chart-pie" style="font-size:14px"></i></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">De onde vem suas finalizações</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px">Posição de origem · ${s.totalApplied} finalizações</div>
+      ${renderChart(s.positions, s.totalApplied)}
+    </div>
+
+    <div class="card">
+      <div class="card-label">Quais finalizações você aplica</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px">Tipo de finalização · ${s.totalApplied} finalizações</div>
+      ${renderChart(s.subs, s.totalApplied)}
+    </div>
+
+    <div class="card">
+      <div class="card-label">Combinações mais frequentes</div>
+      ${combosHtml}
+    </div>
+
+    <div class="card">
+      <div class="card-label">Onde você tem caído</div>
+      ${sufferedHtml}
+    </div>
+  </div>`;
+}
+
+// ---------- COMPS LIST ----------
+function renderComps() {
+  const comps = getCompsForMode().slice().sort((a,b) => b.date.localeCompare(a.date));
+  let body = '';
+  if (comps.length === 0) {
+    body = `<div class="empty"><i class="ti ti-trophy"></i><p>Nenhuma competição registrada<br><span style="color:var(--text-4)">${state.mode === 'gi' ? 'no Gi' : 'no No-Gi'}</span></p></div>`;
+  } else {
+    body = comps.map(c => {
+      const wins = c.matches.filter(m => m.result === 'win').length;
+      const losses = c.matches.filter(m => m.result === 'loss').length;
+      return `<div class="list-item" data-action="view-comp:${c.id}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500;margin-bottom:2px">${escapeHtml(c.name || 'Competição')}</div>
+            <div style="font-size:11px;color:var(--text-3)">${fmtDateLong(c.date)}</div>
+          </div>
+          ${c.result ? `<span class="pill pill-amber"><i class="ti ti-medal" style="font-size:11px"></i> ${escapeHtml(c.result)}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:10px;font-size:11px;color:var(--text-2)">
+          <span><span style="color:var(--green)">${wins}V</span> · <span style="color:var(--red)">${losses}D</span></span>
+          ${c.category ? `<span>·</span><span>${escapeHtml(c.category)}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  return `
+  <div class="screen">
+    <div class="header"><h1>Competições</h1>${headerAvatar()}</div>
+    <div class="toggle">
+      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+    </div>
+    ${body}
+    <button class="btn-primary" style="margin-top:12px" data-action="open:new-comp"><i class="ti ti-plus" style="vertical-align:-2px"></i> Nova competição</button>
+  </div>`;
+}
+
+// ---------- PARTNERS ----------
+function renderPartners() {
+  const partners = state.data.partners.slice().sort((a,b) => a.name.localeCompare(b.name));
+  // Compute stats per partner across both modes
+  const partnerStats = {};
+  state.data.sessions.forEach(s => {
+    (s.applied || []).forEach(a => {
+      if (a.partnerId) {
+        if (!partnerStats[a.partnerId]) partnerStats[a.partnerId] = { rolls: 0, applied: 0, suffered: 0 };
+        partnerStats[a.partnerId].applied++;
+      }
+    });
+    (s.partners || []).forEach(pid => {
+      if (!partnerStats[pid]) partnerStats[pid] = { rolls: 0, applied: 0, suffered: 0 };
+      partnerStats[pid].rolls++;
+    });
+  });
+
+  let body = '';
+  if (partners.length === 0) {
+    body = `<div class="empty"><i class="ti ti-users"></i><p>Nenhum parceiro cadastrado<br><span style="color:var(--text-4)">Adicione parceiros recorrentes pra contextualizar suas estatísticas</span></p></div>`;
+  } else {
+    body = partners.map(p => {
+      const stats = partnerStats[p.id] || { rolls: 0, applied: 0, suffered: 0 };
+      const beltColor = `belt-${p.belt.toLowerCase()}`;
+      return `<div class="card partner-card" data-action="edit-partner:${p.id}" style="cursor:pointer">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div class="partner-avatar" style="width:40px;height:40px;font-size:13px;border:2px solid">
+            <span class="${beltColor}" style="width:8px;height:8px;border-radius:50%;display:inline-block;position:absolute;margin-top:-30px;margin-left:24px"></span>
+            ${initials(p.name)}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500">${escapeHtml(p.name)}</div>
+            <div style="font-size:11px;color:var(--text-2)">${escapeHtml(p.belt)} · ${p.weight}kg${p.gym ? ' · ' + escapeHtml(p.gym) : ''}</div>
+          </div>
+          <div style="background:var(--surface-2);padding:6px 10px;border-radius:14px;display:flex;align-items:center;gap:4px;flex-shrink:0">
+            <i class="ti ti-edit" style="font-size:12px;color:var(--text-2)"></i>
+            <span style="font-size:11px;color:var(--text-2);font-weight:500">Editar</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:var(--surface-2);padding:8px;border-radius:var(--radius-md);text-align:center">
+            <div style="font-family:'Bebas Neue';font-size:18px">${stats.rolls}</div>
+            <div style="font-size:9px;color:var(--text-2);letter-spacing:1px">ROLAS</div>
+          </div>
+          <div style="flex:1;background:var(--surface-2);padding:8px;border-radius:var(--radius-md);text-align:center">
+            <div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">${stats.applied}</div>
+            <div style="font-size:9px;color:var(--text-2);letter-spacing:1px">FINS APLIC</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  return `
+  <div class="screen">
+    <div class="header"><h1>Parceiros</h1>${headerAvatar()}</div>
+    ${body}
+    <button class="btn-primary" style="margin-top:12px" data-action="open:new-partner"><i class="ti ti-plus" style="vertical-align:-2px"></i> Adicionar parceiro</button>
+  </div>`;
+}
+
+// ---------- PROFILE ----------
+function renderProfile() {
+  const p = state.data.profile;
+  const beltColor = `belt-${p.belt.toLowerCase()}`;
+  const giSessions = state.data.sessions.filter(s => s.mode === 'gi').length;
+  const nogiSessions = state.data.sessions.filter(s => s.mode === 'no-gi').length;
+  const comps = state.data.comps.length;
+  return `
+  <div class="screen">
+    <div class="header"><h1>Perfil</h1><button class="close-btn" data-action="logout"><i class="ti ti-logout" style="font-size:16px;color:var(--text-2)"></i></button></div>
+
+    <div class="card" style="text-align:center;padding:24px">
+      ${p.photo
+        ? `<div style="width:88px;height:88px;margin:0 auto 12px;border-radius:50%;border:3px solid var(--primary);overflow:hidden"><img src="${p.photo}" style="width:100%;height:100%;object-fit:cover" alt="foto"></div>`
+        : `<div style="width:88px;height:88px;margin:0 auto 12px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:32px;border:3px solid var(--primary)">${initials(p.name)}</div>`}
+      <div style="font-size:18px;font-weight:500">${escapeHtml(p.name)}</div>
+      <div style="font-size:11px;color:var(--text-2);margin-top:4px">${escapeHtml(p.gym || 'Sem academia cadastrada')}${p.age ? ` · ${p.age} anos` : ''}</div>
+      ${renderBeltBadge(p.belt, p.degrees)}
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-head"><span class="label">Peso</span></div>
+        <div class="stat-value">${p.weight}<span style="font-size:14px;color:var(--text-4)">kg</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">Praticando há</span></div>
+        <div class="stat-value">${new Date().getFullYear() - p.startedAt}<span style="font-size:14px;color:var(--text-4)">a</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">Treinos/sem</span></div>
+        <div class="stat-value">${(() => {
+          const allSessions = state.data.sessions;
+          if (allSessions.length === 0) return '0';
+          const dates = allSessions.map(s => parseLocalISO(s.date)).sort((a,b) => a-b);
+          const weeks = Math.max(1, (new Date() - dates[0]) / (7*24*60*60*1000));
+          return (allSessions.length / weeks).toFixed(1);
+        })()}<span style="font-size:14px;color:var(--text-4)">/sem</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="label">Competições</span></div>
+        <div class="stat-value">${comps}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Sessões totais</div>
+      <div style="display:flex;justify-content:space-around;text-align:center">
+        <div><div style="font-family:'Bebas Neue';font-size:24px">${giSessions}</div><div style="font-size:10px;color:var(--text-2)">GI</div></div>
+        <div style="width:1px;background:var(--border-2)"></div>
+        <div><div style="font-family:'Bebas Neue';font-size:24px">${nogiSessions}</div><div style="font-size:10px;color:var(--text-2)">NO-GI</div></div>
+      </div>
+    </div>
+
+    ${(() => {
+      const recaps = getAvailableRecaps();
+      if (recaps.length === 0) return '';
+      return `<div class="card">
+        <div class="card-label" style="display:flex;align-items:center;gap:6px"><i class="ti ti-history" style="font-size:13px"></i> Retrospectivas mensais</div>
+        ${recaps.slice(0, 12).map(r => {
+          const monthName = new Date(r.year, r.month, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+          const monthCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+          const recap = computeMonthlyRecap(r.year, r.month);
+          if (!recap.hasData) return '';
+          return `<button data-action="recap-open:${r.year}-${r.month}" style="width:100%;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left">
+            <div style="font-size:22px">🎁</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500;color:var(--text)">${monthCap}</div>
+              <div style="font-size:11px;color:var(--text-3)">${recap.sessions} treinos · ${recap.hours}h</div>
+            </div>
+            <i class="ti ti-chevron-right" style="font-size:16px;color:var(--text-3)"></i>
+          </button>`;
+        }).join('')}
+      </div>`;
+    })()}
+
+    <button class="btn-secondary" style="margin-top:12px" data-action="open:edit-profile"><i class="ti ti-edit" style="vertical-align:-2px"></i> Editar perfil</button>
+    <button class="btn-dashed" style="margin-top:8px" data-action="logout"><i class="ti ti-logout" style="vertical-align:-2px"></i> Sair</button>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:20px">Logado como ${escapeHtml(state.currentUser)}</p>
+  </div>`;
+}
+
+// ---------- NAV ----------
+function renderNav() {
+  const tabs = [
+    { id: 'home', icon: 'home', label: 'Home' },
+    { id: 'calendar', icon: 'calendar', label: 'Histórico' },
+    { id: 'stats', icon: 'chart-bar', label: 'Stats' },
+    { id: 'comps', icon: 'trophy', label: 'Comps' },
+    { id: 'partners', icon: 'users', label: 'Parceiros' },
+  ];
+  const active = state.currentTab === 'day' ? 'calendar' : state.currentTab;
+  return `<div class="nav-bottom">
+    ${tabs.map(t => `<button class="nav-item ${active === t.id ? 'active' : ''}" data-action="tab:${t.id}">
+      <i class="ti ti-${t.icon}"></i><span>${t.label}</span>
+    </button>`).join('')}
+  </div>`;
+}
+
+// =================== EVENT HANDLING ===================
+function attachListeners() {
+  // No-op: we use event delegation globally (see initDelegation below)
+}
+
+// Global event delegation - registered once. Survives re-renders.
+let _delegationInited = false;
+function initDelegation() {
+  if (_delegationInited) return;
+  _delegationInited = true;
+  // Use bubble phase (default) - more reliable across browsers (especially Safari)
+  document.addEventListener('click', (e) => {
+    // Action handler
+    const actionTarget = e.target.closest('[data-action]');
+    if (actionTarget) {
+      e.stopPropagation();
+      handleAction(actionTarget.dataset.action);
+      return;
+    }
+    // Modal action handler (skip inputs/textareas/selects which use other listeners)
+    const mactTarget = e.target.closest('[data-mact]');
+    if (mactTarget) {
+      const tag = mactTarget.tagName;
+      if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.stopPropagation();
+      handleModalAction(mactTarget.dataset.mact, mactTarget.value);
+    }
+  });
+  // Select changes (for modal dropdowns)
+  document.addEventListener('change', (e) => {
+    const target = e.target.closest('[data-mact]');
+    if (target && target.tagName === 'SELECT') {
+      handleModalAction(target.dataset.mact, target.value);
+    }
+  });
+}
+
+function attachModalListeners() {
+  // No-op for action wiring (delegation handles it).
+  // But still wire the raw textarea / file input handlers needed inline.
+}
+
+function handleAction(a) {
+  const [cmd, ...rest] = a.split(':');
+  const arg = rest.join(':');
+  switch (cmd) {
+    case 'tab': state.currentTab = arg; render(); break;
+    case 'goto': state.currentTab = arg; render(); break;
+    case 'mode': state.mode = arg; render(); break;
+    case 'period': statsPeriod = parseInt(arg); render(); break;
+    case 'chart': statsChart = arg; render(); break;
+    case 'recap-open':
+      const [ry, rm] = arg.split('-').map(Number);
+      openRecap(ry, rm);
+      break;
+    case 'recap-close': closeRecap(); break;
+    case 'recap-next': nextRecapSlide(); break;
+    case 'recap-prev': prevRecapSlide(); break;
+    case 'cal':
+      if (arg === 'prev') {
+        state.cal.month--;
+        if (state.cal.month < 0) { state.cal.month = 11; state.cal.year--; }
+      } else if (arg === 'next') {
+        state.cal.month++;
+        if (state.cal.month > 11) { state.cal.month = 0; state.cal.year++; }
+      }
+      render(); break;
+    case 'select-day':
+      state.selectedDate = arg;
+      state.currentTab = 'day';
+      render();
+      break;
+    case 'open':
+      handleOpen(arg);
+      break;
+    case 'logout':
+      if (confirm('Sair da conta?')) logout();
+      break;
+    case 'del-session':
+      if (confirm('Deletar este treino?')) {
+        state.data.sessions = state.data.sessions.filter(s => s.id !== arg);
+        persistUser(); render(); showToast('Treino deletado');
+      }
+      break;
+    case 'edit-session':
+      openEditSessionModal(arg);
+      break;
+    case 'del-comp':
+      if (confirm('Deletar esta competição?')) {
+        state.data.comps = state.data.comps.filter(c => c.id !== arg);
+        persistUser(); render(); showToast('Competição deletada');
+      }
+      break;
+    case 'del-partner':
+      if (confirm('Deletar este parceiro? Os registros existentes não serão afetados.')) {
+        state.data.partners = state.data.partners.filter(p => p.id !== arg);
+        persistUser(); render(); showToast('Parceiro removido');
+      }
+      break;
+    case 'edit-partner':
+      openEditPartnerModal(arg);
+      break;
+    case 'view-comp':
+      const comp = state.data.comps.find(c => c.id === arg);
+      if (comp) { state.selectedDate = comp.date; state.currentTab = 'day'; render(); }
+      break;
+    case 'toggle-plan':
+      const idx = parseInt(arg);
+      const wk = getCurrentWeekProgress();
+      // getCurrentWeekProgress already migrates/initializes the structure
+      state.data.weekPlans[wk.weekKey][state.mode][idx] = !state.data.weekPlans[wk.weekKey][state.mode][idx];
+      persistUser(); render();
+      break;
+  }
+}
+
+function handleOpen(arg) {
+  const [type, param] = arg.split('-date:');
+  if (arg === 'new-session' || type === 'new-session') openSessionModal(param || todayISO());
+  else if (arg === 'new-comp') openCompModal();
+  else if (arg === 'new-partner') openPartnerModal();
+  else if (arg === 'edit-profile') openProfileModal();
+}
+
+// =================== MONTHLY RECAP (WRAPPED) ===================
+const RECAP_THEMES = [
+  { bg: 'linear-gradient(135deg, #ff4444 0%, #cc1f5c 100%)' }, // vermelho
+  { bg: 'linear-gradient(135deg, #6644aa 0%, #2a1f5c 100%)' }, // roxo
+  { bg: 'linear-gradient(135deg, #ff8833 0%, #cc4422 100%)' }, // laranja
+  { bg: 'linear-gradient(135deg, #2a9e44 0%, #1a5c2e 100%)' }, // verde
+  { bg: 'linear-gradient(135deg, #4488ff 0%, #2a3a8a 100%)' }, // azul
+  { bg: 'linear-gradient(135deg, #ffaa33 0%, #cc6622 100%)' }, // amber
+  { bg: 'linear-gradient(135deg, #aa66ff 0%, #5a2a8a 100%)' }, // violeta
+  { bg: 'linear-gradient(135deg, #ff6699 0%, #aa2a5c 100%)' }, // rosa
+  { bg: 'linear-gradient(135deg, #44cccc 0%, #1a5c5c 100%)' }, // ciano
+  { bg: 'linear-gradient(135deg, #ff4444 0%, #ff8833 100%)' }, // gradient finale
+];
+
+let recapState = { active: false, year: 0, month: 0, slideIdx: 0, slides: [] };
+
+function buildRecapSlides(recap) {
+  const slides = [];
+  const monthCap = recap.monthName.charAt(0).toUpperCase() + recap.monthName.slice(1);
+
+  // Slide 1: Capa
+  slides.push({
+    title: `Sua jornada em ${monthCap}`,
+    render: () => `
+      <div class="recap-content">
+        <div class="recap-emoji">🥋</div>
+        <div class="recap-label">Retrospectiva</div>
+        <div class="recap-big" style="font-size:56px">${monthCap.toUpperCase()}</div>
+        <div class="recap-big-sub" style="font-size:32px;font-family:'Bebas Neue';letter-spacing:0.04em">${recap.year}</div>
+        <div class="recap-body" style="margin-top:24px">Bora ver como foi seu mês no tatame?</div>
+      </div>`
+  });
+
+  // Slide 2: Volume — treinos
+  const prevDiff = recap.sessions - recap.prev.sessions;
+  const sessionMsg = recap.prev.sessions === 0
+    ? `Bora manter o ritmo no próximo!`
+    : prevDiff > 0
+      ? `${prevDiff} ${prevDiff === 1 ? 'treino a mais' : 'treinos a mais'} que ${recap.prev.sessions === 1 ? 'o mês passado' : 'em ' + recap.prev.sessions}!`
+      : prevDiff < 0
+        ? `${Math.abs(prevDiff)} ${Math.abs(prevDiff) === 1 ? 'a menos' : 'a menos'} que o mês passado.`
+        : `Mantendo o ritmo do mês passado.`;
+  slides.push({
+    title: 'Volume',
+    render: () => `
+      <div class="recap-content">
+        <div class="recap-emoji">🔥</div>
+        <div class="recap-label">Você apareceu no tatame</div>
+        <div class="recap-big">${recap.sessions}</div>
+        <div class="recap-big-sub">${recap.sessions === 1 ? 'vez' : 'vezes'}</div>
+        <div class="recap-body">${sessionMsg}</div>
+      </div>`
+  });
+
+  // Slide 3: Horas no tatame
+  const hoursDiffPct = recap.prev.hours > 0 ? Math.round((recap.hours - recap.prev.hours) / recap.prev.hours * 100) : null;
+  const hoursMsg = hoursDiffPct == null
+    ? `Cada minuto conta.`
+    : hoursDiffPct > 0
+      ? `${hoursDiffPct}% a mais que mês passado.`
+      : hoursDiffPct < 0
+        ? `${Math.abs(hoursDiffPct)}% a menos que mês passado.`
+        : `Mesmo tempo de treino do mês passado.`;
+  slides.push({
+    title: 'Tempo no tatame',
+    render: () => `
+      <div class="recap-content">
+        <div class="recap-emoji">⏱️</div>
+        <div class="recap-label">Horas treinando</div>
+        <div class="recap-big">${recap.hours}<span style="font-size:32px">h</span></div>
+        <div class="recap-big-sub">${recap.rolls} rolas no total</div>
+        <div class="recap-body">${hoursMsg}</div>
+      </div>`
+  });
+
+  // Slide 4: Finalização favorita
+  if (recap.topSub) {
+    slides.push({
+      title: 'Finalização favorita',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">🏆</div>
+          <div class="recap-label">Sua finalização</div>
+          <div class="recap-headline">${escapeHtml(recap.topSub[0])}</div>
+          <div class="recap-body">Aplicada <b>${recap.topSub[1]} ${recap.topSub[1] === 1 ? 'vez' : 'vezes'}</b> este mês.<br>É o seu golpe.</div>
+        </div>`
+    });
+  }
+
+  // Slide 5: Combinação favorita (posição → finalização)
+  if (recap.topCombo) {
+    const [pos, sub] = recap.topCombo[0].split(' → ');
+    slides.push({
+      title: 'Combinação mais frequente',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">⚡</div>
+          <div class="recap-label">Combinação favorita</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px">
+            <div style="background:rgba(255,255,255,0.2);padding:10px 20px;border-radius:20px;font-size:18px;font-weight:500">${escapeHtml(pos)}</div>
+            <div style="font-size:24px">↓</div>
+            <div style="background:rgba(255,255,255,0.9);color:#000;padding:10px 20px;border-radius:20px;font-size:18px;font-weight:600">${escapeHtml(sub)}</div>
+          </div>
+          <div class="recap-body">${recap.topCombo[1]}× este mês.<br>Seu caminho preferido até a finalização.</div>
+        </div>`
+    });
+  }
+
+  // Slide 6: Vulnerabilidade (onde mais caiu)
+  if (recap.topVulnerability) {
+    const [pos, sub] = recap.topVulnerability[0].split(' → ');
+    slides.push({
+      title: 'Onde você caiu',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">🛡️</div>
+          <div class="recap-label">Sua kryptonita</div>
+          <div class="recap-headline">${escapeHtml(pos)}<br><span style="font-size:24px;opacity:0.8">→ ${escapeHtml(sub)}</span></div>
+          <div class="recap-body">Sofreu <b>${recap.topVulnerability[1]}×</b> esse mês.<br>Mês que vem, vamos trabalhar essa defesa?</div>
+        </div>`
+    });
+  }
+
+  // Slide 7: Parceiro mais frequente
+  if (recap.topPartner) {
+    slides.push({
+      title: 'Parceiro mais frequente',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">🤝</div>
+          <div class="recap-label">Seu sparring</div>
+          <div class="recap-headline">${escapeHtml(recap.topPartner.name)}</div>
+          <div class="recap-body">${escapeHtml(recap.topPartner.belt)} · ${recap.topPartner.weight}kg<br>Quem mais rolou com você esse mês.</div>
+        </div>`
+    });
+  }
+
+  // Slide 8: Mood médio
+  if (recap.avgMood != null) {
+    const avgRounded = Math.round(recap.avgMood * 10) / 10;
+    const intMood = Math.round(avgRounded);
+    slides.push({
+      title: 'Como você se sentiu',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">${moodEmoji(intMood)}</div>
+          <div class="recap-label">Energia média</div>
+          <div class="recap-big">${avgRounded.toFixed(1)}<span style="font-size:32px;opacity:0.6">/10</span></div>
+          <div class="recap-big-sub">${moodLabel(intMood)}</div>
+          <div class="recap-body">Baseado em ${recap.moodCount} ${recap.moodCount === 1 ? 'treino registrado' : 'treinos registrados'} com mood.</div>
+        </div>`
+    });
+  }
+
+  // Slide 9: Streak / consistência
+  if (recap.maxStreak >= 2) {
+    slides.push({
+      title: 'Consistência',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">⚡</div>
+          <div class="recap-label">Sua maior sequência</div>
+          <div class="recap-big">${recap.maxStreak}</div>
+          <div class="recap-big-sub">dias seguidos no tatame</div>
+          <div class="recap-body">Sem desculpa. Treino bate ponto.</div>
+        </div>`
+    });
+  }
+
+  // Slide 10: Competição (se teve)
+  if (recap.comps > 0) {
+    slides.push({
+      title: 'Competições',
+      render: () => `
+        <div class="recap-content">
+          <div class="recap-emoji">🥇</div>
+          <div class="recap-label">Você competiu</div>
+          <div class="recap-big">${recap.comps}</div>
+          <div class="recap-big-sub">${recap.comps === 1 ? 'campeonato' : 'campeonatos'} esse mês</div>
+          <div class="recap-body">Coragem de quem encara o chaveamento.</div>
+        </div>`
+    });
+  }
+
+  // Slide final: encerramento
+  const totalCombat = recap.applied + recap.suffered;
+  const finalMsg = recap.applied > recap.suffered
+    ? 'Mais aplicadas que sofridas. Tá no caminho.'
+    : recap.applied === recap.suffered && recap.applied > 0
+      ? 'Aplicou e sofreu em peso igual. Aprendizado dos dois lados.'
+      : totalCombat > 0
+        ? 'Comeu cera, mas a vivência conta. Bora pra cima.'
+        : 'Cada treino é um passo. Continua.';
+  slides.push({
+    title: 'Bora pro próximo',
+    render: () => `
+      <div class="recap-content">
+        <div class="recap-emoji">🥋</div>
+        <div class="recap-label">${monthCap} foi assim</div>
+        <div class="recap-headline">${recap.sessions} ${recap.sessions === 1 ? 'treino' : 'treinos'}<br>${recap.hours}h no tatame<br>${recap.applied} ${recap.applied === 1 ? 'finalização' : 'finalizações'}</div>
+        <div class="recap-body" style="margin-top:18px">${finalMsg}</div>
+        <div style="margin-top:32px"><button class="recap-share-btn" style="position:static;transform:none" data-action="recap-close">Fechar retrospectiva</button></div>
+      </div>`
+  });
+
+  return slides;
+}
+
+function openRecap(year, month) {
+  const recap = computeMonthlyRecap(year, month);
+  if (!recap.hasData) {
+    showToast('Sem treinos neste mês pra montar a retrospectiva', 'error');
+    return;
+  }
+  const slides = buildRecapSlides(recap);
+  recapState = { active: true, year, month, slideIdx: 0, slides, recap };
+  // Mark as seen
+  const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+  if (!state.data.recapsDismissed) state.data.recapsDismissed = {};
+  state.data.recapsDismissed[key] = true;
+  persistUser();
+  renderRecap();
+}
+
+function renderRecap() {
+  if (!recapState.active) return;
+  // Remove existing
+  const existing = document.querySelector('.recap-overlay');
+  if (existing) existing.remove();
+
+  const { slideIdx, slides } = recapState;
+  const slide = slides[slideIdx];
+  const theme = RECAP_THEMES[slideIdx % RECAP_THEMES.length];
+
+  const div = document.createElement('div');
+  div.className = 'recap-overlay';
+  div.innerHTML = `
+    <div class="recap-slide" style="background:${theme.bg}">
+      <div class="recap-progress">
+        ${slides.map((_, i) => `<div class="recap-progress-bar ${i < slideIdx ? 'done' : i === slideIdx ? 'active' : ''}"></div>`).join('')}
+      </div>
+      <button class="recap-close" data-action="recap-close"><i class="ti ti-x" style="font-size:18px"></i></button>
+      <div class="recap-nav-zone recap-nav-prev" data-action="recap-prev"></div>
+      <div class="recap-nav-zone recap-nav-next" data-action="recap-next"></div>
+      ${slide.render()}
+      ${slideIdx < slides.length - 1 ? `<div class="recap-hint">Toque pra avançar →</div>` : ''}
+    </div>`;
+  document.body.appendChild(div);
+
+  // Auto-advance after 4s (matches CSS animation)
+  if (recapState._autoTimer) clearTimeout(recapState._autoTimer);
+  if (slideIdx < slides.length - 1) {
+    recapState._autoTimer = setTimeout(() => {
+      if (recapState.active && recapState.slideIdx === slideIdx) {
+        recapState.slideIdx++;
+        renderRecap();
+      }
+    }, 4000);
+  }
+}
+
+function closeRecap() {
+  if (recapState._autoTimer) clearTimeout(recapState._autoTimer);
+  recapState = { active: false, year: 0, month: 0, slideIdx: 0, slides: [] };
+  const el = document.querySelector('.recap-overlay');
+  if (el) el.remove();
+  render();
+}
+
+function nextRecapSlide() {
+  if (!recapState.active) return;
+  if (recapState.slideIdx < recapState.slides.length - 1) {
+    recapState.slideIdx++;
+    renderRecap();
+  } else {
+    closeRecap();
+  }
+}
+
+function prevRecapSlide() {
+  if (!recapState.active) return;
+  if (recapState.slideIdx > 0) {
+    recapState.slideIdx--;
+    renderRecap();
+  }
+}
+
+// =================== MODALS ===================
+let modalState = {};
+
+function openModal(html) {
+  const existing = document.querySelector('.modal-overlay');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.className = 'modal-overlay';
+  div.innerHTML = `<div class="modal">${html}</div>`;
+  // Only close when click lands directly on the overlay backdrop (not on children)
+  div.addEventListener('click', (e) => {
+    if (e.target === div) closeModal();
+  });
+  document.body.appendChild(div);
+}
+
+function closeModal() {
+  const m = document.querySelector('.modal-overlay');
+  if (m) m.remove();
+  modalState = {};
+}
+
+// ---------- SESSION MODAL ----------
+function openSessionModal(date) {
+  let initDate = date || todayISO();
+  if (initDate > todayISO()) initDate = todayISO();
+  modalState = {
+    _kind: 'session',
+    _editingId: null,
+    date: initDate,
+    mode: state.mode,
+    duration: 60,
+    rollCount: 3,
+    rolls: [makeEmptyRoll(), makeEmptyRoll(), makeEmptyRoll()],
+    expandedRoll: 0,
+    notes: '',
+    mood: null,
+    _newPartnerForRollIdx: null
+  };
+  renderSessionModal();
+}
+
+function openEditSessionModal(sessionId) {
+  const s = state.data.sessions.find(x => x.id === sessionId);
+  if (!s) { showToast('Treino não encontrado', 'error'); return; }
+  // Rebuild rolls structure from rollDetails if available, else fallback to flat
+  let rolls;
+  if (s.rollDetails && Array.isArray(s.rollDetails) && s.rollDetails.length > 0) {
+    rolls = s.rollDetails.map(r => ({
+      partnerId: r.partnerId || '',
+      applied: (r.applied || []).map(a => ({ position: a.position || '', submission: a.submission || '' })),
+      suffered: (r.suffered || []).map(x => ({ position: x.position || '', submission: x.submission || '' })),
+      notes: r.notes || ''
+    }));
+  } else {
+    // Legacy session sem rollDetails: reconstroi com 1 roll só, agrupando tudo
+    const rollCount = s.rolls || 1;
+    rolls = [];
+    for (let i = 0; i < rollCount; i++) rolls.push(makeEmptyRoll());
+    // Empurra applied/suffered todos pra primeira rola
+    if (rolls[0]) {
+      rolls[0].applied = (s.applied || []).map(a => ({ position: a.position, submission: a.submission }));
+      rolls[0].suffered = (s.suffered || []).map(x => ({ position: x.position, submission: x.submission }));
+      rolls[0].partnerId = (s.partners && s.partners[0]) || '';
+    }
+  }
+  modalState = {
+    _kind: 'session',
+    _editingId: s.id,
+    date: s.date,
+    mode: s.mode,
+    duration: s.duration || 60,
+    rollCount: rolls.length,
+    rolls,
+    expandedRoll: 0,
+    notes: s.notes || '',
+    mood: s.mood == null ? null : s.mood,
+    _newPartnerForRollIdx: null
+  };
+  renderSessionModal();
+}
+
+function makeEmptyRoll() {
+  return { partnerId: '', applied: [], suffered: [], notes: '' };
+}
+
+function adjustRollCount(newCount) {
+  newCount = Math.max(0, Math.min(50, newCount));
+  while (modalState.rolls.length < newCount) modalState.rolls.push(makeEmptyRoll());
+  while (modalState.rolls.length > newCount) modalState.rolls.pop();
+  modalState.rollCount = newCount;
+  if (modalState.expandedRoll >= newCount) modalState.expandedRoll = Math.max(0, newCount - 1);
+}
+
+function renderSessionModal() {
+  const subs = modalState.mode === 'gi' ? SUBMISSIONS_GI : SUBMISSIONS_NOGI;
+  const positions = modalState.mode === 'gi' ? POSITIONS_GI : POSITIONS_NOGI;
+  const partnersById = Object.fromEntries(state.data.partners.map(p => [p.id, p]));
+
+  // Render each roll card
+  const rollsHtml = modalState.rolls.map((roll, ri) => {
+    const isOpen = modalState.expandedRoll === ri;
+    const partner = roll.partnerId ? partnersById[roll.partnerId] : null;
+    const summary = `${roll.applied.length} aplic · ${roll.suffered.length} sofr${partner ? ` · ${escapeHtml(partner.name.split(' ')[0])}` : ''}`;
+
+    const appliedHtml = roll.applied.map((a, ai) => `<div class="sub-card">
+      <div class="sub-card-head">
+        <span class="num">Aplicada ${ai+1}</span>
+        <button data-mact="rm-applied:${ri}|${ai}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+      </div>
+      <div class="input-grid-2">
+        <div class="input-row"><label>Veio de</label>
+          <select data-mact="set-applied:${ri}|${ai}|position">
+            <option value="">Selecione...</option>
+            ${positions.map(p => `<option value="${escapeHtml(p)}" ${a.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-row"><label>Finalização</label>
+          <select data-mact="set-applied:${ri}|${ai}|submission">
+            <option value="">Selecione...</option>
+            ${subs.map(s => `<option value="${escapeHtml(s)}" ${a.submission === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+
+    const sufferedHtml = roll.suffered.map((x, si) => `<div class="sub-card sofrida">
+      <div class="sub-card-head sofrida">
+        <span class="num">Sofrida ${si+1}</span>
+        <button data-mact="rm-suffered:${ri}|${si}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+      </div>
+      <div class="input-grid-2">
+        <div class="input-row"><label>Caiu em</label>
+          <select data-mact="set-suffered:${ri}|${si}|position">
+            <option value="">Selecione...</option>
+            ${positions.map(p => `<option value="${escapeHtml(p)}" ${x.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-row"><label>Sofreu</label>
+          <select data-mact="set-suffered:${ri}|${si}|submission">
+            <option value="">Selecione...</option>
+            ${subs.map(s => `<option value="${escapeHtml(s)}" ${x.submission === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+
+    return `<div class="card" style="border-left:3px solid ${isOpen ? 'var(--primary)' : 'var(--border-2)'};padding:14px">
+      <button data-mact="toggle-roll:${ri}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;padding:0;cursor:pointer;text-align:left">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:${isOpen ? 'var(--primary)' : 'var(--surface-2)'};color:${isOpen ? '#fff' : 'var(--text-2)'};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:14px">${ri+1}</div>
+          <div>
+            <div style="font-size:13px;font-weight:500">Rola ${ri+1}</div>
+            <div style="font-size:11px;color:var(--text-3)">${summary}</div>
+          </div>
+        </div>
+        <i class="ti ti-chevron-${isOpen ? 'up' : 'down'}" style="font-size:18px;color:var(--text-3)"></i>
+      </button>
+
+      ${isOpen ? `<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="card-label">Parceiro desta rola</div>
+        <div class="input-row" style="margin-bottom:8px"><label>Quem foi seu par</label>
+          <select data-mact="set-roll-partner:${ri}">
+            <option value="">— Não informado</option>
+            ${state.data.partners.map(p => `<option value="${p.id}" ${roll.partnerId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (${escapeHtml(p.belt)} · ${p.weight}kg)</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn-dashed" data-mact="new-partner-for-roll:${ri}" style="margin-bottom:14px"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Cadastrar novo parceiro</button>
+
+        <div class="card-label" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <span>Finalizações aplicadas</span>
+          <span class="pill pill-green">${roll.applied.length}</span>
+        </div>
+        ${appliedHtml}
+        <button class="btn-dashed" data-mact="add-applied:${ri}"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar finalização</button>
+
+        <div class="card-label" style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+          <span>Finalizações sofridas</span>
+          <span class="pill pill-red">${roll.suffered.length}</span>
+        </div>
+        ${sufferedHtml}
+        <button class="btn-dashed" data-mact="add-suffered:${ri}"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar</button>
+
+        <div class="card-label" style="margin-top:14px">Observação da rola</div>
+        <textarea data-roll-notes="${ri}" rows="2" placeholder="Como foi essa rola? Algo a anotar?" style="background:var(--surface-2);border:1px solid var(--border-2);color:var(--text);font-family:inherit;font-size:13px">${escapeHtml(roll.notes || '')}</textarea>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${modalState._editingId ? 'Editar treino' : 'Registrar treino'}</div>
+      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+    </div>
+
+    <div class="toggle">
+      <button class="${modalState.mode === 'gi' ? 'active' : ''}" data-mact="m-mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${modalState.mode === 'no-gi' ? 'active' : ''}" data-mact="m-mode:no-gi">No-Gi</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Data & duração</div>
+      <div class="input-grid-2">
+        <div class="input-row"><label>Data</label><input type="date" id="m-date" value="${modalState.date}" max="${todayISO()}"></div>
+        <div class="input-row"><label>Duração (min)</label><input type="number" id="m-duration" value="${modalState.duration}" min="0" max="600"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Como você se sentiu hoje?</div>
+      ${renderMoodSlider(modalState.mood)}
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div class="card-label" style="margin-bottom:0">Quantidade de rolas</div>
+        <div class="counter">
+          <button class="minus" data-mact="rolls:-1">−</button>
+          <span class="value">${modalState.rollCount}</span>
+          <button class="plus" data-mact="rolls:+1">+</button>
+        </div>
+      </div>
+      <p style="font-size:10px;color:var(--text-3);margin-top:4px">Cada rola vira um card abaixo. Toque pra preencher.</p>
+    </div>
+
+    ${rollsHtml || '<div class="empty" style="padding:20px"><p>Aumente a quantidade de rolas pra começar</p></div>'}
+
+    <div class="card">
+      <div class="card-label">Observações gerais do treino (opcional)</div>
+      <textarea id="m-notes" rows="2" placeholder="Como foi o treino no geral...">${escapeHtml(modalState.notes)}</textarea>
+    </div>
+
+    <button class="btn-primary" data-mact="save-session"><i class="ti ti-check" style="vertical-align:-2px"></i> ${modalState._editingId ? 'Salvar alterações' : 'Salvar treino'}</button>
+    <div style="height:20px"></div>
+  `);
+  attachModalListeners();
+  document.querySelectorAll('[data-roll-notes]').forEach(el => {
+    el.addEventListener('input', () => {
+      const idx = parseInt(el.dataset.rollNotes);
+      modalState.rolls[idx].notes = el.value;
+    });
+  });
+  // Date guard: clamp future dates immediately
+  const dateEl = document.getElementById('m-date');
+  if (dateEl) {
+    dateEl.addEventListener('change', () => {
+      if (dateEl.value > todayISO()) {
+        dateEl.value = todayISO();
+        modalState.date = todayISO();
+        showToast('Não é possível registrar treino futuro', 'error');
+      }
+    });
+  }
+  // Mood slider: update emoji + score live without full re-render
+  const moodEl = document.getElementById('m-mood');
+  if (moodEl) {
+    const updateMoodUI = () => {
+      const v = parseInt(moodEl.value);
+      modalState.mood = v;
+      moodEl.style.accentColor = moodColor(v);
+      moodEl.style.opacity = '1';
+      const emojiEl = document.getElementById('mood-emoji');
+      const scoreEl = document.getElementById('mood-score');
+      if (emojiEl) emojiEl.textContent = moodEmoji(v);
+      if (scoreEl) {
+        scoreEl.innerHTML = `${v}<span style="font-size:18px;opacity:0.6">/10</span>`;
+        scoreEl.style.color = moodColor(v);
+      }
+    };
+    moodEl.addEventListener('input', updateMoodUI);
+    // Mobile-friendly: also listen to change for some browsers
+    moodEl.addEventListener('change', updateMoodUI);
+  }
+}
+
+function handleModalAction(a, val) {
+  const [cmd, ...rest] = a.split(':');
+  const arg = rest.join(':');
+  switch (cmd) {
+    case 'close': closeModal(); break;
+    case 'm-mode':
+      syncSessionInputs();
+      modalState.mode = arg;
+      renderSessionModal();
+      break;
+    case 'rolls':
+      syncSessionInputs();
+      adjustRollCount(modalState.rollCount + parseInt(arg));
+      renderSessionModal();
+      break;
+    case 'toggle-roll':
+      syncSessionInputs();
+      const ti = parseInt(arg);
+      modalState.expandedRoll = (modalState.expandedRoll === ti) ? -1 : ti;
+      renderSessionModal();
+      break;
+    case 'set-roll-partner':
+      modalState.rolls[parseInt(arg)].partnerId = val;
+      break;
+    case 'new-partner-for-roll':
+      syncSessionInputs();
+      modalState._newPartnerForRollIdx = parseInt(arg);
+      // Save session modal state aside and open partner modal
+      window._savedSessionModal = JSON.parse(JSON.stringify(modalState));
+      openPartnerModal((newPartnerId) => {
+        // Restore session modal and auto-assign new partner to that roll
+        modalState = window._savedSessionModal;
+        delete window._savedSessionModal;
+        if (newPartnerId !== undefined && modalState._newPartnerForRollIdx !== null) {
+          modalState.rolls[modalState._newPartnerForRollIdx].partnerId = newPartnerId;
+        }
+        modalState._newPartnerForRollIdx = null;
+        renderSessionModal();
+      });
+      break;
+    case 'add-applied': {
+      syncSessionInputs();
+      modalState.rolls[parseInt(arg)].applied.push({ position: '', submission: '' });
+      renderSessionModal();
+      break;
+    }
+    case 'rm-applied': {
+      syncSessionInputs();
+      const [ri, ai] = arg.split('|').map(n => parseInt(n));
+      modalState.rolls[ri].applied.splice(ai, 1);
+      renderSessionModal();
+      break;
+    }
+    case 'set-applied': {
+      const [ri, ai, field] = arg.split('|');
+      modalState.rolls[parseInt(ri)].applied[parseInt(ai)][field] = val;
+      break;
+    }
+    case 'add-suffered': {
+      syncSessionInputs();
+      modalState.rolls[parseInt(arg)].suffered.push({ position: '', submission: '' });
+      renderSessionModal();
+      break;
+    }
+    case 'rm-suffered': {
+      syncSessionInputs();
+      const [ri, si] = arg.split('|').map(n => parseInt(n));
+      modalState.rolls[ri].suffered.splice(si, 1);
+      renderSessionModal();
+      break;
+    }
+    case 'set-suffered': {
+      const [ri, si, field] = arg.split('|');
+      modalState.rolls[parseInt(ri)].suffered[parseInt(si)][field] = val;
+      break;
+    }
+    case 'save-session':
+      syncSessionInputs();
+      saveSession();
+      break;
+    // COMP actions
+    case 'save-comp':
+      syncCompInputs();
+      saveComp();
+      break;
+    case 'comp-result':
+      modalState.result = arg;
+      syncCompInputs();
+      renderCompModal();
+      break;
+    case 'comp-mode':
+      modalState.mode = arg;
+      syncCompInputs();
+      renderCompModal();
+      break;
+    case 'add-match':
+      syncCompInputs();
+      modalState.matches.push({ round: '', opponent: '', team: '', result: 'win', type: '', submission: '', score: '' });
+      renderCompModal();
+      break;
+    case 'rm-match':
+      syncCompInputs();
+      modalState.matches.splice(parseInt(arg), 1);
+      renderCompModal();
+      break;
+    case 'set-match':
+      const [idx, field] = arg.split('|');
+      modalState.matches[parseInt(idx)][field] = val;
+      break;
+    // Partner
+    case 'save-partner':
+      savePartner();
+      break;
+    // Profile
+    case 'save-profile':
+      saveProfile();
+      break;
+    case 'rm-photo':
+      syncProfileInputs();
+      modalState.photo = null;
+      renderProfileModal();
+      break;
+    case 'age-change':
+      break;
+  }
+}
+
+function syncSessionInputs() {
+  if (modalState._kind !== 'session') return;
+  const dateEl = document.getElementById('m-date');
+  const durEl = document.getElementById('m-duration');
+  const notesEl = document.getElementById('m-notes');
+  if (dateEl) {
+    let v = dateEl.value;
+    // Defensive: even if browser allowed future date, clamp to today
+    if (v && v > todayISO()) {
+      v = todayISO();
+      dateEl.value = v;
+    }
+    modalState.date = v;
+  }
+  if (durEl) modalState.duration = parseInt(durEl.value) || 0;
+  if (notesEl) modalState.notes = notesEl.value;
+  document.querySelectorAll('[data-roll-notes]').forEach(el => {
+    const i = parseInt(el.dataset.rollNotes);
+    if (modalState.rolls[i]) modalState.rolls[i].notes = el.value;
+  });
+}
+
+function saveSession() {
+  if (!modalState.date) { alert('Selecione uma data'); return; }
+  if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
+  // Flatten roll data into legacy `applied` and `suffered` arrays for stats compatibility
+  const allApplied = [];
+  const allSuffered = [];
+  const partnerSet = new Set();
+  modalState.rolls.forEach(roll => {
+    if (roll.partnerId) partnerSet.add(roll.partnerId);
+    (roll.applied || []).filter(a => a.position && a.submission).forEach(a => {
+      allApplied.push({ position: a.position, submission: a.submission, partnerId: roll.partnerId || '' });
+    });
+    (roll.suffered || []).filter(x => x.position && x.submission).forEach(x => {
+      allSuffered.push({ position: x.position, submission: x.submission, partnerId: roll.partnerId || '' });
+    });
+  });
+  const isEdit = !!modalState._editingId;
+  const sessionData = {
+    id: modalState._editingId || uid(),
+    date: modalState.date,
+    mode: modalState.mode,
+    duration: modalState.duration,
+    rolls: modalState.rollCount,
+    partners: Array.from(partnerSet),
+    applied: allApplied,
+    suffered: allSuffered,
+    rollDetails: modalState.rolls.map(r => ({ partnerId: r.partnerId, applied: r.applied, suffered: r.suffered, notes: r.notes })),
+    notes: modalState.notes,
+    mood: modalState.mood
+  };
+  if (isEdit) {
+    const idx = state.data.sessions.findIndex(s => s.id === modalState._editingId);
+    if (idx >= 0) state.data.sessions[idx] = sessionData;
+  } else {
+    state.data.sessions.push(sessionData);
+  }
+  persistUser();
+  closeModal();
+  showToast(isEdit ? 'Treino atualizado!' : 'Treino salvo!');
+  render();
+}
+
+// ---------- COMP MODAL ----------
+function openCompModal() {
+  modalState = {
+    date: todayISO(),
+    mode: state.mode,
+    name: '',
+    category: '',
+    weightClass: '',
+    result: '',
+    matches: []
+  };
+  renderCompModal();
+}
+
+function renderCompModal() {
+  const subs = modalState.mode === 'gi' ? SUBMISSIONS_GI : SUBMISSIONS_NOGI;
+  const weightClasses = state.data.profile.gender === 'female' ? WEIGHT_CLASSES_GI_FEMALE : WEIGHT_CLASSES_GI_MALE;
+
+  const matchesHtml = modalState.matches.map((m, i) => `<div class="sub-card">
+    <div class="sub-card-head">
+      <span class="num" style="${m.result === 'win' ? '' : '--accent: var(--red)'}">Luta ${i+1}</span>
+      <button data-mact="rm-match:${i}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+    </div>
+    <div class="input-grid-2" style="margin-bottom:8px">
+      <div class="input-row"><label>Fase</label>
+        <select data-mact="set-match:${i}|round">
+          <option value="">—</option>
+          ${['Eliminatória','Oitavas','Quartas','Semi','Final','Bronze'].map(r => `<option value="${r}" ${m.round === r ? 'selected' : ''}>${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="input-row"><label>Resultado</label>
+        <select data-mact="set-match:${i}|result">
+          <option value="win" ${m.result === 'win' ? 'selected' : ''}>Vitória</option>
+          <option value="loss" ${m.result === 'loss' ? 'selected' : ''}>Derrota</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row"><label>Oponente</label><input type="text" data-mact="set-match:${i}|opponent" value="${escapeHtml(m.opponent)}" placeholder="Nome"></div>
+    <div class="input-row"><label>Equipe</label><input type="text" data-mact="set-match:${i}|team" value="${escapeHtml(m.team)}" placeholder="Academia"></div>
+    <div class="input-row"><label>Como terminou</label>
+      <select data-mact="set-match:${i}|type">
+        <option value="">—</option>
+        <option ${m.type === 'Finalização' ? 'selected' : ''}>Finalização</option>
+        <option ${m.type === 'Pontos' ? 'selected' : ''}>Pontos</option>
+        <option ${m.type === 'Vantagem' ? 'selected' : ''}>Vantagem</option>
+        <option ${m.type === 'DQ' ? 'selected' : ''}>DQ</option>
+        <option ${m.type === 'Decisão' ? 'selected' : ''}>Decisão dos árbitros</option>
+      </select>
+    </div>
+    ${m.type === 'Finalização' ? `<div class="input-row"><label>Qual finalização</label>
+      <select data-mact="set-match:${i}|submission">
+        <option value="">—</option>
+        ${subs.map(s => `<option ${m.submission === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+      </select></div>` : ''}
+    ${(m.type === 'Pontos' || m.type === 'Vantagem') ? `<div class="input-row"><label>Placar</label><input type="text" data-mact="set-match:${i}|score" value="${escapeHtml(m.score)}" placeholder="ex: 6×2"></div>` : ''}
+  </div>`).join('');
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Registrar competição</div>
+      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+    </div>
+
+    <div class="toggle">
+      <button class="${modalState.mode === 'gi' ? 'active' : ''}" data-mact="comp-mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${modalState.mode === 'no-gi' ? 'active' : ''}" data-mact="comp-mode:no-gi">No-Gi</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Evento</div>
+      <div class="input-row"><label>Nome do campeonato</label><input type="text" id="c-name" value="${escapeHtml(modalState.name)}" placeholder="ex: São Paulo Open"></div>
+      <div class="input-grid-2">
+        <div class="input-row"><label>Data</label><input type="date" id="c-date" value="${modalState.date}" max="${todayISO()}"></div>
+        <div class="input-row"><label>Categoria (faixa)</label>
+          <select id="c-category">
+            <option value="">—</option>
+            ${getBelts(state.data.profile.age).map(b => `<option ${modalState.category === b ? 'selected' : ''}>${b}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="input-row"><label>Peso (IBJJF)</label>
+        <select id="c-weight">
+          <option value="">—</option>
+          ${weightClasses.map(w => `<option ${modalState.weightClass === w.name ? 'selected' : ''}>${w.name}${w.limit < 999 ? ' (até ' + w.limit + 'kg)' : ' (+' + weightClasses[weightClasses.length-2].limit + 'kg)'}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Resultado final</div>
+      <div class="input-grid-3" style="grid-template-columns:repeat(4,1fr)">
+        ${[
+          {v: 'Ouro', c: '#ffaa33'},
+          {v: 'Prata', c: '#c0c0c0'},
+          {v: 'Bronze', c: '#cd7f32'},
+          {v: 'Sem pódio', c: 'var(--text-2)'}
+        ].map(r => `<button data-mact="comp-result:${r.v}" style="background:${modalState.result === r.v ? `rgba(255,170,51,0.15)` : 'var(--surface-2)'};color:${modalState.result === r.v ? r.c : 'var(--text-2)'};border:1px solid ${modalState.result === r.v ? r.c : 'var(--border-2)'};padding:10px 4px;border-radius:var(--radius-md);font-size:11px;font-weight:${modalState.result === r.v ? '500' : '400'}">${r.v}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-label" style="margin-bottom:0">Lutas do chaveamento</div>
+        <span class="pill pill-green">${modalState.matches.length}</span>
+      </div>
+      ${matchesHtml}
+      <button class="btn-dashed" data-mact="add-match"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar luta</button>
+    </div>
+
+    <button class="btn-primary" data-mact="save-comp"><i class="ti ti-check" style="vertical-align:-2px"></i> Salvar competição</button>
+    <div style="height:20px"></div>
+  `);
+  attachModalListeners();
+  const cDateEl = document.getElementById('c-date');
+  if (cDateEl) {
+    cDateEl.addEventListener('change', () => {
+      if (cDateEl.value > todayISO()) {
+        cDateEl.value = todayISO();
+        modalState.date = todayISO();
+        showToast('Não é possível registrar competição futura', 'error');
+      }
+    });
+  }
+}
+
+function syncCompInputs() {
+  const name = document.getElementById('c-name');
+  const date = document.getElementById('c-date');
+  const cat = document.getElementById('c-category');
+  const w = document.getElementById('c-weight');
+  if (name) modalState.name = name.value;
+  if (date) {
+    let v = date.value;
+    if (v && v > todayISO()) { v = todayISO(); date.value = v; }
+    modalState.date = v;
+  }
+  if (cat) modalState.category = cat.value;
+  if (w) modalState.weightClass = w.value;
+  // Sync match text fields
+  document.querySelectorAll('[data-mact^="set-match:"]').forEach(el => {
+    if (el.tagName === 'INPUT') {
+      const [, arg] = el.dataset.mact.split(':');
+      const [idx, field] = arg.split('|');
+      if (modalState.matches[parseInt(idx)]) modalState.matches[parseInt(idx)][field] = el.value;
+    }
+  });
+}
+
+function saveComp() {
+  if (!modalState.date) { alert('Selecione uma data'); return; }
+  if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
+  if (!modalState.name) { alert('Adicione o nome do evento'); return; }
+  const comp = {
+    id: uid(),
+    date: modalState.date,
+    mode: modalState.mode,
+    name: modalState.name,
+    category: modalState.category,
+    weightClass: modalState.weightClass,
+    result: modalState.result,
+    matches: modalState.matches
+  };
+  state.data.comps.push(comp);
+  persistUser();
+  closeModal();
+  showToast('Competição salva!');
+  render();
+}
+
+// ---------- PARTNER MODAL ----------
+function openPartnerModal(onSave) {
+  modalState = { _editingId: null, name: '', belt: 'Branca', weight: 80, gym: '', _onSave: onSave };
+  renderPartnerModal();
+}
+
+function openEditPartnerModal(partnerId) {
+  const p = state.data.partners.find(x => x.id === partnerId);
+  if (!p) { showToast('Parceiro não encontrado', 'error'); return; }
+  modalState = {
+    _editingId: p.id,
+    name: p.name || '',
+    belt: p.belt || 'Branca',
+    weight: p.weight || 80,
+    gym: p.gym || '',
+    _onSave: null
+  };
+  renderPartnerModal();
+}
+
+function renderPartnerModal() {
+  const isEdit = !!modalState._editingId;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${isEdit ? 'Editar parceiro' : 'Novo parceiro'}</div>
+      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+    </div>
+    <div class="card">
+      <div class="input-row"><label>Nome</label><input type="text" id="p-name" placeholder="Nome do parceiro" value="${escapeHtml(modalState.name)}"></div>
+      <div class="input-grid-2">
+        <div class="input-row"><label>Faixa</label>
+          <select id="p-belt">
+            <optgroup label="Adulto">
+              ${BELTS_ADULT.map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
+            </optgroup>
+            <optgroup label="Kids (menor de 16)">
+              ${BELTS_KIDS.slice(1).map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
+            </optgroup>
+          </select>
+        </div>
+        <div class="input-row"><label>Peso (kg)</label><input type="number" id="p-weight" value="${modalState.weight}" min="30" max="200"></div>
+      </div>
+      <div class="input-row"><label>Academia (opcional)</label><input type="text" id="p-gym" placeholder="Nome da academia" value="${escapeHtml(modalState.gym || '')}"></div>
+    </div>
+    <button class="btn-primary" data-mact="save-partner"><i class="ti ti-check" style="vertical-align:-2px"></i> ${isEdit ? 'Salvar alterações' : 'Salvar parceiro'}</button>
+    <div style="height:20px"></div>
+  `);
+  attachModalListeners();
+}
+
+function savePartner() {
+  const name = document.getElementById('p-name').value.trim();
+  const belt = document.getElementById('p-belt').value;
+  const weight = parseInt(document.getElementById('p-weight').value) || 80;
+  const gym = document.getElementById('p-gym').value.trim();
+  if (!name) { alert('Informe o nome'); return; }
+  const isEdit = !!modalState._editingId;
+  let id;
+  if (isEdit) {
+    id = modalState._editingId;
+    const idx = state.data.partners.findIndex(p => p.id === id);
+    if (idx >= 0) {
+      state.data.partners[idx] = { id, name, belt, weight, gym };
+    }
+  } else {
+    id = uid();
+    state.data.partners.push({ id, name, belt, weight, gym });
+  }
+  persistUser();
+  const onSave = modalState._onSave;
+  closeModal();
+  showToast(isEdit ? 'Parceiro atualizado!' : 'Parceiro cadastrado!');
+  if (onSave) {
+    onSave(id);
+  } else {
+    render();
+  }
+}
+
+// ---------- PROFILE MODAL ----------
+function openProfileModal() {
+  modalState = { ...state.data.profile };
+  renderProfileModal();
+}
+
+function renderProfileModal() {
+  const beltsList = getBelts(modalState.age);
+  // If user changes age and current belt isn't valid, fallback to Branca
+  const validBelt = beltsList.includes(modalState.belt) ? modalState.belt : 'Branca';
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Editar perfil</div>
+      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px">
+      <div style="position:relative">
+        <div id="photo-preview" style="width:88px;height:88px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:30px;border:3px solid var(--primary);overflow:hidden">
+          ${modalState.photo
+            ? `<img src="${modalState.photo}" style="width:100%;height:100%;object-fit:cover" alt="foto">`
+            : escapeHtml(initials(modalState.name || 'A'))}
+        </div>
+        <label style="position:absolute;bottom:-4px;right:-4px;width:30px;height:30px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--bg)">
+          <i class="ti ti-camera" style="font-size:14px;color:#fff"></i>
+          <input type="file" id="pr-photo" accept="image/*" style="display:none">
+        </label>
+      </div>
+      ${modalState.photo ? `<button class="btn-dashed" style="max-width:140px;font-size:11px;padding:6px" data-mact="rm-photo"><i class="ti ti-trash" style="font-size:11px;vertical-align:-1px"></i> Remover foto</button>` : ''}
+    </div>
+    <div class="card">
+      <div class="input-row"><label>Nome</label><input type="text" id="pr-name" value="${escapeHtml(modalState.name)}"></div>
+      <div class="input-grid-3">
+        <div class="input-row"><label>Idade</label><input type="number" id="pr-age" value="${modalState.age || ''}" min="3" max="99" data-mact="age-change"></div>
+        <div class="input-row"><label>Gênero</label>
+          <select id="pr-gender">
+            <option value="male" ${modalState.gender === 'male' ? 'selected' : ''}>Masculino</option>
+            <option value="female" ${modalState.gender === 'female' ? 'selected' : ''}>Feminino</option>
+          </select>
+        </div>
+        <div class="input-row"><label>Peso (kg)</label><input type="number" id="pr-weight" value="${modalState.weight}" min="20" max="200"></div>
+      </div>
+      ${modalState.age && modalState.age < 16 ? `<p style="font-size:10px;color:var(--text-3);margin:-4px 0 8px;text-align:center"><i class="ti ti-info-circle" style="font-size:10px;vertical-align:-1px"></i> Sistema de faixas IBJJF Kids ativado</p>` : ''}
+      <div class="input-grid-2">
+        <div class="input-row"><label>Faixa</label>
+          <select id="pr-belt">
+            ${beltsList.map(b => `<option ${validBelt === b ? 'selected' : ''}>${b}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-row"><label>Graus</label>
+          <select id="pr-degrees">
+            ${[0,1,2,3,4].map(d => `<option ${modalState.degrees === d ? 'selected' : ''} value="${d}">${d}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="input-row"><label>Academia</label><input type="text" id="pr-gym" value="${escapeHtml(modalState.gym)}" placeholder="Nome da academia"></div>
+      <div class="input-row"><label>Começou em</label><input type="number" id="pr-started" value="${modalState.startedAt}" min="1980" max="${new Date().getFullYear()}"></div>
+    </div>
+    <button class="btn-primary" data-mact="save-profile"><i class="ti ti-check" style="vertical-align:-2px"></i> Salvar</button>
+    <div style="height:20px"></div>
+  `);
+  attachModalListeners();
+  // Handle photo input + age live-update
+  const photoInput = document.getElementById('pr-photo');
+  if (photoInput) photoInput.addEventListener('change', handlePhotoSelect);
+  const ageInput = document.getElementById('pr-age');
+  if (ageInput) ageInput.addEventListener('change', () => {
+    syncProfileInputs();
+    renderProfileModal();
+  });
+}
+
+function syncProfileInputs() {
+  const ids = { 'pr-name':'name', 'pr-age':'age', 'pr-gender':'gender', 'pr-weight':'weight', 'pr-belt':'belt', 'pr-degrees':'degrees', 'pr-gym':'gym', 'pr-started':'startedAt' };
+  for (const id in ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    let v = el.value;
+    if (['age','weight','degrees','startedAt'].includes(ids[id])) v = parseInt(v) || 0;
+    modalState[ids[id]] = v;
+  }
+}
+
+async function handlePhotoSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  // Read + resize to ~300px, jpeg 0.85 quality
+  const dataUrl = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  const img = new Image();
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = dataUrl; });
+  // Crop center square + downscale
+  const size = 300;
+  const min = Math.min(img.width, img.height);
+  const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+  syncProfileInputs();
+  modalState.photo = canvas.toDataURL('image/jpeg', 0.85);
+  renderProfileModal();
+}
+
+function saveProfile() {
+  syncProfileInputs();
+  state.data.profile = {
+    name: (modalState.name || '').trim() || 'Atleta',
+    gender: modalState.gender || 'male',
+    age: parseInt(modalState.age) || null,
+    weight: parseInt(modalState.weight) || 80,
+    belt: modalState.belt || 'Branca',
+    degrees: parseInt(modalState.degrees) || 0,
+    gym: (modalState.gym || '').trim(),
+    startedAt: parseInt(modalState.startedAt) || new Date().getFullYear() - 1,
+    photo: modalState.photo || null
+  };
+  persistUser();
+  closeModal();
+  showToast('Perfil atualizado!');
+  render();
+}
+
+// =================== INIT ===================
+initDelegation();
+if (tryAutoLogin()) {
+  state.currentTab = 'home';
+}
+render();
+</script>
+<!-- Vercel Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
