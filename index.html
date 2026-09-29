@@ -6,163 +6,1047 @@
 <title>Tatame · Performance Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Ícones agora são SVG inline via função icon() em JS -->
+<style>
+.i-svg { display: inline-flex; align-items: center; justify-content: center; vertical-align: -0.15em; }
+.i-svg svg { display: block; }
+</style>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  :root {
+
+  /* === TEMA ESCURO (padrão) === */
+  :root, [data-theme="dark"] {
     --bg: #0a0a0a;
     --surface: #141414;
-    --surface-2: #1a1a1a;
-    --surface-3: #1f1f1f;
-    --border: #222;
-    --border-2: #2a2a2a;
-    --text: #fff;
-    --text-2: #888;
-    --text-3: #555;
-    --text-4: #666;
-    --primary: #ff4444;
-    --primary-dark: #cc3333;
+    --surface-2: #1c1c1c;
+    --surface-3: #232323;
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.14);
+    --text: #ffffff;
+    --text-2: #a8a8a8;
+    --text-3: #6a6a6a;
+    --text-4: #555;
+    --primary: #e63946;
+    --primary-dark: #b82934;
+    --primary-soft: rgba(230,57,70,0.12);
     --green: #6ee06e;
-    --green-bg: #1f3a1f;
+    --green-bg: rgba(110,224,110,0.12);
     --red: #ff6b6b;
-    --red-bg: #3a1f1f;
+    --red-bg: rgba(255,107,107,0.12);
     --amber: #ffaa33;
-    --amber-bg: #2a1f00;
+    --amber-bg: rgba(255,170,51,0.12);
     --blue: #4488ff;
     --purple: #aa66ff;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 22px;
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.15);
   }
-  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 14px; overflow-x: hidden; }
+
+  /* === TEMA CLARO === */
+  [data-theme="light"] {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f4f2ec;
+    --surface-3: #ebe8e0;
+    --border: rgba(0,0,0,0.08);
+    --border-2: rgba(0,0,0,0.14);
+    --text: #2a2a2a;
+    --text-2: #6a6a6a;
+    --text-3: #a0a0a0;
+    --text-4: #b8b8b8;
+    --primary: #e63946;
+    --primary-dark: #b82934;
+    --primary-soft: rgba(230,57,70,0.08);
+    --green: #2ea043;
+    --green-bg: rgba(46,160,67,0.12);
+    --red: #d63030;
+    --red-bg: rgba(214,48,48,0.10);
+    --amber: #d97706;
+    --amber-bg: rgba(217,119,6,0.10);
+    --blue: #2563eb;
+    --purple: #7c3aed;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+    transition: background-color 0.2s, color 0.2s;
+  }
   body { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-  #app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg); position: relative; padding-bottom: 80px; }
+  #app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg); position: relative; padding-bottom: 100px; }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-  input, select, textarea { font-family: inherit; font-size: 14px; background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text); border-radius: var(--radius-md); padding: 10px 12px; width: 100%; outline: none; }
-  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-  .display-font { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
-  .screen { padding: 20px; animation: fadeIn 0.2s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 0.02em; }
-  .header .label { font-size: 12px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
-  .avatar-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; padding: 0; }
+  input, select, textarea {
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 14px 16px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--text); }
+
+  /* Tipografia */
+  .serif { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.01em; }
+  .display-font { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.02em; }
+  .grotesk { font-family: 'Space Grotesk', sans-serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Wordmark (logo) */
+  .wordmark {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    display: inline-block;
+  }
+  .wordmark .dot { color: var(--primary); }
+  .wordmark.lg { font-size: 56px; }
+  .wordmark.md { font-size: 32px; }
+  .wordmark.sm { font-size: 20px; }
+
+  .screen { padding: 20px; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ===== HEADER da tela ===== */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-top: 8px;
+  }
+  .app-header .left { display: flex; flex-direction: column; gap: 4px; }
+  .app-header .day {
+    color: var(--text-2);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .app-header .greeting {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .app-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .app-header .meta {
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: 1px;
+  }
+
+  .avatar-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px;
+    font-weight: 400;
+    overflow: hidden;
+    padding: 0;
+    color: var(--text);
+  }
   .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
-  .toggle { display: flex; gap: 6px; background: var(--surface); padding: 4px; border-radius: 24px; border: 1px solid var(--surface-3); margin-bottom: 16px; }
-  .toggle button { flex: 1; background: transparent; color: var(--text-2); padding: 10px; border-radius: 20px; font-size: 12px; transition: all 0.15s; }
-  .toggle button.active { background: var(--primary); color: #fff; font-weight: 500; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 12px; }
-  .card-label { font-size: 11px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
-  .stat-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .stat-head i { font-size: 18px; }
-  .stat-head .label { font-size: 10px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
-  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; font-weight: 400; line-height: 1; letter-spacing: 0.02em; }
-  .stat-sub { font-size: 10px; color: var(--text-4); margin-top: 4px; }
-  .stat-sub.positive { color: var(--green); }
-  .stat-sub.negative { color: var(--red); }
-  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
-  .pill-green { background: var(--green-bg); color: var(--green); }
-  .pill-red { background: var(--red-bg); color: var(--red); }
-  .pill-amber { background: var(--amber-bg); color: var(--amber); }
-  .btn-primary { width: 100%; background: var(--primary); color: #fff; padding: 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; transition: background 0.15s; }
+
+  /* ===== TOGGLE (Gi / No-Gi) ===== */
+  .toggle {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 3px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .toggle button {
+    background: transparent;
+    color: var(--text-2);
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: all 0.15s;
+  }
+  .toggle button.active { background: var(--text); color: var(--bg); }
+
+  /* Card genérico */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .card-label {
+    font-size: 10px;
+    color: var(--text-2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  /* Section header (com título serif + link) */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    margin-top: 8px;
+  }
+  .section-header h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .section-header .link {
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.5px;
+  }
+
+  /* Streak hero */
+  .streak-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: block;
+    text-align: left;
+  }
+  .streak-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle at top right, var(--primary-soft), transparent 70%);
+    pointer-events: none;
+  }
+  .streak-hero .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+  }
+  .streak-hero .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .streak-hero .value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 64px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .streak-hero .value .unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text-2);
+    font-weight: 400;
+  }
+  .streak-hero .value .accent { color: var(--primary); }
+  .streak-hero .meta {
+    text-align: right;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+  .streak-hero .progress {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  .streak-hero .progress .bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .streak-hero .progress .bar .fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 100px;
+    transition: width 0.3s;
+  }
+  .streak-hero .progress .frac {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: 0.5px;
+  }
+  .cta-freeze {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--text-2);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Quick action (Registrar treino) */
+  .quick-action {
+    background: var(--text);
+    color: var(--bg);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-bottom: 28px;
+    border: none;
+    width: 100%;
+    text-align: left;
+  }
+  .quick-action:active { transform: scale(0.99); }
+  .quick-action .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .quick-action .action {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .quick-action .arrow {
+    width: 40px; height: 40px;
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  /* Week strip (dots por dia da semana) */
+  .week-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+  }
+  .day-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .day-dot .label {
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .day-dot .dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .day-dot.done .dot {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .day-dot.done .dot::after {
+    content: '✓';
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .day-dot.today .dot { border-color: var(--text); border-width: 2px; }
+  .day-dot.today .label { color: var(--text); font-weight: 600; }
+
+  /* Stat list (linha por linha) */
+  .stat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat-row {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-row .k .label { font-size: 13px; color: var(--text); }
+  .stat-row .k .sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .stat-row .v {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-row .v .unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
   .btn-primary:active { background: var(--primary-dark); }
-  .btn-secondary { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--border-2); padding: 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; }
-  .btn-dashed { width: 100%; background: transparent; color: var(--text-2); border: 1px dashed var(--border-2); padding: 10px; border-radius: var(--radius-md); font-size: 12px; }
-  .input-row { background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 8px; }
-  .input-row label { display: block; font-size: 10px; color: var(--text-4); margin-bottom: 2px; }
-  .input-row input, .input-row select { background: transparent; border: none; padding: 0; font-size: 14px; }
+  .btn-secondary {
+    width: 100%;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-2);
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .btn-solid {
+    width: 100%;
+    background: var(--text);
+    color: var(--bg);
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .btn-dashed {
+    width: 100%;
+    background: transparent;
+    color: var(--text-2);
+    border: 1px dashed var(--border-2);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  /* ===== INPUTS ===== */
+  .input-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .input-row label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .input-row input, .input-row select, .input-row textarea {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    color: var(--text);
+    width: 100%;
+  }
   .input-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .input-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .nav-bottom { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: rgba(10,10,10,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); z-index: 50; }
-  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-3); font-size: 10px; }
-  .nav-item.active { color: var(--primary); }
-  .nav-item i { font-size: 22px; }
-  .progress-bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+
+  .form-group { margin-bottom: 22px; }
+  .form-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .form-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .chip.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .duration-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .duration-btn {
+    flex: 1;
+    min-width: 40px;
+    padding: 12px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-2);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .duration-btn.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  /* Bottom nav */
+  .nav-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 8px calc(20px + env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--text-3);
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    padding: 6px 10px;
+  }
+  .nav-item.active { color: var(--text); }
+  .nav-item i { font-size: 20px; }
+
+  .progress-bar { height: 4px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s; }
-  .belt-bar { display: flex; gap: 3px; }
-  .belt-stripe { height: 6px; flex: 0 0 18px; border-radius: 1px; background: var(--border-2); }
-  /* LOGIN */
-  .auth-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px 28px; }
-  .auth-logo { text-align: center; margin-bottom: 40px; }
-  .auth-logo .mark { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--primary); letter-spacing: 0.04em; line-height: 1; }
-  .auth-logo .tagline { font-size: 11px; color: var(--text-2); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
-  .auth-form { display: flex; flex-direction: column; gap: 14px; }
-  .auth-form h2 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
-  .auth-form .subtitle { font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
-  .auth-toggle { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-2); }
-  .auth-toggle a { color: var(--primary); cursor: pointer; font-weight: 500; }
-  .error-msg { background: var(--red-bg); color: var(--red); padding: 10px; border-radius: var(--radius-md); font-size: 12px; text-align: center; }
-  /* CALENDAR */
-  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
-  .cal-nav { display: flex; gap: 8px; }
-  .cal-nav button { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .cal-dow { text-align: center; font-size: 10px; color: var(--text-3); padding: 6px 0; letter-spacing: 1px; }
-  .cal-day { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; color: var(--text-2); position: relative; cursor: pointer; transition: all 0.15s; }
-  .cal-day.today { border-color: var(--primary); color: var(--text); }
-  .cal-day.has-session { background: var(--surface-2); color: var(--text); }
-  .cal-day.has-session::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
-  .cal-day.has-comp::after { background: var(--amber); }
-  .cal-day.empty { background: transparent; border: none; cursor: default; }
-  .cal-day.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .cal-day.future { opacity: 0.3; cursor: default; }
-  /* Modal */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 100; animation: fadeOverlay 0.2s; }
-  @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
-  .modal { width: 100%; max-width: 480px; max-height: 90vh; background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 20px; overflow-y: auto; animation: slideUp 0.25s ease; }
-  @keyframes slideUp { from { transform: translateY(20%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .modal-title { font-size: 18px; font-weight: 500; }
-  .close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; }
-  /* Submission card */
-  .sub-card { background: var(--surface-2); padding: 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
-  .sub-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .sub-card-head .num { font-size: 11px; color: var(--text-2); letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
-  .sub-card-head .num::before { content: ''; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
-  .sub-card-head.sofrida .num::before { background: var(--blue); }
-  /* Counter */
-  .counter { display: flex; align-items: center; gap: 12px; }
-  .counter button { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; }
-  .counter .minus { background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text); }
-  .counter .plus { background: var(--primary); color: #fff; }
-  .counter .value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; min-width: 50px; text-align: center; }
-  /* Partner item */
-  .partner-item { display: flex; align-items: center; gap: 10px; background: var(--surface-2); padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
-  .partner-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
-  .partner-info { flex: 1; min-width: 0; }
-  .partner-info .name { font-size: 13px; line-height: 1.2; }
-  .partner-info .meta { font-size: 11px; color: var(--text-4); margin-top: 1px; }
-  /* List item */
-  .list-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 8px; cursor: pointer; }
-  /* Empty state */
-  .empty { text-align: center; padding: 40px 20px; color: var(--text-3); }
-  .empty i { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
-  .empty p { font-size: 13px; }
+
   /* Belt colors */
-  .belt-branca { background: #fff; }
+  .belt-branca { background: #fff; border: 1px solid var(--border-2); }
   .belt-azul { background: #4488ff; }
   .belt-roxa { background: #6644aa; }
   .belt-marrom { background: #8b4513; }
   .belt-preta { background: #000; border: 1px solid #444; }
-  /* Result colors for comp matches */
+
+  .belt-bar { display: flex; gap: 3px; }
+  .belt-stripe { height: 6px; flex: 0 0 18px; border-radius: 1px; background: var(--border-2); }
+
+  /* ===== LOGIN (centralizada) ===== */
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 28px calc(30px + env(safe-area-inset-bottom));
+    position: relative;
+  }
+  .auth-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .auth-tagline {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--text-2);
+    text-align: center;
+    letter-spacing: 0.01em;
+    margin-top: 14px;
+    font-weight: 400;
+  }
+  .auth-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .auth-footer {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+  }
+  /* Formulário (aparece após clicar Entrar/Criar conta) */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 20px;
+  }
+  .auth-form h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .auth-form .subtitle {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+  .auth-back {
+    background: none;
+    color: var(--text-2);
+    font-size: 12px;
+    padding: 8px;
+    margin-top: 6px;
+    text-align: center;
+    font-weight: 500;
+  }
+  .error-msg {
+    background: var(--red-bg);
+    color: var(--red);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  /* ===== CALENDAR ===== */
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .cal-month {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .cal-nav { display: flex; gap: 8px; }
+  .cal-nav button {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .cal-dow {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-3);
+    padding: 6px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    min-width: 0;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-2);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cal-day.today {
+    border: 1.5px solid var(--text);
+    color: var(--text);
+    font-weight: 600;
+  }
+  .cal-day.has-session {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 500;
+  }
+  .cal-day.has-comp::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    background: var(--amber);
+    border-radius: 50%;
+  }
+  .cal-day.empty { background: transparent; border: none; cursor: default; visibility: hidden; }
+  .cal-day.selected { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .cal-day.future { opacity: 0.3; cursor: default; }
+
+  /* ===== MODAL (registrar treino) ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeOverlay 0.2s;
+  }
+  [data-theme="light"] .modal-overlay { background: rgba(0,0,0,0.35); }
+  @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 92vh;
+    background: var(--bg);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 20px 20px calc(30px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+    border-top: 1px solid var(--border);
+  }
+  @keyframes slideUp { from { transform: translateY(20%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    padding-top: 4px;
+  }
+  .modal-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .close-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+
+  /* Collapsible section (finalizações, notas) */
+  .collapse-section {
+    margin-bottom: 14px;
+  }
+  .collapse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .collapse-header .badge {
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+  }
+  .collapse-body {
+    padding: 14px 4px 4px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  /* Sub counter (mata-leão + 2 -) */
+  .sub-counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .sub-counter .name { font-size: 13px; color: var(--text); flex: 1; }
+  .sub-counter .actions { display: flex; align-items: center; gap: 10px; }
+  .sub-counter .actions button {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+  }
+  .sub-counter .actions button.plus {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .sub-counter .actions .val {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    min-width: 24px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  .sub-adder-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px dashed var(--border-2);
+    border-radius: 12px;
+    color: var(--text-2);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  /* Mood stepper — controle customizado sem depender de input range */
+  .mood-stepper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 4px 0;
+  }
+  .mood-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 22px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.1s;
+  }
+  .mood-btn:active { background: var(--surface-2); }
+  .mood-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .mood-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .mood-value-big {
+    font-family: 'Instrument Serif', serif;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .mood-scale {
+    display: flex;
+    gap: 3px;
+    width: 100%;
+    height: 6px;
+  }
+  .mood-tick {
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .mood-tick.filled { background: var(--primary); }
+  .mood-tick.current {
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--primary);
+  }
+  .mood-scale-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+  }
+  .mood-value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    text-align: center;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  /* Partner chip */
+  .partner-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .partner-chip.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .partner-chip .avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .partner-chip.active .avatar { background: rgba(255,255,255,0.15); color: var(--bg); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-3);
+  }
+  .empty i { font-size: 42px; margin-bottom: 12px; opacity: 0.4; }
+  .empty p { font-size: 13px; line-height: 1.5; }
+
+  /* Match result */
   .match-win { border-left: 3px solid var(--green); }
   .match-loss { border-left: 3px solid var(--red); }
-  .match-bg { background: var(--surface-2); padding: 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
-  .insight-card { background: linear-gradient(135deg, rgba(255,68,68,0.08), var(--surface)); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
-  .day-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .day-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
-  .day-header .back { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; }
-  .session-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-  .session-summary > div { background: var(--surface-2); padding: 10px; border-radius: var(--radius-md); text-align: center; }
-  .session-summary .val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
-  .session-summary .lbl { font-size: 9px; color: var(--text-2); letter-spacing: 1px; text-transform: uppercase; }
+  .match-bg {
+    background: var(--surface-2);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+
+  .list-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
   /* Toast */
-  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--green); color: var(--green); padding: 12px 20px; border-radius: var(--radius-md); font-size: 13px; z-index: 200; animation: toastIn 0.3s ease; }
-  .toast.toast-error { border-color: var(--red); color: var(--red); }
-  /* Recap (Wrapped) */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 12px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    z-index: 200;
+    animation: toastIn 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast.toast-error { background: var(--red); color: #fff; }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  /* Recap (Wrapped - inalterado, tema próprio) */
   .recap-overlay { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: #000; }
   .recap-slide { width: 100%; max-width: 480px; height: 100vh; max-height: 100vh; padding: 40px 24px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; cursor: pointer; user-select: none; }
   .recap-slide::before { content: ''; position: absolute; inset: 0; background: inherit; z-index: -1; }
@@ -179,43 +1063,481 @@
   @keyframes recapSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   .recap-emoji { font-size: 80px; margin-bottom: 16px; line-height: 1; }
   .recap-label { font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; margin-bottom: 16px; }
-  .recap-big { font-family: 'Bebas Neue', sans-serif; font-size: 96px; line-height: 0.9; letter-spacing: 0.02em; margin-bottom: 8px; }
+  .recap-big { font-family: 'Instrument Serif', serif; font-size: 96px; line-height: 0.9; letter-spacing: -0.03em; margin-bottom: 8px; }
   .recap-big-sub { font-size: 18px; font-weight: 500; opacity: 0.9; margin-bottom: 16px; }
-  .recap-headline { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; letter-spacing: 0.02em; margin-bottom: 12px; }
+  .recap-headline { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: 1; letter-spacing: -0.02em; margin-bottom: 12px; }
   .recap-body { font-size: 16px; line-height: 1.5; opacity: 0.9; max-width: 320px; margin: 0 auto; }
   .recap-share-btn { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.3); z-index: 11; }
   .recap-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
-  /* Recap card on home */
-  .recap-cta { background: linear-gradient(135deg, #ff4444, #ff8833); border: none; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; color: #fff; cursor: pointer; width: 100%; text-align: left; box-shadow: 0 4px 20px rgba(255,68,68,0.3); }
-  .recap-cta .ico { font-size: 32px; }
+
+  /* Recap CTA on home */
+  .recap-cta {
+    background: linear-gradient(135deg, #ff8833, #e63946);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    box-shadow: 0 4px 20px rgba(230,57,70,0.25);
+  }
+  .recap-cta .ico { font-size: 28px; }
   .recap-cta .info { flex: 1; }
-  .recap-cta .ttl { font-size: 14px; font-weight: 600; }
+  .recap-cta .ttl { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
   .recap-cta .sub { font-size: 11px; opacity: 0.9; margin-top: 2px; }
-  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
-  .ranking-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
-  .ranking-row .name { font-size: 13px; }
-  .ranking-row .count { font-size: 12px; color: var(--text-2); }
-  .progress-track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 4px; }
-  .progress-track .fill { height: 100%; background: var(--primary); border-radius: 4px; }
-  .combo-row { display: flex; align-items: center; gap: 8px; background: var(--surface-2); padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 8px; }
-  .combo-tag { padding: 3px 8px; border-radius: 8px; font-size: 10px; }
-  .combo-tag.pos { background: var(--border-2); color: var(--text-2); }
-  .combo-tag.fin { background: var(--red-bg); color: var(--red); }
-  .combo-row .count { margin-left: auto; font-size: 13px; font-weight: 500; }
-  .week-grid { display: flex; gap: 6px; margin-top: 14px; }
-  .week-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .week-day .box { width: 100%; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; border: none; }
-  .week-day .box.done { background: var(--green); }
-  .week-day .box.planned { background: rgba(255,68,68,0.15); border: 2px solid var(--primary); }
-  .week-day .box.empty-day { background: var(--surface-2); border: 1px dashed var(--border-2); }
-  .week-day .box.today-ring { box-shadow: 0 0 0 2px rgba(255,255,255,0.4); }
-  .week-day .lbl { font-size: 9px; color: var(--text-3); text-transform: uppercase; }
+
+  /* Settings */
+  .settings-group { margin-bottom: 24px; }
+  .settings-group-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+  .settings-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .settings-item {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item .label { font-size: 14px; color: var(--text); }
+  .settings-item .value {
+    font-size: 13px;
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .theme-toggle {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 100px;
+    padding: 3px;
+  }
+  .theme-toggle button {
+    background: transparent;
+    color: var(--text-2);
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .theme-toggle button.active {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* Profile */
+  .profile-hero {
+    padding: 20px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .profile-avatar-big {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 34px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .profile-meta {
+    font-size: 12px;
+    color: var(--text-2);
+    letter-spacing: 0.3px;
+  }
+  .profile-belt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 11px;
+    margin-top: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .profile-belt .stripe {
+    width: 10px; height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 24px 0 24px;
+  }
+  .profile-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .profile-stat .v {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .profile-stat .v .unit { font-size: 13px; color: var(--text-2); }
+  .profile-stat .k {
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* Stats page */
+  .stats-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats-toggle::-webkit-scrollbar { display: none; }
+  .stats-toggle button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .stats-toggle button.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .hero-metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 12px;
+  }
+  .hero-metric .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .hero-metric .value {
+    font-family: 'Instrument Serif', serif;
+    font-size: 54px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .hero-metric .value .accent { color: var(--primary); }
+  .hero-metric .value .unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text-2);
+  }
+  .hero-metric .sub {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 6px;
+  }
+  .chart-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .chart-block .title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .chart-block .subtitle {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  .bars-row { display: flex; flex-direction: column; gap: 12px; }
+  .bar-item { display: flex; flex-direction: column; gap: 6px; }
+  .bar-item .top { display: flex; justify-content: space-between; font-size: 12px; }
+  .bar-item .name { color: var(--text); font-weight: 400; }
+  .bar-item .num {
+    color: var(--text-2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .bar-item .bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar-item .bar .fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 100px;
+    transition: width 0.3s;
+  }
+
+  /* Streak modal */
+  .streak-modal-content { text-align: center; padding: 8px 4px; }
+  .streak-modal-content .huge {
+    font-family: 'Instrument Serif', serif;
+    font-size: 88px;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--primary);
+    margin: 8px 0 4px;
+  }
+  .streak-modal-content .weeks-label {
+    font-size: 12px;
+    color: var(--text-2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .streak-modal-content .stat-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .streak-modal-content .stat-block .k { font-size: 12px; color: var(--text-2); }
+  .streak-modal-content .stat-block .v {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    font-family: 'Instrument Serif', serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Insight card */
+  .insight-card {
+    background: linear-gradient(135deg, var(--primary-soft), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+  }
+
+  /* Session summary (day view) */
+  .day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-top: 8px;
+  }
+  .day-header h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+  }
+  .day-header .back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+  .session-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .session-summary > div {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 10px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .session-summary .val {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .session-summary .lbl {
+    font-size: 9px;
+    color: var(--text-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* Pills small */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .pill-green { background: var(--green-bg); color: var(--green); }
+  .pill-red { background: var(--red-bg); color: var(--red); }
+  .pill-amber { background: var(--amber-bg); color: var(--amber); }
+
+  /* Partner item (in list) */
+  .partner-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .partner-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text);
+  }
+  .partner-info { flex: 1; min-width: 0; }
+  .partner-info .name { font-size: 14px; line-height: 1.2; color: var(--text); }
+  .partner-info .meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+  /* Sub-card (used by comp modal) */
+  .sub-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .sub-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .sub-card-head .num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .sub-card-head button {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
 <div id="app"></div>
 
 <script>
+// =================== ICONS (SVG inline) ===================
+const ICONS = {
+  'home': '<path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>',
+  'calendar': '<path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M11 15h1"/><path d="M12 15v3"/>',
+  'chart-bar': '<path d="M3 12m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M9 8m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M15 4m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M4 20h14"/>',
+  'users': '<path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>',
+  'user': '<path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>',
+  'plus': '<path d="M12 5l0 14"/><path d="M5 12l14 0"/>',
+  'check': '<path d="M5 12l5 5l10 -10"/>',
+  'x': '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+  'chevron-right': '<path d="M9 6l6 6l-6 6"/>',
+  'chevron-left': '<path d="M15 6l-6 6l6 6"/>',
+  'chevron-up': '<path d="M6 15l6 -6l6 6"/>',
+  'chevron-down': '<path d="M6 9l6 6l6 -6"/>',
+  'arrow-left': '<path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/>',
+  'arrow-right': '<path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/>',
+  'edit': '<path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/><path d="M16 5l3 3"/>',
+  'trash': '<path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>',
+  'settings': '<path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>',
+  'logout': '<path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path d="M9 12h12l-3 -3"/><path d="M18 15l3 -3"/>',
+  'moon': '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>',
+  'sun': '<path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/>',
+  'trophy': '<path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M7 4l10 0"/><path d="M17 4v8a5 5 0 0 1 -10 0v-8"/><path d="M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>',
+  'target': '<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/>',
+  'note': '<path d="M13 20l-7 0a3 3 0 0 1 -3 -3l0 -10a3 3 0 0 1 3 -3l10 0a3 3 0 0 1 3 3l0 6.5"/><path d="M18 14v4h4"/><path d="M18 18m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M9 8l6 0"/><path d="M9 12l4 0"/>',
+  'flame': '<path d="M12 12c2 -2.96 0 -7 -1 -8c0 3.038 -1.773 4.741 -3 6c-1.226 1.26 -2 3.24 -2 5a6 6 0 1 0 12 0c0 -1.532 -1.056 -3.94 -2 -5c-1.786 3 -2.791 3 -4 2z"/>',
+  'shirt': '<path d="M15 4l6 2v5h-3v8a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-8h-3v-5l6 -2a3 3 0 0 0 6 0"/>',
+  'lock': '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/>',
+  'medal': '<path d="M12 4l3 6l6 .75l-4.12 4.62l1.12 6.63l-6 -3l-6 3l1.12 -6.63l-4.12 -4.62l6 -.75z"/>',
+  'camera': '<path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>',
+  'calendar-off': '<path d="M4 5m0 2a2 2 0 0 1 2 -2h1"/><path d="M16 3v3"/><path d="M8 3v3"/><path d="M3 3l18 18"/><path d="M20 8v11a2 2 0 0 1 -2 2h-11"/>',
+  'photo': '<path d="M15 8h.01"/><path d="M4 4m0 3a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3z"/><path d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l2 2"/>',
+  'crown': '<path d="M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4z"/>',
+  'sparkles': '<path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2z"/><path d="M16 6a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2z"/><path d="M9.5 15a5.5 5.5 0 0 1 5.5 -5.5a5.5 5.5 0 0 1 -5.5 -5.5a5.5 5.5 0 0 1 -5.5 5.5a5.5 5.5 0 0 1 5.5 5.5z"/>',
+};
+function icon(name, size = 16) {
+  const path = ICONS[name] || '';
+  if (!path) return '';
+  return `<span class="i-svg" style="width:${size}px;height:${size}px"><svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg></span>`;
+}
+
 // =================== DATA & STATE ===================
 const STORAGE_KEY = 'jjtracker_v1';
 
@@ -297,30 +1619,87 @@ const POSITIONS_NOGI = [
   'Guarda Z','Single leg X','Em pé','Crucifixo','Tartaruga'
 ];
 
-// Finalizações
+// Finalizações - baseado na lista de submissions legais da IBJJF
+// Fonte: rulebook oficial IBJJF + guias de submissions
 const SUBMISSIONS_GI = [
-  // Estrangulamentos
-  'Mata-leão','Estrangulamento de lapela (cross choke)','Estrangulamento de Ezequiel',
-  'Estrangulamento Brabo','Loop choke','Baseball choke','Bow and arrow',
-  'Triângulo','Triângulo de braço','Triângulo invertido',
-  'Clock choke','Estrangulamento norte-sul',
-  // Chaves de braço
-  'Armlock','Kimura','Americana','Omoplata','Chave de pulso',
-  // Chaves de perna (legal no gi sem 50/50 reaping)
-  'Chave de joelho (straight ankle lock)',
-  // Outras
-  'Estrangulamento de gola',
+  // === ESTRANGULAMENTOS SANGUÍNEOS (sem lapela) ===
+  'Mata-leão',
+  'Triângulo',
+  'Triângulo de braço',
+  'Triângulo invertido',
+  'Triângulo mão de vaca',
+  'Guilhotina',
+  'D\'Arce (brabo)',
+  'Anaconda',
+  'Peruvian necktie',
+  'Norte-sul choke',
+  'Von Flue choke',
+  // === ESTRANGULAMENTOS COM LAPELA (exclusivos do Gi) ===
+  'Cross choke (gola-gola)',
+  'Bow and arrow',
+  'Clock choke',
+  'Loop choke',
+  'Baseball bat choke',
+  'Estrangulamento de Ezequiel',
+  'Brabo choke (com lapela)',
+  'Papa-gola',
+  'Estrangulamento da lapela invertida',
+  'Estrangulamento estilo japonês',
+  // === CHAVES DE BRAÇO ===
+  'Armlock',
+  'Armlock invertido',
+  'Kimura',
+  'Americana',
+  'Omoplata',
+  'Baratinha (invertida)',
+  'Chave de pulso',
+  // === CHAVES DE PERNA (legais no Gi) ===
+  'Chave de pé reta (straight ankle lock)',
+  // Brown/Black belt only:
+  'Chave de joelho (kneebar)',
+  'Toe hold',
+  'Estima lock',
+  // === COMPRESSÕES (brown/black belt) ===
+  'Bicep slicer',
+  'Calf slicer (estrela)',
 ];
 
 const SUBMISSIONS_NOGI = [
-  // Estrangulamentos sem lapela
-  'Mata-leão','Guilhotina','D\'arce (brabo)','Anaconda','Peruvian necktie',
-  'Triângulo','Triângulo de braço','Triângulo invertido',
-  'Norte-sul choke','Von Flue choke',
-  // Chaves de braço
-  'Armlock','Kimura','Americana','Omoplata','Chave de pulso',
-  // Chaves de perna (mais liberais no no-gi)
-  'Heel hook interno','Heel hook externo','Chave de joelho','Toe hold','Estrela (calf slicer)','Bicep slicer'
+  // === ESTRANGULAMENTOS SANGUÍNEOS ===
+  'Mata-leão',
+  'Triângulo',
+  'Triângulo de braço',
+  'Triângulo invertido',
+  'Triângulo mão de vaca',
+  'Guilhotina',
+  'Guilhotina de braço dentro',
+  'D\'Arce (brabo)',
+  'Anaconda',
+  'Peruvian necktie',
+  'Norte-sul choke',
+  'Von Flue choke',
+  'Estrangulamento de Ezequiel',
+  'Head and arm choke',
+  // === CHAVES DE BRAÇO ===
+  'Armlock',
+  'Armlock invertido',
+  'Kimura',
+  'Americana',
+  'Omoplata',
+  'Baratinha (invertida)',
+  'Chave de pulso',
+  // === CHAVES DE PERNA (No-Gi tem mais liberdade) ===
+  'Chave de pé reta (straight ankle lock)',
+  'Heel hook interno (inside)',
+  'Heel hook externo (outside)',
+  'Chave de joelho (kneebar)',
+  'Toe hold',
+  'Estima lock',
+  'Aoki lock',
+  '50/50 kneebar',
+  // === COMPRESSÕES ===
+  'Bicep slicer',
+  'Calf slicer (estrela)',
 ];
 
 const RESULT_TYPES = ['Vitória por finalização','Vitória por pontos','Vitória por vantagem','Vitória por DQ','Derrota por finalização','Derrota por pontos','Derrota por vantagem','Derrota por DQ','Empate (draw)'];
@@ -343,7 +1722,16 @@ function loadAll() {
     return raw ? JSON.parse(raw) : { users: {}, currentEmail: null };
   } catch { return { users: {}, currentEmail: null }; }
 }
-function saveAll(db) { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+function saveAll(db) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    return true;
+  } catch (err) {
+    console.error('Erro ao salvar em localStorage:', err);
+    showToast('Erro ao salvar. Verifique o espaço do navegador.', 'error');
+    return false;
+  }
+}
 
 // Simple password hash (NOT cryptographically secure - for local-only demo)
 async function hashPassword(pw) {
@@ -385,6 +1773,7 @@ async function tryRegister(email, password, name) {
   const hash = await hashPassword(password);
   const data = newUserData();
   data.profile.name = name || email.split('@')[0];
+  migrate(data);
   db.users[email] = { passwordHash: hash, data };
   db.currentEmail = email;
   saveAll(db);
@@ -394,11 +1783,22 @@ async function tryRegister(email, password, name) {
 }
 
 function logout() {
+  // Fecha qualquer modal aberto
+  const overlay = document.querySelector('.modal-overlay');
+  if (overlay) overlay.remove();
+  modalState = null;
+  // Limpa sessão
   const db = loadAll();
   db.currentEmail = null;
   saveAll(db);
   state.currentUser = null;
   state.data = null;
+  state.currentTab = 'home';
+  // Reset auth ui state
+  authMode = 'landing';
+  authError = '';
+  // Aplica tema light padrão (sem user logado)
+  document.documentElement.setAttribute('data-theme', 'light');
   render();
 }
 
@@ -417,6 +1817,14 @@ function migrate(data) {
   if (data.profile.age === undefined) data.profile.age = null;
   if (data.profile.photo === undefined) data.profile.photo = null;
   if (!data.recapsDismissed) data.recapsDismissed = {}; // { "2026-04": true }
+  // Streak system
+  if (data.profile.streakGoal === undefined) data.profile.streakGoal = 3; // meta: X treinos/semana
+  // Theme
+  if (data.profile.theme === undefined) data.profile.theme = 'light'; // 'dark' | 'light'
+  if (!data.streakData) data.streakData = {
+    freezesUsed: {}, // { "2026-09": 1 } — freezes usados por mês
+    recordStreak: 0, // recorde histórico de semanas seguidas
+  };
   // Migrate weekPlans: old array format → new {gi, 'no-gi'} format
   for (const k in data.weekPlans) {
     if (Array.isArray(data.weekPlans[k])) {
@@ -465,6 +1873,174 @@ function initials(name) {
   return name.trim().split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase();
 }
 
+// =================== SISTEMA DE STREAK SEMANAL ===================
+// Semana: segunda a domingo. Meta pessoal. Freeze: 2/mês.
+
+// Retorna a data (Date) da segunda-feira da semana que contém a data passada
+function mondayOf(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dow = d.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+  const daysToSubtract = dow === 0 ? 6 : dow - 1;
+  d.setDate(d.getDate() - daysToSubtract);
+  return d;
+}
+
+// Chave da semana: "2026-W38" (ISO-ish, segunda a domingo)
+function weekKey(date) {
+  const monday = mondayOf(date);
+  return localISO(monday); // usa a data da segunda como chave
+}
+
+// Chave do mês: "2026-09"
+function monthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+}
+
+// Conta treinos registrados na semana que contém a data
+function trainingsInWeek(mondayISO) {
+  const monday = parseLocalISO(mondayISO);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  const mondayStr = localISO(monday);
+  const sundayStr = localISO(sunday);
+  // Contamos dias distintos (não treinos) — treinar 2x no mesmo dia conta como 1
+  const days = new Set();
+  state.data.sessions.forEach(s => {
+    if (s.date >= mondayStr && s.date <= sundayStr) {
+      days.add(s.date);
+    }
+  });
+  return days.size;
+}
+
+// Se a semana bateu meta OU teve freeze usado
+function weekMetGoal(mondayISO, goal) {
+  return trainingsInWeek(mondayISO) >= goal;
+}
+
+// Retorna quantos freezes já foram usados no mês
+function freezesUsedInMonth(monthKeyStr) {
+  return (state.data.streakData.freezesUsed[monthKeyStr] || 0);
+}
+
+// Máximo de freezes por mês
+const MAX_FREEZES_PER_MONTH = 2;
+function getMaxFreezesPerMonth() {
+  const hasPhoto = !!(state.data && state.data.profile && state.data.profile.photo);
+  return MAX_FREEZES_PER_MONTH + (hasPhoto ? 1 : 0);
+}
+
+// Calcula streak atual: quantas semanas consecutivas bateu meta (contando freezes)
+// A semana ATUAL só conta se já foi fechada OU se já bateu meta
+function computeCurrentStreak() {
+  const goal = state.data.profile.streakGoal || 3;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const currentMonday = mondayOf(today);
+  const currentMondayISO = localISO(currentMonday);
+
+  let streak = 0;
+  let checkMonday = new Date(currentMonday);
+
+  // Se a semana atual já bateu a meta, começa contando ela
+  if (weekMetGoal(currentMondayISO, goal)) {
+    streak = 1;
+    checkMonday.setDate(checkMonday.getDate() - 7);
+  } else {
+    // Se a semana atual ainda tá aberta e NÃO bateu meta, ela não quebra o streak ainda
+    // Começamos verificando da semana passada
+    checkMonday.setDate(checkMonday.getDate() - 7);
+  }
+
+  // Volta semana a semana enquanto tiver bateu meta OU tiver freeze
+  while (true) {
+    const iso = localISO(checkMonday);
+    // Não conta semanas anteriores à primeira sessão registrada
+    const firstSession = state.data.sessions.length > 0
+      ? state.data.sessions.map(s => s.date).sort()[0]
+      : null;
+    if (firstSession && iso < firstSession && !weekMetGoal(iso, goal)) {
+      break; // parou antes de começar a treinar
+    }
+    if (weekMetGoal(iso, goal)) {
+      streak++;
+      checkMonday.setDate(checkMonday.getDate() - 7);
+      continue;
+    }
+    // Não bateu meta — tenta freeze
+    const mk = monthKey(checkMonday);
+    // Verificamos se HÁ freeze marcado nessa semana (usaremos um flag por semana)
+    const freezeKey = `freeze_${iso}`;
+    if (state.data.streakData.freezesUsed[freezeKey]) {
+      streak++;
+      checkMonday.setDate(checkMonday.getDate() - 7);
+      continue;
+    }
+    break; // quebrou
+  }
+
+  return streak;
+}
+
+// Atualiza recorde histórico se o streak atual for maior
+function updateStreakRecord() {
+  const current = computeCurrentStreak();
+  if (current > (state.data.streakData.recordStreak || 0)) {
+    state.data.streakData.recordStreak = current;
+  }
+}
+
+// Aplica um freeze na semana passada (última semana fechada que quebrou o streak)
+function useFreezeOnLastWeek() {
+  const today = new Date();
+  const lastWeekMonday = mondayOf(today);
+  lastWeekMonday.setDate(lastWeekMonday.getDate() - 7);
+  const iso = localISO(lastWeekMonday);
+  const mk = monthKey(lastWeekMonday);
+  const goal = state.data.profile.streakGoal || 3;
+
+  if (weekMetGoal(iso, goal)) {
+    showToast('Semana passada já bateu meta, não precisa freeze', 'error');
+    return false;
+  }
+  const usedInMonth = freezesUsedInMonth(mk);
+  if (usedInMonth >= getMaxFreezesPerMonth()) {
+    showToast(`Você já usou ${getMaxFreezesPerMonth()} freezes esse mês`, 'error');
+    return false;
+  }
+  // Verificar se já foi usado nessa semana
+  const freezeKey = `freeze_${iso}`;
+  if (state.data.streakData.freezesUsed[freezeKey]) {
+    showToast('Você já usou freeze nessa semana', 'error');
+    return false;
+  }
+  // Aplica freeze
+  state.data.streakData.freezesUsed[freezeKey] = true;
+  state.data.streakData.freezesUsed[mk] = (state.data.streakData.freezesUsed[mk] || 0) + 1;
+  persistUser();
+  updateStreakRecord();
+  showToast('Freeze usado! Streak protegido 🧊');
+  return true;
+}
+
+// Estado da semana atual: quantos treinos, quantos faltam, etc
+function currentWeekStatus() {
+  const goal = state.data.profile.streakGoal || 3;
+  const today = new Date();
+  const currentMonday = mondayOf(today);
+  const currentMondayISO = localISO(currentMonday);
+  const done = trainingsInWeek(currentMondayISO);
+  const remaining = Math.max(0, goal - done);
+  const metGoal = done >= goal;
+
+  // Dias restantes na semana (incluindo hoje)
+  const sunday = new Date(currentMonday);
+  sunday.setDate(sunday.getDate() + 6);
+  const daysLeft = Math.ceil((sunday - today) / (1000 * 60 * 60 * 24)) + 1;
+
+  return { goal, done, remaining, metGoal, daysLeft };
+}
+
 function headerAvatar() {
   const p = state.data.profile;
   return `<button class="avatar-btn" data-action="goto:profile">${p.photo ? `<img src="${p.photo}" alt="foto">` : initials(p.name)}</button>`;
@@ -476,8 +2052,8 @@ function escapeHtml(s) {
 function showToast(msg, kind = 'success') {
   const t = document.createElement('div');
   t.className = 'toast' + (kind === 'error' ? ' toast-error' : '');
-  const icon = kind === 'error' ? 'alert-triangle' : 'check';
-  t.innerHTML = `<i class="ti ti-${icon}" style="vertical-align:-2px"></i> ${escapeHtml(msg)}`;
+  const iconName = kind === 'error' ? 'x' : 'check';
+  t.innerHTML = `${icon(iconName, 14)} ${escapeHtml(msg)}`;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2400);
 }
@@ -513,7 +2089,7 @@ function renderMoodSlider(value) {
   const dimmed = value == null;
   return `<div style="text-align:center">
     <div id="mood-emoji" style="font-size:64px;line-height:1;margin-bottom:6px">${moodEmoji(value)}</div>
-    <div id="mood-score" style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:${moodColor(value)};margin-bottom:18px;letter-spacing:0.02em">${value != null ? `${value}<span style="font-size:18px;opacity:0.6">/10</span>` : '<span style="font-size:18px;opacity:0.6">Toque pra registrar</span>'}</div>
+    <div id="mood-score" style="font-family:'Instrument Serif',sans-serif;font-size:36px;line-height:1;color:${moodColor(value)};margin-bottom:18px;letter-spacing:0.02em">${value != null ? `${value}<span style="font-size:18px;opacity:0.6">/10</span>` : '<span style="font-size:18px;opacity:0.6">Toque pra registrar</span>'}</div>
     <input type="range" id="m-mood" min="0" max="10" step="1" value="${v}" style="width:100%;accent-color:${moodColor(value)};${dimmed ? 'opacity:0.6' : ''}">
     <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px;letter-spacing:0.5px">
       <span>0 · HORRÍVEL</span>
@@ -763,7 +2339,13 @@ function getCurrentUnseenRecap() {
 }
 
 // =================== RENDER ===================
+function applyTheme() {
+  const theme = (state.data && state.data.profile && state.data.profile.theme) || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
 function render() {
+  applyTheme();
   const root = document.getElementById('app');
   if (!state.currentUser) { root.innerHTML = renderAuth(); attachAuthListeners(); return; }
   let content = '';
@@ -775,6 +2357,7 @@ function render() {
     case 'comps': content = renderComps(); break;
     case 'partners': content = renderPartners(); break;
     case 'profile': content = renderProfile(); break;
+    case 'settings': content = renderSettings(); break;
     default: content = renderHome();
   }
   root.innerHTML = content + renderNav();
@@ -782,37 +2365,52 @@ function render() {
 }
 
 // ---------- AUTH SCREEN ----------
-let authMode = 'login';
+let authMode = 'landing'; // 'landing' | 'login' | 'register'
 let authError = '';
 function renderAuth() {
+  if (authMode === 'landing') {
+    return `
+    <div class="auth-container">
+      <div class="auth-center">
+        <div class="wordmark lg">tatame<span class="dot">.</span></div>
+        <div class="auth-tagline">A new way to live jiu jitsu</div>
+      </div>
+      <div class="auth-actions">
+        <button class="btn-solid" id="auth-go-login">Entrar</button>
+        <button class="btn-secondary" id="auth-go-register">Criar conta</button>
+        <div class="auth-footer">Seus dados ficam neste dispositivo</div>
+      </div>
+    </div>`;
+  }
   const isLogin = authMode === 'login';
   return `
   <div class="auth-container">
-    <div class="auth-logo">
-      <div class="mark">TATAME</div>
-      <div class="tagline">Performance Tracker</div>
+    <div class="auth-center">
+      <div class="wordmark md">tatame<span class="dot">.</span></div>
+      <div class="auth-form">
+        <h2>${isLogin ? 'Entrar' : 'Criar conta'}</h2>
+        <div class="subtitle">${isLogin ? 'Acesse sua conta' : 'Comece a registrar seus treinos'}</div>
+        ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" placeholder="Como podemos te chamar?"></div>` : ''}
+        <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" placeholder="seu@email.com"></div>
+        <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
+        ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
+        <button class="btn-primary" id="auth-submit">${isLogin ? 'Entrar' : 'Criar conta'}</button>
+        <button class="auth-back" id="auth-back">← Voltar</button>
+      </div>
     </div>
-    <div class="auth-form">
-      <h2>${isLogin ? 'Entrar' : 'Criar conta'}</h2>
-      <div class="subtitle">${isLogin ? 'Acesse sua conta' : 'Comece a registrar seus treinos'}</div>
-      ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" placeholder="Como podemos te chamar?"></div>` : ''}
-      <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" placeholder="seu@email.com"></div>
-      <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
-      ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
-      <button class="btn-primary" id="auth-submit">${isLogin ? 'Entrar' : 'Criar conta'}</button>
-      <div class="auth-toggle">${isLogin ? 'Novo no Tatame?' : 'Já tem conta?'} <a id="auth-toggle">${isLogin ? 'Criar conta' : 'Entrar'}</a></div>
-    </div>
-    <p style="text-align:center; margin-top: 32px; font-size: 10px; color: var(--text-3); line-height: 1.5;">Os dados ficam salvos neste navegador.<br>Versão demo · sem servidor remoto.</p>
+    <div class="auth-footer">Seus dados ficam neste dispositivo</div>
   </div>`;
 }
 
 function attachAuthListeners() {
-  document.getElementById('auth-toggle').onclick = () => {
-    authMode = authMode === 'login' ? 'register' : 'login';
-    authError = '';
-    render();
-  };
-  document.getElementById('auth-submit').onclick = async () => {
+  const goLogin = document.getElementById('auth-go-login');
+  const goRegister = document.getElementById('auth-go-register');
+  const back = document.getElementById('auth-back');
+  if (goLogin) goLogin.onclick = () => { authMode = 'login'; authError = ''; render(); };
+  if (goRegister) goRegister.onclick = () => { authMode = 'register'; authError = ''; render(); };
+  if (back) back.onclick = () => { authMode = 'landing'; authError = ''; render(); };
+  const submit = document.getElementById('auth-submit');
+  if (submit) submit.onclick = async () => {
     const email = document.getElementById('auth-email').value.trim().toLowerCase();
     const pw = document.getElementById('auth-pw').value;
     if (!email || !pw) { authError = 'Preencha email e senha'; render(); return; }
@@ -824,71 +2422,97 @@ function attachAuthListeners() {
       res = await tryRegister(email, pw, name);
     }
     if (res.error) { authError = res.error; render(); }
-    else { authError = ''; state.currentTab = 'home'; render(); }
+    else { authError = ''; authMode = 'landing'; state.currentTab = 'home'; render(); }
   };
-  // Enter key submit
+  // Enter submit
   ['auth-email','auth-pw','auth-name'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('auth-submit').click(); });
+    if (el && submit) el.addEventListener('keydown', e => { if (e.key === 'Enter') submit.click(); });
   });
 }
 
 // ---------- HOME ----------
 function renderHome() {
   const p = state.data.profile;
-  const month = getMonthStats(state.cal.year, state.cal.month);
   const week = getCurrentWeekProgress();
+  const month = getMonthStats(new Date().getFullYear(), new Date().getMonth());
   const stats = computeStats(30);
+  const now = new Date();
+  const dayLbl = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' })
+    .replace(/^./, c => c.toUpperCase());
 
+  // Week strip (dots)
   const weekDaysHtml = week.days.map((d, i) => {
     const isToday = d.toDateString() === new Date().toDateString();
     const trained = week.sessionsByDay[i];
-    const planned = week.plan[i];
-    let cls, inner;
-    if (trained) {
-      cls = 'done';
-      inner = '<i class="ti ti-check" style="color:#0a0a0a;font-size:14px"></i>';
-    } else if (planned) {
-      cls = 'planned';
-      inner = '';
-    } else {
-      cls = 'empty-day';
-      inner = '';
-    }
-    if (isToday && !trained) cls += ' today-ring';
-    const lbl = ['SEG','TER','QUA','QUI','SEX','SAB','DOM'][i];
-    const displayLbl = isToday ? 'HOJE' : lbl;
-    return `<div class="week-day">
-      <button class="box ${cls}" data-action="toggle-plan:${i}" title="${planned ? 'Planejado' : 'Clique para planejar'}">${inner}</button>
-      <div class="lbl" style="${isToday ? 'color:var(--text);font-weight:600' : ''}">${displayLbl}</div>
-    </div>`;
+    const lbl = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'][i];
+    let cls = 'day-dot';
+    if (trained) cls += ' done';
+    if (isToday) cls += ' today';
+    return `<button class="${cls}" data-action="toggle-plan:${i}">
+      <div class="dot"></div>
+      <div class="label">${lbl}</div>
+    </button>`;
   }).join('');
 
-  const topSubsHtml = stats.subs.length ? stats.subs.map(([name, count]) => {
-    const pct = Math.round(count / stats.totalApplied * 100);
-    return `<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-        <span>${escapeHtml(name)}</span>
-        <span style="color:var(--text-2)">${count} · <span style="color:var(--primary);font-weight:500">${pct}%</span></span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    </div>`;
-  }).join('') : `<div style="text-align:center;color:var(--text-3);font-size:12px;padding:20px 0">Sem finalizações nos últimos 30 dias</div>`;
+  // Top submission
+  const topSub = stats.subs.length > 0 ? stats.subs[0] : null;
+  // Onde mais cai
+  const topSuffered = stats.suffered && stats.suffered.length > 0 ? stats.suffered[0] : null;
+
+  const monthName = now.toLocaleDateString('pt-BR', { month: 'long' })
+    .replace(/^./, c => c.toUpperCase());
 
   return `
   <div class="screen">
-    <div class="header">
-      <div>
-        <div class="label">${getGreeting()}, ${escapeHtml(p.name)}</div>
-        <h1>Tatame</h1>
+    <div class="app-header">
+      <div class="left">
+        <span class="day">${dayLbl}</span>
+        <span class="greeting">Olá, ${escapeHtml(p.name || 'atleta')}</span>
       </div>
       ${headerAvatar()}
     </div>
 
-    <div class="toggle">
-      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
-      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+    <div style="margin-bottom:20px">
+      <div class="toggle" style="margin-bottom:0">
+        <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi">Gi</button>
+        <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+      </div>
     </div>
+
+    ${(() => {
+      const streak = computeCurrentStreak();
+      const wk = currentWeekStatus();
+      const record = state.data.streakData.recordStreak || 0;
+      const mk = monthKey(new Date());
+      const freezesUsed = freezesUsedInMonth(mk);
+      const freezesAvailable = getMaxFreezesPerMonth() - freezesUsed;
+      const lastMonday = mondayOf(new Date());
+      lastMonday.setDate(lastMonday.getDate() - 7);
+      const lastWeekLost = !weekMetGoal(localISO(lastMonday), wk.goal);
+      const lastWeekFreezeKey = `freeze_${localISO(lastMonday)}`;
+      const lastWeekAlreadyFrozen = !!state.data.streakData.freezesUsed[lastWeekFreezeKey];
+      const canFreezeLastWeek = lastWeekLost && !lastWeekAlreadyFrozen && freezesAvailable > 0 && streak === 0 && state.data.sessions.length > 0;
+
+      const pct = wk.goal > 0 ? Math.min(100, (wk.done / wk.goal) * 100) : 0;
+      const showRecord = record > 0 && record > streak;
+      const displayStreak = streak;
+
+      return `<button class="streak-hero" data-action="open:streak-modal">
+        <div class="row">
+          <div>
+            <div class="label">Streak semanal</div>
+            <div class="value"><span class="accent">${displayStreak}</span> <span class="unit">${displayStreak === 1 ? 'semana' : 'semanas'}</span></div>
+          </div>
+          ${showRecord ? `<div class="meta">Recorde<br><strong style="color:var(--text-2)">${record}</strong></div>` : ''}
+        </div>
+        <div class="progress">
+          <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+          <div class="frac">${wk.done}/${wk.goal}</div>
+        </div>
+        ${canFreezeLastWeek ? `<div style="margin-top:12px"><span class="cta-freeze" data-action="use-freeze" onclick="event.stopPropagation()">🧊 Usar freeze (${freezesAvailable})</span></div>` : ''}
+      </button>`;
+    })()}
 
     ${(() => {
       const unseen = getCurrentUnseenRecap();
@@ -899,72 +2523,70 @@ function renderHome() {
       return `<button class="recap-cta" data-action="recap-open:${unseen.year}-${unseen.month}">
         <div class="ico">🎁</div>
         <div class="info">
-          <div class="ttl">Sua retrospectiva de ${monthCap} chegou!</div>
+          <div class="ttl">Retrospectiva de ${monthCap} chegou</div>
           <div class="sub">${recap.sessions} treinos · ${recap.hours}h no tatame · Toque pra ver</div>
         </div>
-        <i class="ti ti-chevron-right" style="font-size:20px"></i>
+        ${icon('chevron-right', 20)}
       </button>`;
     })()}
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div>
-          <div class="card-label">Frequência semanal · ${state.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
-          ${week.goal > 0 ? `
-            <div style="font-family:'Bebas Neue';font-size:36px;line-height:1">${week.done}<span style="font-size:18px;color:var(--text-4)">/${week.goal}</span></div>
-            <div style="font-size:11px;color:${week.done >= week.goal ? 'var(--green)' : 'var(--text-2)'};margin-top:4px">${
-              week.done >= week.goal
-                ? (week.done > week.goal ? `Meta cumprida +${week.done - week.goal} bônus!` : 'Meta semanal cumprida!')
-                : `Faltam ${week.goal - week.done} ${week.goal - week.done === 1 ? 'treino' : 'treinos'}`
-            }</div>
-          ` : `
-            <div style="font-family:'Bebas Neue';font-size:28px;line-height:1;color:var(--text-2)">Sem plano</div>
-            <div style="font-size:11px;color:var(--text-3);margin-top:4px">Toque nos dias abaixo pra planejar</div>
-          `}
+    <button class="quick-action" data-action="open:new-session">
+      <div>
+        <div class="label">Hoje</div>
+        <div class="action">Registrar treino</div>
+      </div>
+      <div class="arrow">→</div>
+    </button>
+
+    <div class="section-header">
+      <h3>Essa semana</h3>
+      <span class="link" data-action="tab:calendar">Ver histórico →</span>
+    </div>
+
+    <div class="week-strip">${weekDaysHtml}</div>
+
+    <div class="section-header">
+      <h3>${monthName}</h3>
+      <span class="link" data-action="tab:stats">Detalhes →</span>
+    </div>
+
+    <div class="stat-list">
+      <div class="stat-row">
+        <div class="k">
+          <div class="label">Tempo no tatame</div>
+          <div class="sub">${month.sessionsCount} ${month.sessionsCount === 1 ? 'treino' : 'treinos'}</div>
         </div>
-        ${week.goal > 0 ? `<span class="pill ${week.done >= week.goal ? 'pill-green' : 'pill-amber'}">${Math.round(week.done/week.goal*100)}%</span>` : ''}
+        <div class="v">${month.hours}<span class="unit">h</span></div>
       </div>
-      <div class="week-grid">${weekDaysHtml}</div>
-      <p style="font-size:10px;color:var(--text-3);margin-top:10px;text-align:center">Plano de ${state.mode === 'gi' ? 'Gi' : 'No-Gi'} · troque o modo no topo pra ver o outro</p>
+      ${topSub ? `<div class="stat-row">
+        <div class="k">
+          <div class="label">Finalização favorita</div>
+          <div class="sub">${escapeHtml(topSub[0])} · ${topSub[1]}×</div>
+        </div>
+        <div class="v">${Math.round(topSub[1] / stats.totalApplied * 100)}<span class="unit">%</span></div>
+      </div>` : `<div class="stat-row">
+        <div class="k">
+          <div class="label">Finalizações aplicadas</div>
+          <div class="sub">Registre pra ver estatística</div>
+        </div>
+        <div class="v">${month.applied}</div>
+      </div>`}
+      ${topSuffered ? `<div class="stat-row">
+        <div class="k">
+          <div class="label">Onde mais cai</div>
+          <div class="sub">${escapeHtml(topSuffered[0])}</div>
+        </div>
+        <div class="v">${topSuffered[1]}<span class="unit">×</span></div>
+      </div>` : `<div class="stat-row">
+        <div class="k">
+          <div class="label">Finalizações sofridas</div>
+          <div class="sub">no mês</div>
+        </div>
+        <div class="v">${month.suffered}</div>
+      </div>`}
     </div>
 
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="stat-head"><i class="ti ti-flame" style="color:var(--primary)"></i><span class="label">Rolas</span></div>
-        <div class="stat-value">${month.rolls}</div>
-        <div class="stat-sub">este mês</div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><i class="ti ti-trophy" style="color:var(--amber)"></i><span class="label">Finalizações</span></div>
-        <div class="stat-value">${month.applied}</div>
-        <div class="stat-sub">este mês</div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><i class="ti ti-shield" style="color:var(--blue)"></i><span class="label">Sofridas</span></div>
-        <div class="stat-value">${month.suffered}</div>
-        <div class="stat-sub">este mês</div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><i class="ti ti-clock" style="color:var(--purple)"></i><span class="label">Tatame</span></div>
-        <div class="stat-value">${month.hours}<span style="font-size:16px;color:var(--text-4)">h</span></div>
-        <div class="stat-sub">este mês</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:500">Composição do meu jogo</div>
-        <span style="font-size:10px;color:var(--text-4)">${state.mode === 'gi' ? 'Gi' : 'No-Gi'} · 30 dias</span>
-      </div>
-      ${stats.totalApplied > 0 ? `<div style="font-size:11px;color:var(--text-2);margin-bottom:12px">Das suas <span style="color:var(--text)">${stats.totalApplied} finalizações</span>:</div>` : ''}
-      ${topSubsHtml}
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn-primary" data-action="open:new-session"><i class="ti ti-plus" style="vertical-align:-2px"></i> Novo treino</button>
-      <button class="btn-secondary" data-action="open:new-comp"><i class="ti ti-trophy" style="vertical-align:-2px"></i> Competição</button>
-    </div>
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:18px;letter-spacing:1px">TATAME · build v12</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v15</p>
   </div>`;
 }
 
@@ -980,7 +2602,7 @@ function renderCalendar() {
   const { year, month } = state.cal;
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  const startOffset = (firstDay.getDay() + 6) % 7; // Monday first
+  const startOffset = (firstDay.getDay() + 6) % 7;
   const sessions = getSessionsForMode();
   const compsList = getCompsForMode();
   const sessionDates = new Set(sessions.map(s => s.date));
@@ -997,61 +2619,82 @@ function renderCalendar() {
     const hasSession = sessionDates.has(iso);
     const hasComp = compDates.has(iso);
     let cls = 'cal-day';
-    if (isToday) cls += ' today';
     if (hasSession) cls += ' has-session';
     if (hasComp) cls += ' has-comp';
+    if (isToday) cls += ' today';
     if (isFuture && !hasSession && !hasComp) cls += ' future';
-    cells += `<div class="${cls}" data-action="select-day:${iso}">${d}</div>`;
+    cells += `<button class="${cls}" data-action="select-day:${iso}">${d}</button>`;
   }
 
   const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const monthCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  const m = getMonthStats(year, month);
+
+  // Melhor semana do mês
+  let bestWeek = 0;
+  const weekCounts = {};
+  sessions.filter(s => {
+    const d = parseLocalISO(s.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  }).forEach(s => {
+    const wk = weekKey(parseLocalISO(s.date));
+    weekCounts[wk] = (weekCounts[wk] || 0) + 1;
+  });
+  Object.values(weekCounts).forEach(v => { if (v > bestWeek) bestWeek = v; });
 
   return `
   <div class="screen">
-    <div class="header">
-      <h1>Histórico</h1>
-      ${headerAvatar()}
-    </div>
-
-    <div class="toggle">
-      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
-      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
-    </div>
-
-    <div class="cal-header">
-      <div class="cal-month" style="text-transform:capitalize">${monthName}</div>
+    <div class="app-header">
+      <div class="left">
+        <span class="day">${monthCap}</span>
+        <h1>Histórico</h1>
+      </div>
       <div class="cal-nav">
-        <button data-action="cal:prev"><i class="ti ti-chevron-left"></i></button>
-        <button data-action="cal:next"><i class="ti ti-chevron-right"></i></button>
+        <button data-action="cal:prev">${icon('chevron-left', 16)}</button>
+        <button data-action="cal:next">${icon('chevron-right', 16)}</button>
       </div>
     </div>
 
-    <div class="cal-grid" style="margin-bottom:8px">
-      <div class="cal-dow">SEG</div>
-      <div class="cal-dow">TER</div>
-      <div class="cal-dow">QUA</div>
-      <div class="cal-dow">QUI</div>
-      <div class="cal-dow">SEX</div>
-      <div class="cal-dow">SÁB</div>
-      <div class="cal-dow">DOM</div>
-    </div>
-    <div class="cal-grid">${cells}</div>
-
-    <div style="display:flex;gap:14px;justify-content:center;margin:18px 0;font-size:11px;color:var(--text-2)">
-      <span><span style="display:inline-block;width:6px;height:6px;background:var(--primary);border-radius:50%;vertical-align:1px;margin-right:6px"></span>Treino</span>
-      <span><span style="display:inline-block;width:6px;height:6px;background:var(--amber);border-radius:50%;vertical-align:1px;margin-right:6px"></span>Competição</span>
+    <div style="margin-bottom:16px">
+      <div class="toggle" style="margin-bottom:0">
+        <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi">Gi</button>
+        <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Resumo do mês</div>
-      ${(() => {
-        const m = getMonthStats(year, month);
-        return `<div class="session-summary">
-          <div><div class="val">${m.sessionsCount}</div><div class="lbl">Treinos</div></div>
-          <div><div class="val">${m.rolls}</div><div class="lbl">Rolas</div></div>
-          <div><div class="val">${m.applied}</div><div class="lbl">Finalizações</div></div>
-        </div>`;
-      })()}
+    <div class="cal-grid" style="margin-bottom:6px">
+      <div class="cal-dow">S</div>
+      <div class="cal-dow">T</div>
+      <div class="cal-dow">Q</div>
+      <div class="cal-dow">Q</div>
+      <div class="cal-dow">S</div>
+      <div class="cal-dow">S</div>
+      <div class="cal-dow">D</div>
+    </div>
+    <div class="cal-grid" style="margin-bottom:24px">${cells}</div>
+
+    <div class="stat-list">
+      <div class="stat-row">
+        <div class="k">
+          <div class="label">Treinos no mês</div>
+          <div class="sub">${m.hours}h no total</div>
+        </div>
+        <div class="v">${m.sessionsCount}</div>
+      </div>
+      <div class="stat-row">
+        <div class="k">
+          <div class="label">Rolas registradas</div>
+          <div class="sub">${m.applied} finalizações aplicadas</div>
+        </div>
+        <div class="v">${m.rolls}</div>
+      </div>
+      <div class="stat-row">
+        <div class="k">
+          <div class="label">Melhor semana</div>
+          <div class="sub">Máximo de treinos numa semana</div>
+        </div>
+        <div class="v">${bestWeek}</div>
+      </div>
     </div>
   </div>`;
 }
@@ -1064,7 +2707,7 @@ function renderDay() {
 
   let body = '';
   if (sessions.length === 0 && comps.length === 0) {
-    body = `<div class="empty"><i class="ti ti-calendar-off"></i><p>Sem atividades neste dia</p></div>`;
+    body = `<div class="empty">${icon('calendar-off', 16)}<p>Sem atividades neste dia</p></div>`;
   } else {
     sessions.forEach(s => {
       body += renderSessionCard(s);
@@ -1078,14 +2721,14 @@ function renderDay() {
   return `
   <div class="screen">
     <div class="day-header">
-      <button class="back" data-action="goto:calendar"><i class="ti ti-arrow-left" style="font-size:18px"></i></button>
-      <h2 style="text-transform:capitalize">${fmtDateLong(date)}</h2>
+      <button class="back" data-action="goto:calendar">${icon('arrow-left', 18)}</button>
+      <h2>${(() => { const s = fmtDateLong(date); return s.charAt(0).toUpperCase() + s.slice(1); })()}</h2>
       <div style="width:32px"></div>
     </div>
     ${body}
     ${isFutureDate
-      ? `<div class="empty" style="padding:20px;margin-top:16px"><i class="ti ti-lock"></i><p>Datas futuras não podem ter treinos registrados</p></div>`
-      : `<button class="btn-primary" style="margin-top:16px" data-action="open:new-session-date:${date}"><i class="ti ti-plus" style="vertical-align:-2px"></i> Adicionar treino neste dia</button>`}
+      ? `<div class="empty" style="padding:20px;margin-top:16px">${icon('lock', 16)}<p>Datas futuras não podem ter treinos registrados</p></div>`
+      : `<button class="btn-primary" style="margin-top:16px" data-action="open:new-session-date:${date}"><span style="vertical-align:-2px">${icon('plus', 16)}</span> Adicionar treino neste dia</button>`}
   </div>`;
 }
 
@@ -1096,7 +2739,7 @@ function renderSessionCard(s) {
   const partnersList = (s.partners || []).map(pid => partnersById[pid]).filter(Boolean);
   const partnersHtml = partnersList.length ? `
     <div style="margin-top:12px">
-      <div style="font-size:11px;color:var(--text-2);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase"><i class="ti ti-users" style="vertical-align:-2px;font-size:13px"></i> Parceiros desta sessão</div>
+      <div style="font-size:11px;color:var(--text-2);margin-bottom:8px;letter-spacing:0.5px;text-transform:uppercase"><span style="vertical-align:-2px;">${icon('users', 13)}</span> Parceiros desta sessão</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${partnersList.map(p => {
           const v = getBeltVisual(p.belt);
@@ -1122,8 +2765,8 @@ function renderSessionCard(s) {
             <div style="font-size:12px;font-weight:500">Rola ${ri+1}${partner ? ` · ${escapeHtml(partner.name.split(' ')[0])}` : ''}</div>
             <div style="font-size:10px;color:var(--text-3)">${appliedC.length ? `<span style="color:var(--green)">${appliedC.length} aplic</span>` : ''}${appliedC.length && sufferedC.length ? ' · ' : ''}${sufferedC.length ? `<span style="color:var(--red)">${sufferedC.length} sofr</span>` : ''}</div>
           </div>
-          ${appliedC.map(a => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--green);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(a.position)}</span><i class="ti ti-arrow-right" style="font-size:10px;color:var(--text-4)"></i><span>${escapeHtml(a.submission)}</span></div>`).join('')}
-          ${sufferedC.map(x => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--red);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(x.position)}</span><i class="ti ti-arrow-right" style="font-size:10px;color:var(--text-4)"></i><span style="color:var(--red)">${escapeHtml(x.submission)}</span></div>`).join('')}
+          ${appliedC.map(a => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--green);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(a.position)}</span><span style="color:var(--text-4)">${icon('arrow-right', 10)}</span><span>${escapeHtml(a.submission)}</span></div>`).join('')}
+          ${sufferedC.map(x => `<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-top:4px"><span style="width:5px;height:5px;background:var(--red);border-radius:50%"></span><span style="color:var(--text-2)">${escapeHtml(x.position)}</span><span style="color:var(--text-4)">${icon('arrow-right', 10)}</span><span style="color:var(--red)">${escapeHtml(x.submission)}</span></div>`).join('')}
           ${r.notes ? `<div style="margin-top:6px;font-size:11px;color:var(--text-3);font-style:italic">"${escapeHtml(r.notes)}"</div>` : ''}
         </div>`;
       }).join('')}
@@ -1134,14 +2777,14 @@ function renderSessionCard(s) {
       ${(s.applied || []).length ? `<div style="font-size:11px;color:var(--text-2);margin-top:8px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Finalizações aplicadas</div>` : ''}
       ${(s.applied || []).map(a => `<div class="combo-row">
         <span class="combo-tag pos">${escapeHtml(a.position)}</span>
-        <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
+        <span style="color:var(--text-4)">${icon('arrow-right', 12)}</span>
         <span class="combo-tag fin">${escapeHtml(a.submission)}</span>
         ${a.partnerId && partnersById[a.partnerId] ? `<span style="margin-left:auto;font-size:11px;color:var(--text-4)">${escapeHtml(partnersById[a.partnerId].name.split(' ')[0])}</span>` : ''}
       </div>`).join('')}
       ${(s.suffered || []).length ? `<div style="font-size:11px;color:var(--text-2);margin-top:10px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Finalizações sofridas</div>` : ''}
       ${(s.suffered || []).map(x => `<div class="combo-row" style="background:var(--surface-2);border-left:3px solid var(--blue)">
         <span class="combo-tag pos">${escapeHtml(x.position)}</span>
-        <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
+        <span style="color:var(--text-4)">${icon('arrow-right', 12)}</span>
         <span class="combo-tag" style="background:rgba(68,136,255,0.15);color:var(--blue)">${escapeHtml(x.submission)}</span>
       </div>`).join('')}`;
   }
@@ -1150,7 +2793,7 @@ function renderSessionCard(s) {
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px">
-        <i class="ti ti-flame" style="color:var(--primary);font-size:18px"></i>
+        <span style="color:var(--primary);">${icon('flame', 18)}</span>
         <div>
           <div style="font-size:14px;font-weight:500">Treino</div>
           <div style="font-size:11px;color:var(--text-3)">${s.duration} min · ${s.rolls} rolas · ${s.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
@@ -1158,8 +2801,8 @@ function renderSessionCard(s) {
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         ${s.mood != null ? `<div style="display:flex;align-items:center;gap:4px;background:var(--surface-2);padding:4px 10px;border-radius:14px" title="Como se sentiu: ${moodLabel(s.mood)} · ${s.mood}/10"><span style="font-size:16px">${moodEmoji(s.mood)}</span><span style="font-size:11px;color:${moodColor(s.mood)};font-weight:500">${s.mood}</span></div>` : ''}
-        <button class="close-btn" data-action="edit-session:${s.id}" title="Editar"><i class="ti ti-edit" style="font-size:14px;color:var(--text-3)"></i></button>
-        <button class="close-btn" data-action="del-session:${s.id}" title="Deletar"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+        <button class="close-btn" data-action="edit-session:${s.id}" title="Editar"><span style="color:var(--text-3)">${icon('edit', 14)}</span></button>
+        <button class="close-btn" data-action="del-session:${s.id}" title="Deletar"><span style="color:var(--text-3)">${icon('trash', 14)}</span></button>
       </div>
     </div>
     <div class="session-summary">
@@ -1181,12 +2824,12 @@ function renderCompCard(c) {
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <i class="ti ti-trophy" style="color:var(--amber);font-size:18px"></i>
+          <span style="color:var(--amber);">${icon('trophy', 18)}</span>
           <div style="font-size:14px;font-weight:500">${escapeHtml(c.name || 'Competição')}</div>
         </div>
         <div style="font-size:11px;color:var(--text-3)">${escapeHtml(c.category || '')}${c.weightClass ? ' · ' + escapeHtml(c.weightClass) : ''}</div>
       </div>
-      <button class="close-btn" data-action="del-comp:${c.id}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+      <button class="close-btn" data-action="del-comp:${c.id}"><span style="color:var(--text-3)">${icon('trash', 14)}</span></button>
     </div>
     <div class="session-summary">
       <div><div class="val" style="color:var(--green)">${wins}</div><div class="lbl">Vitórias</div></div>
@@ -1274,79 +2917,106 @@ function renderBars(entries, total) {
 
 function renderStats() {
   const s = computeStats(statsPeriod);
-  const periodLabel = { 7: '7d', 30: '30d', 90: '90d', 9999: 'Tudo' };
+  const periodLabel = { 7: '7 dias', 30: '30 dias', 90: '90 dias', 9999: 'Tudo' };
 
-  function renderChart(entries, total) {
-    if (!entries.length) return `<div style="text-align:center;color:var(--text-3);padding:24px 16px;font-size:12px">
-      <i class="ti ti-chart-bar" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>
-      <div>Sem finalizações aplicadas no período</div>
-      <div style="margin-top:6px;font-size:11px;opacity:0.7">Registre um treino com finalização aplicada pra ver o gráfico</div>
+  // Bars renderer minimalista
+  function renderBarsClean(entries, total) {
+    if (!entries.length) return `<div style="text-align:center;color:var(--text-3);padding:24px 8px;font-size:12px">
+      <div>Sem dados no período</div>
     </div>`;
-    return statsChart === 'pie' ? renderPie(entries, total) : renderBars(entries, total);
+    const maxVal = Math.max(...entries.map(([_, c]) => c));
+    return `<div class="bars-row">
+      ${entries.slice(0, 6).map(([name, c]) => {
+        const pct = maxVal > 0 ? (c / maxVal * 100) : 0;
+        const shareStr = total > 0 ? Math.round(c / total * 100) + '%' : '';
+        return `<div class="bar-item">
+          <div class="top"><span class="name">${escapeHtml(name)}</span><span class="num">${c}${shareStr ? ' · ' + shareStr : ''}</span></div>
+          <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>`;
   }
 
-  const combosHtml = s.combos.length ? s.combos.map(([k, c]) => {
-    const [pos, sub] = k.split(' → ');
-    return `<div class="combo-row">
-      <span class="combo-tag pos">${escapeHtml(pos)}</span>
-      <i class="ti ti-arrow-right" style="font-size:12px;color:var(--text-4)"></i>
-      <span class="combo-tag fin">${escapeHtml(sub)}</span>
-      <span class="count">${c}×</span>
-    </div>`;
-  }).join('') : '<div style="text-align:center;color:var(--text-3);padding:20px;font-size:12px">Sem combinações registradas</div>';
-
-  const sufferedHtml = s.suffered.length ? s.suffered.map(([k, c]) => {
-    const [pos, sub] = k.split(' → ');
-    return `<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);padding:12px 14px;border-radius:var(--radius-md);border-left:3px solid var(--primary);margin-bottom:8px">
-      <div>
-        <div style="font-size:13px">${escapeHtml(pos)} → ${escapeHtml(sub)}</div>
-        <div style="font-size:10px;color:var(--text-2);margin-top:2px">Sofrido ${c} ${c === 1 ? 'vez' : 'vezes'}</div>
-      </div>
-    </div>`;
-  }).join('') : '<div style="text-align:center;color:var(--text-3);padding:20px;font-size:12px">Sem vulnerabilidades registradas — ótimo sinal!</div>';
+  // Comparar com período anterior (só pra 30d)
+  let comparisonNote = '';
+  if (statsPeriod === 30) {
+    const prevStats = computePriorPeriodStats(30);
+    if (prevStats && prevStats.totalApplied > 0) {
+      const diff = s.totalApplied - prevStats.totalApplied;
+      if (diff !== 0) {
+        comparisonNote = `${diff > 0 ? '+' : ''}${diff} vs mês anterior`;
+      }
+    }
+  }
 
   return `
   <div class="screen">
-    <div class="header">
-      <h1>Stats</h1>
+    <div class="app-header">
+      <div class="left">
+        <span class="day">${periodLabel[statsPeriod] || '30 dias'}</span>
+        <h1>Stats</h1>
+      </div>
       ${headerAvatar()}
     </div>
-    <div class="toggle">
-      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
-      <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px">
-      <div style="display:flex;gap:6px;overflow-x:auto;flex:1">
-        ${[7,30,90,9999].map(d => `<button style="${statsPeriod === d ? 'background:var(--primary);color:#fff;border:none;' : 'background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-2);'}padding:8px 14px;border-radius:16px;font-size:11px;white-space:nowrap" data-action="period:${d}">${periodLabel[d]}</button>`).join('')}
-      </div>
-      <div style="display:flex;gap:4px;background:var(--surface-2);padding:3px;border-radius:14px;border:1px solid var(--border-2)">
-        <button style="background:${statsChart === 'bar' ? 'var(--primary)' : 'transparent'};color:${statsChart === 'bar' ? '#fff' : 'var(--text-2)'};border:none;padding:6px 8px;border-radius:11px;display:flex;align-items:center" data-action="chart:bar" title="Barras"><i class="ti ti-chart-bar" style="font-size:14px"></i></button>
-        <button style="background:${statsChart === 'pie' ? 'var(--primary)' : 'transparent'};color:${statsChart === 'pie' ? '#fff' : 'var(--text-2)'};border:none;padding:6px 8px;border-radius:11px;display:flex;align-items:center" data-action="chart:pie" title="Pizza"><i class="ti ti-chart-pie" style="font-size:14px"></i></button>
+
+    <div style="margin-bottom:16px">
+      <div class="toggle" style="margin-bottom:0">
+        <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi">Gi</button>
+        <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">De onde vem suas finalizações</div>
-      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px">Posição de origem · ${s.totalApplied} finalizações</div>
-      ${renderChart(s.positions, s.totalApplied)}
+    <div class="stats-toggle">
+      ${[7,30,90,9999].map(d => `<button class="${statsPeriod === d ? 'active' : ''}" data-action="period:${d}">${periodLabel[d]}</button>`).join('')}
     </div>
 
-    <div class="card">
-      <div class="card-label">Quais finalizações você aplica</div>
-      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px">Tipo de finalização · ${s.totalApplied} finalizações</div>
-      ${renderChart(s.subs, s.totalApplied)}
+    <div class="hero-metric">
+      <div class="label">Total de finalizações</div>
+      <div class="value"><span class="accent">${s.totalApplied}</span> <span class="unit">aplicadas</span></div>
+      ${comparisonNote ? `<div class="sub">${comparisonNote}</div>` : ''}
     </div>
 
-    <div class="card">
-      <div class="card-label">Combinações mais frequentes</div>
-      ${combosHtml}
+    <div class="chart-block">
+      <div class="title">Suas finalizações</div>
+      <div class="subtitle">De onde vêm · ${state.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
+      ${renderBarsClean(s.subs, s.totalApplied)}
     </div>
 
-    <div class="card">
-      <div class="card-label">Onde você tem caído</div>
-      ${sufferedHtml}
+    <div class="chart-block">
+      <div class="title">Vulnerabilidades</div>
+      <div class="subtitle">Onde você cai · ${state.mode === 'gi' ? 'Gi' : 'No-Gi'}</div>
+      ${renderBarsClean(s.suffered, s.suffered.reduce((sum, [_,c]) => sum+c, 0))}
     </div>
+
+    ${s.combos && s.combos.length > 0 ? `<div class="chart-block">
+      <div class="title">Combos frequentes</div>
+      <div class="subtitle">Posição → finalização</div>
+      ${s.combos.slice(0, 5).map(([k, c]) => {
+        const [pos, sub] = k.split(' → ');
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <span style="font-size:12px;color:var(--text-2)">${escapeHtml(pos)}</span>
+            <span style="color:var(--text-3);margin:0 6px">→</span>
+            <span style="font-size:13px;color:var(--text)">${escapeHtml(sub)}</span>
+          </div>
+          <span class="mono" style="font-size:11px;color:var(--text-2)">${c}×</span>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
   </div>`;
+}
+
+function computePriorPeriodStats(days) {
+  const now = new Date();
+  const start = new Date(now); start.setDate(start.getDate() - days*2);
+  const end = new Date(now); end.setDate(end.getDate() - days);
+  const sessions = getSessionsForMode().filter(s => {
+    const d = parseLocalISO(s.date);
+    return d >= start && d < end;
+  });
+  let totalApplied = 0;
+  sessions.forEach(s => { totalApplied += (s.applied || []).length; });
+  return { totalApplied };
 }
 
 // ---------- COMPS LIST ----------
@@ -1354,7 +3024,7 @@ function renderComps() {
   const comps = getCompsForMode().slice().sort((a,b) => b.date.localeCompare(a.date));
   let body = '';
   if (comps.length === 0) {
-    body = `<div class="empty"><i class="ti ti-trophy"></i><p>Nenhuma competição registrada<br><span style="color:var(--text-4)">${state.mode === 'gi' ? 'no Gi' : 'no No-Gi'}</span></p></div>`;
+    body = `<div class="empty">${icon('trophy', 16)}<p>Nenhuma competição registrada<br><span style="color:var(--text-4)">${state.mode === 'gi' ? 'no Gi' : 'no No-Gi'}</span></p></div>`;
   } else {
     body = comps.map(c => {
       const wins = c.matches.filter(m => m.result === 'win').length;
@@ -1365,7 +3035,7 @@ function renderComps() {
             <div style="font-size:14px;font-weight:500;margin-bottom:2px">${escapeHtml(c.name || 'Competição')}</div>
             <div style="font-size:11px;color:var(--text-3)">${fmtDateLong(c.date)}</div>
           </div>
-          ${c.result ? `<span class="pill pill-amber"><i class="ti ti-medal" style="font-size:11px"></i> ${escapeHtml(c.result)}</span>` : ''}
+          ${c.result ? `<span class="pill pill-amber">${icon('medal', 11)} ${escapeHtml(c.result)}</span>` : ''}
         </div>
         <div style="display:flex;gap:10px;font-size:11px;color:var(--text-2)">
           <span><span style="color:var(--green)">${wins}V</span> · <span style="color:var(--red)">${losses}D</span></span>
@@ -1378,154 +3048,231 @@ function renderComps() {
   <div class="screen">
     <div class="header"><h1>Competições</h1>${headerAvatar()}</div>
     <div class="toggle">
-      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi"><span style="vertical-align:-2px">${icon('shirt', 13)}</span> Gi</button>
       <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
     </div>
     ${body}
-    <button class="btn-primary" style="margin-top:12px" data-action="open:new-comp"><i class="ti ti-plus" style="vertical-align:-2px"></i> Nova competição</button>
+    <button class="btn-primary" style="margin-top:12px" data-action="open:new-comp"><span style="vertical-align:-2px">${icon('plus', 16)}</span> Nova competição</button>
   </div>`;
 }
 
 // ---------- PARTNERS ----------
 function renderPartners() {
   const partners = state.data.partners.slice().sort((a,b) => a.name.localeCompare(b.name));
-  // Compute stats per partner across both modes
   const partnerStats = {};
   state.data.sessions.forEach(s => {
-    (s.applied || []).forEach(a => {
-      if (a.partnerId) {
-        if (!partnerStats[a.partnerId]) partnerStats[a.partnerId] = { rolls: 0, applied: 0, suffered: 0 };
-        partnerStats[a.partnerId].applied++;
-      }
-    });
     (s.partners || []).forEach(pid => {
-      if (!partnerStats[pid]) partnerStats[pid] = { rolls: 0, applied: 0, suffered: 0 };
-      partnerStats[pid].rolls++;
+      if (!partnerStats[pid]) partnerStats[pid] = { sessions: 0, applied: 0, suffered: 0 };
+      partnerStats[pid].sessions++;
     });
   });
 
-  let body = '';
-  if (partners.length === 0) {
-    body = `<div class="empty"><i class="ti ti-users"></i><p>Nenhum parceiro cadastrado<br><span style="color:var(--text-4)">Adicione parceiros recorrentes pra contextualizar suas estatísticas</span></p></div>`;
-  } else {
-    body = partners.map(p => {
-      const stats = partnerStats[p.id] || { rolls: 0, applied: 0, suffered: 0 };
-      const beltColor = `belt-${p.belt.toLowerCase()}`;
-      return `<div class="card partner-card" data-action="edit-partner:${p.id}" style="cursor:pointer">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-          <div class="partner-avatar" style="width:40px;height:40px;font-size:13px;border:2px solid">
-            <span class="${beltColor}" style="width:8px;height:8px;border-radius:50%;display:inline-block;position:absolute;margin-top:-30px;margin-left:24px"></span>
-            ${initials(p.name)}
-          </div>
-          <div style="flex:1">
-            <div style="font-size:14px;font-weight:500">${escapeHtml(p.name)}</div>
-            <div style="font-size:11px;color:var(--text-2)">${escapeHtml(p.belt)} · ${p.weight}kg${p.gym ? ' · ' + escapeHtml(p.gym) : ''}</div>
-          </div>
-          <div style="background:var(--surface-2);padding:6px 10px;border-radius:14px;display:flex;align-items:center;gap:4px;flex-shrink:0">
-            <i class="ti ti-edit" style="font-size:12px;color:var(--text-2)"></i>
-            <span style="font-size:11px;color:var(--text-2);font-weight:500">Editar</span>
-          </div>
+  const partnersHtml = partners.length === 0
+    ? `<div style="padding:24px 16px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg)">
+        <p style="color:var(--text-3);font-size:12px;line-height:1.5">Nenhum parceiro cadastrado ainda.<br>Adicione pra acompanhar com quem você mais treina.</p>
+      </div>`
+    : partners.map(p => {
+      const stats = partnerStats[p.id] || { sessions: 0 };
+      return `<button class="partner-item" data-action="edit-partner:${p.id}" style="text-align:left">
+        <div class="partner-avatar">${initials(p.name)}</div>
+        <div class="partner-info">
+          <div class="name">${escapeHtml(p.name)}</div>
+          <div class="meta">${escapeHtml(p.belt)} · ${p.weight}kg${stats.sessions > 0 ? ' · ' + stats.sessions + ' ' + (stats.sessions === 1 ? 'treino' : 'treinos') : ''}</div>
         </div>
-        <div style="display:flex;gap:8px">
-          <div style="flex:1;background:var(--surface-2);padding:8px;border-radius:var(--radius-md);text-align:center">
-            <div style="font-family:'Bebas Neue';font-size:18px">${stats.rolls}</div>
-            <div style="font-size:9px;color:var(--text-2);letter-spacing:1px">ROLAS</div>
-          </div>
-          <div style="flex:1;background:var(--surface-2);padding:8px;border-radius:var(--radius-md);text-align:center">
-            <div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">${stats.applied}</div>
-            <div style="font-size:9px;color:var(--text-2);letter-spacing:1px">FINS APLIC</div>
-          </div>
-        </div>
-      </div>`;
+        <span style="color:var(--text-3)">${icon('chevron-right', 18)}</span>
+      </button>`;
     }).join('');
-  }
+
   return `
   <div class="screen">
-    <div class="header"><h1>Parceiros</h1>${headerAvatar()}</div>
-    ${body}
-    <button class="btn-primary" style="margin-top:12px" data-action="open:new-partner"><i class="ti ti-plus" style="vertical-align:-2px"></i> Adicionar parceiro</button>
+    <div class="app-header">
+      <div class="left">
+        <span class="day">Grupos, amigos e parceiros</span>
+        <h1>Comunidade</h1>
+      </div>
+      ${headerAvatar()}
+    </div>
+
+    <div style="background:linear-gradient(135deg, var(--primary-soft), var(--surface));border:1px dashed var(--primary);border-radius:var(--radius-lg);padding:22px 20px;text-align:center;margin-bottom:24px">
+      <div style="color:var(--primary);margin-bottom:10px">${icon('sparkles', 32)}</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-0.01em;margin-bottom:8px;color:var(--text)">Grupos em breve</div>
+      <p style="font-size:12px;color:var(--text-2);line-height:1.5;max-width:280px;margin:0 auto 14px">
+        Em breve você vai poder criar grupos da sua academia, convidar amigos com código e ver um ranking semanal de quem treinou mais.
+      </p>
+      <button class="btn-secondary" style="font-size:12px;padding:10px 18px;width:auto;display:inline-block" data-action="notify-interest">Me avisar quando estiver pronto</button>
+    </div>
+
+    <div class="section-header">
+      <h3>Meus parceiros</h3>
+      <span class="link">${partners.length > 0 ? partners.length + (partners.length === 1 ? ' pessoa' : ' pessoas') : ''}</span>
+    </div>
+
+    ${partnersHtml}
+
+    <button class="btn-primary" style="margin-top:16px" data-action="open:new-partner"><span style="vertical-align:-2px">${icon('plus', 16)}</span> Adicionar parceiro</button>
   </div>`;
 }
 
 // ---------- PROFILE ----------
 function renderProfile() {
   const p = state.data.profile;
-  const beltColor = `belt-${p.belt.toLowerCase()}`;
-  const giSessions = state.data.sessions.filter(s => s.mode === 'gi').length;
-  const nogiSessions = state.data.sessions.filter(s => s.mode === 'no-gi').length;
-  const comps = state.data.comps.length;
+  const totalTreinos = state.data.sessions.length;
+  const totalHours = Math.round(state.data.sessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
+  const currentStreak = computeCurrentStreak();
+  const yearsPracticing = new Date().getFullYear() - (p.startedAt || new Date().getFullYear());
+
   return `
   <div class="screen">
-    <div class="header"><h1>Perfil</h1><button class="close-btn" data-action="logout"><i class="ti ti-logout" style="font-size:16px;color:var(--text-2)"></i></button></div>
-
-    <div class="card" style="text-align:center;padding:24px">
-      ${p.photo
-        ? `<div style="width:88px;height:88px;margin:0 auto 12px;border-radius:50%;border:3px solid var(--primary);overflow:hidden"><img src="${p.photo}" style="width:100%;height:100%;object-fit:cover" alt="foto"></div>`
-        : `<div style="width:88px;height:88px;margin:0 auto 12px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:32px;border:3px solid var(--primary)">${initials(p.name)}</div>`}
-      <div style="font-size:18px;font-weight:500">${escapeHtml(p.name)}</div>
-      <div style="font-size:11px;color:var(--text-2);margin-top:4px">${escapeHtml(p.gym || 'Sem academia cadastrada')}${p.age ? ` · ${p.age} anos` : ''}</div>
-      ${renderBeltBadge(p.belt, p.degrees)}
-    </div>
-
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="stat-head"><span class="label">Peso</span></div>
-        <div class="stat-value">${p.weight}<span style="font-size:14px;color:var(--text-4)">kg</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><span class="label">Praticando há</span></div>
-        <div class="stat-value">${new Date().getFullYear() - p.startedAt}<span style="font-size:14px;color:var(--text-4)">a</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><span class="label">Treinos/sem</span></div>
-        <div class="stat-value">${(() => {
-          const allSessions = state.data.sessions;
-          if (allSessions.length === 0) return '0';
-          const dates = allSessions.map(s => parseLocalISO(s.date)).sort((a,b) => a-b);
-          const weeks = Math.max(1, (new Date() - dates[0]) / (7*24*60*60*1000));
-          return (allSessions.length / weeks).toFixed(1);
-        })()}<span style="font-size:14px;color:var(--text-4)">/sem</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-head"><span class="label">Competições</span></div>
-        <div class="stat-value">${comps}</div>
+    <div class="profile-hero">
+      <button data-action="open:edit-profile" style="border:none;background:none;padding:0;cursor:pointer;position:relative">
+        <div class="profile-avatar-big">${p.photo ? `<img src="${p.photo}" alt="foto">` : initials(p.name)}</div>
+        <div style="position:absolute;bottom:14px;right:-2px;width:28px;height:28px;background:var(--text);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bg);border:3px solid var(--bg)">
+          ${icon('camera', 13)}
+        </div>
+      </button>
+      <div class="profile-name">${escapeHtml(p.name || 'Sem nome')}</div>
+      <div class="profile-meta">${escapeHtml(p.gym || 'Sem academia')}${yearsPracticing > 0 ? ` · desde ${p.startedAt}` : ''}</div>
+      <div class="profile-belt">
+        <span>${p.belt}</span>
+        ${Array.from({length: p.degrees || 0}, () => '<span class="stripe"></span>').join('')}
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Sessões totais</div>
-      <div style="display:flex;justify-content:space-around;text-align:center">
-        <div><div style="font-family:'Bebas Neue';font-size:24px">${giSessions}</div><div style="font-size:10px;color:var(--text-2)">GI</div></div>
-        <div style="width:1px;background:var(--border-2)"></div>
-        <div><div style="font-family:'Bebas Neue';font-size:24px">${nogiSessions}</div><div style="font-size:10px;color:var(--text-2)">NO-GI</div></div>
+    ${!p.photo ? `<button class="card" data-action="open:edit-profile" style="width:100%;text-align:left;display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg, var(--primary-soft), var(--surface));border:1px solid var(--primary);cursor:pointer;margin-bottom:14px">
+      <div style="color:var(--primary)">${icon('photo', 22)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">Adicionar foto de perfil</div>
+        <div style="font-size:11px;color:var(--text-2);margin-top:2px">Ganhe +1 freeze semanal por mês (total: 3)</div>
+      </div>
+      ${icon('chevron-right', 16)}
+    </button>` : ''}
+
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="v">${totalTreinos}</div>
+        <div class="k">Treinos</div>
+      </div>
+      <div class="profile-stat">
+        <div class="v">${totalHours}<span class="unit">h</span></div>
+        <div class="k">Tatame</div>
+      </div>
+      <div class="profile-stat">
+        <div class="v">${currentStreak}</div>
+        <div class="k">Streak</div>
       </div>
     </div>
 
     ${(() => {
       const recaps = getAvailableRecaps();
       if (recaps.length === 0) return '';
-      return `<div class="card">
-        <div class="card-label" style="display:flex;align-items:center;gap:6px"><i class="ti ti-history" style="font-size:13px"></i> Retrospectivas mensais</div>
-        ${recaps.slice(0, 12).map(r => {
+      return `<div class="section-header">
+        <h3>Retrospectivas</h3>
+        <span></span>
+      </div>
+      <div class="stat-list" style="margin-bottom:20px">
+        ${recaps.slice(0, 6).map(r => {
           const monthName = new Date(r.year, r.month, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
           const monthCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
           const recap = computeMonthlyRecap(r.year, r.month);
           if (!recap.hasData) return '';
-          return `<button data-action="recap-open:${r.year}-${r.month}" style="width:100%;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left">
-            <div style="font-size:22px">🎁</div>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:500;color:var(--text)">${monthCap}</div>
-              <div style="font-size:11px;color:var(--text-3)">${recap.sessions} treinos · ${recap.hours}h</div>
+          return `<div class="stat-row" data-action="recap-open:${r.year}-${r.month}" style="cursor:pointer">
+            <div class="k">
+              <div class="label">${monthCap}</div>
+              <div class="sub">${recap.sessions} treinos · ${recap.hours}h</div>
             </div>
-            <i class="ti ti-chevron-right" style="font-size:16px;color:var(--text-3)"></i>
-          </button>`;
+            <div class="v" style="font-size:18px;color:var(--text-2)">→</div>
+          </div>`;
         }).join('')}
       </div>`;
     })()}
 
-    <button class="btn-secondary" style="margin-top:12px" data-action="open:edit-profile"><i class="ti ti-edit" style="vertical-align:-2px"></i> Editar perfil</button>
-    <button class="btn-dashed" style="margin-top:8px" data-action="logout"><i class="ti ti-logout" style="vertical-align:-2px"></i> Sair</button>
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:20px">Logado como ${escapeHtml(state.currentUser)}</p>
+    <div class="section-header">
+      <h3>Configurações</h3>
+      <span></span>
+    </div>
+
+    <div class="settings-list">
+      <div class="settings-item" data-action="tab:settings">
+        <span class="label"><span style="margin-right:8px;vertical-align:-2px">${icon('settings', 16)}</span>Ajustes gerais</span>
+        <span class="value">${icon('chevron-right', 16)}</span>
+      </div>
+      <div class="settings-item" data-action="open:edit-profile">
+        <span class="label"><span style="margin-right:8px;vertical-align:-2px">${icon('user', 16)}</span>Editar perfil</span>
+        <span class="value">${icon('chevron-right', 16)}</span>
+      </div>
+      <div class="settings-item" data-action="tab:comps">
+        <span class="label"><span style="margin-right:8px;vertical-align:-2px">${icon('trophy', 16)}</span>Minhas competições</span>
+        <span class="value">${state.data.comps.length} ${icon('chevron-right', 16)}</span>
+      </div>
+      <div class="settings-item" data-action="logout">
+        <span class="label" style="color:var(--primary)"><span style="margin-right:8px;vertical-align:-2px">${icon('logout', 16)}</span>Sair</span>
+        <span class="value"></span>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px">Logado como ${escapeHtml(state.currentUser)}</p>
+  </div>`;
+}
+
+// ---------- SETTINGS ----------
+function renderSettings() {
+  const p = state.data.profile;
+  const theme = p.theme || 'dark';
+  const streakGoal = p.streakGoal || 3;
+  const mk = monthKey(new Date());
+  const freezesUsed = freezesUsedInMonth(mk);
+
+  return `
+  <div class="screen">
+    <div class="app-header">
+      <div class="left">
+        <span class="day"><button data-action="tab:profile" style="background:none;border:none;color:var(--text-2);font-size:12px;padding:0;cursor:pointer">← Perfil</button></span>
+        <h1>Configurações</h1>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Aparência</div>
+      <div class="settings-list">
+        <div class="settings-item" style="cursor:default">
+          <span class="label">Tema</span>
+          <div class="theme-toggle">
+            <button class="${theme === 'light' ? 'active' : ''}" data-action="set-theme:light">${icon('sun', 16)} Claro</button>
+            <button class="${theme === 'dark' ? 'active' : ''}" data-action="set-theme:dark">${icon('moon', 16)} Escuro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Streak</div>
+      <div class="settings-list">
+        <div class="settings-item" data-action="open:streak-modal">
+          <span class="label">Meta semanal</span>
+          <span class="value">${streakGoal} ${streakGoal === 1 ? 'treino' : 'treinos'} ${icon('chevron-right', 16)}</span>
+        </div>
+        <div class="settings-item" style="cursor:default">
+          <span class="label">🧊 Freezes usados este mês</span>
+          <span class="value">${freezesUsed} / ${getMaxFreezesPerMonth()}${state.data.profile.photo ? ' <span style="color:var(--primary);font-size:10px">+1 foto</span>' : ''}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Conta</div>
+      <div class="settings-list">
+        <div class="settings-item" data-action="open:edit-profile">
+          <span class="label">Editar perfil</span>
+          <span class="value">${icon('chevron-right', 16)}</span>
+        </div>
+        <div class="settings-item" data-action="logout">
+          <span class="label" style="color:var(--primary)">Sair</span>
+          <span class="value"></span>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v15</p>
   </div>`;
 }
 
@@ -1535,13 +3282,13 @@ function renderNav() {
     { id: 'home', icon: 'home', label: 'Home' },
     { id: 'calendar', icon: 'calendar', label: 'Histórico' },
     { id: 'stats', icon: 'chart-bar', label: 'Stats' },
-    { id: 'comps', icon: 'trophy', label: 'Comps' },
-    { id: 'partners', icon: 'users', label: 'Parceiros' },
+    { id: 'partners', icon: 'users', label: 'Comunidade' },
+    { id: 'profile', icon: 'user', label: 'Perfil' },
   ];
-  const active = state.currentTab === 'day' ? 'calendar' : state.currentTab;
+  const active = state.currentTab === 'day' ? 'calendar' : (state.currentTab === 'comps' || state.currentTab === 'settings') ? 'profile' : state.currentTab;
   return `<div class="nav-bottom">
     ${tabs.map(t => `<button class="nav-item ${active === t.id ? 'active' : ''}" data-action="tab:${t.id}">
-      <i class="ti ti-${t.icon}"></i><span>${t.label}</span>
+      ${icon(t.icon, 20)}<span>${t.label}</span>
     </button>`).join('')}
   </div>`;
 }
@@ -1604,6 +3351,18 @@ function handleAction(a) {
     case 'recap-close': closeRecap(); break;
     case 'recap-next': nextRecapSlide(); break;
     case 'recap-prev': prevRecapSlide(); break;
+    case 'use-freeze':
+      openConfirmModal('Usar freeze', 'Proteger seu streak da semana passada?', 'Usar freeze', () => {
+        useFreezeOnLastWeek();
+        render();
+      });
+      break;
+    case 'set-theme':
+      state.data.profile.theme = arg;
+      persistUser();
+      render();
+      showToast(arg === 'dark' ? 'Modo escuro' : 'Modo claro');
+      break;
     case 'cal':
       if (arg === 'prev') {
         state.cal.month--;
@@ -1622,28 +3381,27 @@ function handleAction(a) {
       handleOpen(arg);
       break;
     case 'logout':
-      if (confirm('Sair da conta?')) logout();
+      openConfirmModal('Sair da conta?', 'Você vai precisar entrar de novo.', 'Sair', () => {
+        logout();
+      });
+      break;
+    case 'notify-interest':
+      showToast('Obrigado! Vamos avisar quando estiver pronto.');
       break;
     case 'del-session':
-      if (confirm('Deletar este treino?')) {
-        state.data.sessions = state.data.sessions.filter(s => s.id !== arg);
-        persistUser(); render(); showToast('Treino deletado');
-      }
+      openConfirmModal('Deletar treino', 'Esta ação não pode ser desfeita.', 'Deletar', () => { state.data.sessions = state.data.sessions.filter(s => s.id !== arg); persistUser(); render(); showToast('Treino deletado'); });
       break;
     case 'edit-session':
       openEditSessionModal(arg);
       break;
     case 'del-comp':
-      if (confirm('Deletar esta competição?')) {
-        state.data.comps = state.data.comps.filter(c => c.id !== arg);
-        persistUser(); render(); showToast('Competição deletada');
-      }
+      openConfirmModal('Deletar competição', 'Esta ação não pode ser desfeita.', 'Deletar', () => { state.data.comps = state.data.comps.filter(c => c.id !== arg); persistUser(); render(); showToast('Competição deletada'); });
       break;
     case 'del-partner':
-      if (confirm('Deletar este parceiro? Os registros existentes não serão afetados.')) {
+      openConfirmModal('Deletar parceiro', 'Os registros existentes vão manter a referência.', 'Deletar', () => {
         state.data.partners = state.data.partners.filter(p => p.id !== arg);
         persistUser(); render(); showToast('Parceiro removido');
-      }
+      });
       break;
     case 'edit-partner':
       openEditPartnerModal(arg);
@@ -1668,6 +3426,70 @@ function handleOpen(arg) {
   else if (arg === 'new-comp') openCompModal();
   else if (arg === 'new-partner') openPartnerModal();
   else if (arg === 'edit-profile') openProfileModal();
+  else if (arg === 'streak-modal') openStreakModal();
+}
+
+function openStreakModal() {
+  const streak = computeCurrentStreak();
+  const wk = currentWeekStatus();
+  const record = state.data.streakData.recordStreak || 0;
+  const goal = state.data.profile.streakGoal || 3;
+  const mk = monthKey(new Date());
+  const freezesUsed = freezesUsedInMonth(mk);
+  const freezesAvailable = getMaxFreezesPerMonth() - freezesUsed;
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">🔥 Streak semanal</div>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
+    </div>
+    <div class="card">
+      <div class="streak-modal-content">
+        <div style="font-size:56px;line-height:1">🔥</div>
+        <div class="huge">${streak}</div>
+        <div class="weeks-label">${streak === 1 ? 'semana seguida' : 'semanas seguidas'}</div>
+
+        <div class="stat-block">
+          <span class="k">Meta semanal</span>
+          <span class="v">${goal} treinos</span>
+        </div>
+        <div class="stat-block">
+          <span class="k">Progresso essa semana</span>
+          <span class="v" style="color:${wk.metGoal ? 'var(--green)' : 'var(--text)'}">${wk.done}/${wk.goal} ${wk.metGoal ? '✓' : ''}</span>
+        </div>
+        <div class="stat-block">
+          <span class="k">Recorde histórico</span>
+          <span class="v">${record} ${record === 1 ? 'semana' : 'semanas'}</span>
+        </div>
+        <div class="stat-block">
+          <span class="k">🧊 Freezes disponíveis (mês)</span>
+          <span class="v">${freezesAvailable}/${getMaxFreezesPerMonth()}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Ajustar meta semanal</div>
+      <p style="font-size:12px;color:var(--text-2);margin-bottom:12px">Quantos treinos por semana você quer bater pra manter o streak?</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${[1,2,3,4,5,6,7].map(n =>
+          `<button class="${n === goal ? 'btn-primary' : 'btn-secondary'}" style="flex:1;min-width:40px;padding:10px 0" data-mact="set-streak-goal:${n}">${n}×</button>`
+        ).join('')}
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--surface-2);padding:12px 14px">
+      <div style="font-size:11px;color:var(--text-2);line-height:1.5">
+        <strong style="color:var(--text)">Como funciona:</strong><br>
+        · Semana: <strong>segunda a domingo</strong><br>
+        · Bater a meta = streak continua<br>
+        · Não bater = zera (mas o recorde histórico fica salvo)<br>
+        · Você tem <strong>2 freezes por mês</strong> pra proteger uma semana perdida
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  `);
+  attachModalListeners();
 }
 
 // =================== MONTHLY RECAP (WRAPPED) ===================
@@ -1698,7 +3520,7 @@ function buildRecapSlides(recap) {
         <div class="recap-emoji">🥋</div>
         <div class="recap-label">Retrospectiva</div>
         <div class="recap-big" style="font-size:56px">${monthCap.toUpperCase()}</div>
-        <div class="recap-big-sub" style="font-size:32px;font-family:'Bebas Neue';letter-spacing:0.04em">${recap.year}</div>
+        <div class="recap-big-sub" style="font-size:32px;font-family:'Instrument Serif';letter-spacing:0.04em">${recap.year}</div>
         <div class="recap-body" style="margin-top:24px">Bora ver como foi seu mês no tatame?</div>
       </div>`
   });
@@ -1911,7 +3733,7 @@ function renderRecap() {
       <div class="recap-progress">
         ${slides.map((_, i) => `<div class="recap-progress-bar ${i < slideIdx ? 'done' : i === slideIdx ? 'active' : ''}"></div>`).join('')}
       </div>
-      <button class="recap-close" data-action="recap-close"><i class="ti ti-x" style="font-size:18px"></i></button>
+      <button class="recap-close" data-action="recap-close">${icon('x', 18)}</button>
       <div class="recap-nav-zone recap-nav-prev" data-action="recap-prev"></div>
       <div class="recap-nav-zone recap-nav-next" data-action="recap-next"></div>
       ${slide.render()}
@@ -1979,6 +3801,81 @@ function closeModal() {
   modalState = {};
 }
 
+// Update in-place da lista de finalizações (sem re-render do modal)
+function updateSubsList(kind) {
+  const counts = kind === 'applied' ? modalState.appliedCounts : modalState.sufferedCounts;
+  const list = Object.entries(counts).sort();
+  const total = list.reduce((s, [_, n]) => s + n, 0);
+  const container = document.querySelector(`[data-subs-list="${kind}"]`);
+  if (!container) return;
+  container.innerHTML = list.map(([name, count]) => `
+    <div class="sub-counter">
+      <span class="name">${escapeHtml(name)}</span>
+      <div class="actions">
+        <button data-mact="dec-${kind}:${escapeHtml(name)}">−</button>
+        <span class="val">${count}</span>
+        <button class="plus" data-mact="inc-${kind}:${escapeHtml(name)}">+</button>
+      </div>
+    </div>`).join('');
+  // Atualiza contador total no label
+  const totalEl = document.querySelector(`[data-subs-total="${kind}"]`);
+  if (totalEl) totalEl.textContent = total;
+  // Atualiza badge no header do collapse
+  updateDetailsBadge();
+}
+
+function updateDetailsBadge() {
+  const totalApplied = Object.values(modalState.appliedCounts || {}).reduce((s, n) => s + n, 0);
+  const totalSuffered = Object.values(modalState.sufferedCounts || {}).reduce((s, n) => s + n, 0);
+  const badge = document.querySelector('[data-details-badge]');
+  if (!badge) return;
+  if (totalApplied + totalSuffered > 0) {
+    badge.textContent = `${totalApplied}+${totalSuffered}`;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Update in-place do controle de mood (sem re-render do modal)
+function updateMoodDisplay() {
+  const mood = modalState.mood == null ? 7 : modalState.mood;
+  const valEl = document.querySelector('.mood-value-big');
+  if (valEl) valEl.textContent = mood;
+  const ticks = document.querySelectorAll('.mood-tick');
+  ticks.forEach((t, i) => {
+    t.classList.toggle('filled', i <= mood);
+    t.classList.toggle('current', i === mood);
+  });
+  const decBtn = document.querySelector('[data-mact="mood-dec"]');
+  const incBtn = document.querySelector('[data-mact="mood-inc"]');
+  if (decBtn) decBtn.disabled = mood <= 0;
+  if (incBtn) incBtn.disabled = mood >= 10;
+}
+
+// Modal de confirmação customizado (substitui confirm() nativo)
+function openConfirmModal(title, message, confirmLabel, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal" style="max-width:340px;padding:24px 20px">
+    <div style="font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-0.01em;margin-bottom:8px;color:var(--text)">${escapeHtml(title)}</div>
+    <p style="font-size:13px;color:var(--text-2);margin:0 0 20px;line-height:1.4">${escapeHtml(message)}</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn-secondary" id="cfm-cancel" style="flex:1">Cancelar</button>
+      <button class="btn-primary" id="cfm-confirm" style="flex:1;margin:0">${escapeHtml(confirmLabel)}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+  overlay.querySelector('#cfm-cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#cfm-confirm').addEventListener('click', () => {
+    overlay.remove();
+    onConfirm();
+  });
+}
+
 // ---------- SESSION MODAL ----------
 function openSessionModal(date) {
   let initDate = date || todayISO();
@@ -1990,10 +3887,17 @@ function openSessionModal(date) {
     mode: state.mode,
     duration: 60,
     rollCount: 3,
+    // Novo formato agregado: contadores de finalização por técnica
+    appliedCounts: {},   // { "Mata-leão": 2, "Armlock": 1 }
+    sufferedCounts: {},  // { "Kimura": 1 }
+    partnerIds: [],      // parceiros que treinou hoje
+    // Legado (mantido pra compat de save):
     rolls: [makeEmptyRoll(), makeEmptyRoll(), makeEmptyRoll()],
-    expandedRoll: 0,
+    expandedRoll: -1,
     notes: '',
     mood: null,
+    _showDetails: false,   // sessão "detalhar finalizações" dobrada
+    _showNotes: false,     // sessão "notas" dobrada
     _newPartnerForRollIdx: null
   };
   renderSessionModal();
@@ -2002,38 +3906,31 @@ function openSessionModal(date) {
 function openEditSessionModal(sessionId) {
   const s = state.data.sessions.find(x => x.id === sessionId);
   if (!s) { showToast('Treino não encontrado', 'error'); return; }
-  // Rebuild rolls structure from rollDetails if available, else fallback to flat
-  let rolls;
-  if (s.rollDetails && Array.isArray(s.rollDetails) && s.rollDetails.length > 0) {
-    rolls = s.rollDetails.map(r => ({
-      partnerId: r.partnerId || '',
-      applied: (r.applied || []).map(a => ({ position: a.position || '', submission: a.submission || '' })),
-      suffered: (r.suffered || []).map(x => ({ position: x.position || '', submission: x.submission || '' })),
-      notes: r.notes || ''
-    }));
-  } else {
-    // Legacy session sem rollDetails: reconstroi com 1 roll só, agrupando tudo
-    const rollCount = s.rolls || 1;
-    rolls = [];
-    for (let i = 0; i < rollCount; i++) rolls.push(makeEmptyRoll());
-    // Empurra applied/suffered todos pra primeira rola
-    if (rolls[0]) {
-      rolls[0].applied = (s.applied || []).map(a => ({ position: a.position, submission: a.submission }));
-      rolls[0].suffered = (s.suffered || []).map(x => ({ position: x.position, submission: x.submission }));
-      rolls[0].partnerId = (s.partners && s.partners[0]) || '';
-    }
-  }
+  // Agregar applied/suffered por técnica
+  const appliedCounts = {};
+  (s.applied || []).forEach(a => {
+    if (a.submission) appliedCounts[a.submission] = (appliedCounts[a.submission] || 0) + 1;
+  });
+  const sufferedCounts = {};
+  (s.suffered || []).forEach(a => {
+    if (a.submission) sufferedCounts[a.submission] = (sufferedCounts[a.submission] || 0) + 1;
+  });
   modalState = {
     _kind: 'session',
     _editingId: s.id,
     date: s.date,
     mode: s.mode,
     duration: s.duration || 60,
-    rollCount: rolls.length,
-    rolls,
-    expandedRoll: 0,
+    rollCount: s.rolls || 3,
+    appliedCounts,
+    sufferedCounts,
+    partnerIds: (s.partners || []).slice(),
+    rolls: [], // não usado no novo modo
+    expandedRoll: -1,
     notes: s.notes || '',
     mood: s.mood == null ? null : s.mood,
+    _showDetails: Object.keys(appliedCounts).length > 0 || Object.keys(sufferedCounts).length > 0,
+    _showNotes: !!(s.notes),
     _newPartnerForRollIdx: null
   };
   renderSessionModal();
@@ -2045,161 +3942,153 @@ function makeEmptyRoll() {
 
 function adjustRollCount(newCount) {
   newCount = Math.max(0, Math.min(50, newCount));
-  while (modalState.rolls.length < newCount) modalState.rolls.push(makeEmptyRoll());
-  while (modalState.rolls.length > newCount) modalState.rolls.pop();
   modalState.rollCount = newCount;
-  if (modalState.expandedRoll >= newCount) modalState.expandedRoll = Math.max(0, newCount - 1);
 }
 
 function renderSessionModal() {
   const subs = modalState.mode === 'gi' ? SUBMISSIONS_GI : SUBMISSIONS_NOGI;
-  const positions = modalState.mode === 'gi' ? POSITIONS_GI : POSITIONS_NOGI;
-  const partnersById = Object.fromEntries(state.data.partners.map(p => [p.id, p]));
+  const partners = state.data.partners || [];
+  const mood = modalState.mood == null ? 7 : modalState.mood;
 
-  // Render each roll card
-  const rollsHtml = modalState.rolls.map((roll, ri) => {
-    const isOpen = modalState.expandedRoll === ri;
-    const partner = roll.partnerId ? partnersById[roll.partnerId] : null;
-    const summary = `${roll.applied.length} aplic · ${roll.suffered.length} sofr${partner ? ` · ${escapeHtml(partner.name.split(' ')[0])}` : ''}`;
+  // Contadores de finalizações aplicadas
+  const appliedList = Object.entries(modalState.appliedCounts).sort();
+  const sufferedList = Object.entries(modalState.sufferedCounts).sort();
+  const totalApplied = appliedList.reduce((s, [_, n]) => s + n, 0);
+  const totalSuffered = sufferedList.reduce((s, [_, n]) => s + n, 0);
 
-    const appliedHtml = roll.applied.map((a, ai) => `<div class="sub-card">
-      <div class="sub-card-head">
-        <span class="num">Aplicada ${ai+1}</span>
-        <button data-mact="rm-applied:${ri}|${ai}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
-      </div>
-      <div class="input-grid-2">
-        <div class="input-row"><label>Veio de</label>
-          <select data-mact="set-applied:${ri}|${ai}|position">
-            <option value="">Selecione...</option>
-            ${positions.map(p => `<option value="${escapeHtml(p)}" ${a.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="input-row"><label>Finalização</label>
-          <select data-mact="set-applied:${ri}|${ai}|submission">
-            <option value="">Selecione...</option>
-            ${subs.map(s => `<option value="${escapeHtml(s)}" ${a.submission === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
-          </select>
-        </div>
+  const appliedItemsHtml = appliedList.map(([name, count]) => `
+    <div class="sub-counter">
+      <span class="name">${escapeHtml(name)}</span>
+      <div class="actions">
+        <button data-mact="dec-applied:${escapeHtml(name)}">−</button>
+        <span class="val">${count}</span>
+        <button class="plus" data-mact="inc-applied:${escapeHtml(name)}">+</button>
       </div>
     </div>`).join('');
 
-    const sufferedHtml = roll.suffered.map((x, si) => `<div class="sub-card sofrida">
-      <div class="sub-card-head sofrida">
-        <span class="num">Sofrida ${si+1}</span>
-        <button data-mact="rm-suffered:${ri}|${si}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
-      </div>
-      <div class="input-grid-2">
-        <div class="input-row"><label>Caiu em</label>
-          <select data-mact="set-suffered:${ri}|${si}|position">
-            <option value="">Selecione...</option>
-            ${positions.map(p => `<option value="${escapeHtml(p)}" ${x.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="input-row"><label>Sofreu</label>
-          <select data-mact="set-suffered:${ri}|${si}|submission">
-            <option value="">Selecione...</option>
-            ${subs.map(s => `<option value="${escapeHtml(s)}" ${x.submission === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
-          </select>
-        </div>
+  const sufferedItemsHtml = sufferedList.map(([name, count]) => `
+    <div class="sub-counter">
+      <span class="name">${escapeHtml(name)}</span>
+      <div class="actions">
+        <button data-mact="dec-suffered:${escapeHtml(name)}">−</button>
+        <span class="val">${count}</span>
+        <button class="plus" data-mact="inc-suffered:${escapeHtml(name)}">+</button>
       </div>
     </div>`).join('');
 
-    return `<div class="card" style="border-left:3px solid ${isOpen ? 'var(--primary)' : 'var(--border-2)'};padding:14px">
-      <button data-mact="toggle-roll:${ri}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;padding:0;cursor:pointer;text-align:left">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:28px;height:28px;border-radius:50%;background:${isOpen ? 'var(--primary)' : 'var(--surface-2)'};color:${isOpen ? '#fff' : 'var(--text-2)'};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:14px">${ri+1}</div>
-          <div>
-            <div style="font-size:13px;font-weight:500">Rola ${ri+1}</div>
-            <div style="font-size:11px;color:var(--text-3)">${summary}</div>
-          </div>
-        </div>
-        <i class="ti ti-chevron-${isOpen ? 'up' : 'down'}" style="font-size:18px;color:var(--text-3)"></i>
-      </button>
+  // Chips de duração e rolas
+  const durations = [30, 45, 60, 75, 90, 120];
+  const durationChips = durations.map(d => `<button class="duration-btn ${modalState.duration === d ? 'active' : ''}" data-mact="set-duration:${d}">${d}</button>`).join('');
 
-      ${isOpen ? `<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-        <div class="card-label">Parceiro desta rola</div>
-        <div class="input-row" style="margin-bottom:8px"><label>Quem foi seu par</label>
-          <select data-mact="set-roll-partner:${ri}">
-            <option value="">— Não informado</option>
-            ${state.data.partners.map(p => `<option value="${p.id}" ${roll.partnerId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (${escapeHtml(p.belt)} · ${p.weight}kg)</option>`).join('')}
-          </select>
-        </div>
-        <button class="btn-dashed" data-mact="new-partner-for-roll:${ri}" style="margin-bottom:14px"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Cadastrar novo parceiro</button>
+  const rollCounts = [1, 2, 3, 4, 5, 6, 7, 8];
+  const rollChips = rollCounts.map(n => `<button class="duration-btn ${modalState.rollCount === n ? 'active' : ''}" data-mact="set-rollcount:${n}">${n}</button>`).join('');
 
-        <div class="card-label" style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-          <span>Finalizações aplicadas</span>
-          <span class="pill pill-green">${roll.applied.length}</span>
-        </div>
-        ${appliedHtml}
-        <button class="btn-dashed" data-mact="add-applied:${ri}"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar finalização</button>
-
-        <div class="card-label" style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-          <span>Finalizações sofridas</span>
-          <span class="pill pill-red">${roll.suffered.length}</span>
-        </div>
-        ${sufferedHtml}
-        <button class="btn-dashed" data-mact="add-suffered:${ri}"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar</button>
-
-        <div class="card-label" style="margin-top:14px">Observação da rola</div>
-        <textarea data-roll-notes="${ri}" rows="2" placeholder="Como foi essa rola? Algo a anotar?" style="background:var(--surface-2);border:1px solid var(--border-2);color:var(--text);font-family:inherit;font-size:13px">${escapeHtml(roll.notes || '')}</textarea>
-      </div>` : ''}
-    </div>`;
-  }).join('');
+  // Chips de parceiros
+  const partnerChipsHtml = partners.length > 0
+    ? partners.map(p => `<button class="partner-chip ${modalState.partnerIds.includes(p.id) ? 'active' : ''}" data-mact="toggle-partner:${p.id}">
+        <span class="avatar">${initials(p.name)}</span>
+        <span>${escapeHtml(p.name.split(' ')[0])}</span>
+      </button>`).join('')
+    : '';
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${modalState._editingId ? 'Editar treino' : 'Registrar treino'}</div>
-      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+      <div class="modal-title">${modalState._editingId ? 'Editar treino' : 'Novo treino'}</div>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
     </div>
 
-    <div class="toggle">
-      <button class="${modalState.mode === 'gi' ? 'active' : ''}" data-mact="m-mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
-      <button class="${modalState.mode === 'no-gi' ? 'active' : ''}" data-mact="m-mode:no-gi">No-Gi</button>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Data & duração</div>
-      <div class="input-grid-2">
-        <div class="input-row"><label>Data</label><input type="date" id="m-date" value="${modalState.date}" max="${todayISO()}"></div>
-        <div class="input-row"><label>Duração (min)</label><input type="number" id="m-duration" value="${modalState.duration}" min="0" max="600"></div>
+    <div class="form-group">
+      <label class="form-label">Modo</label>
+      <div class="form-chips">
+        <button class="chip ${modalState.mode === 'gi' ? 'active' : ''}" data-mact="m-mode:gi">Gi</button>
+        <button class="chip ${modalState.mode === 'no-gi' ? 'active' : ''}" data-mact="m-mode:no-gi">No-Gi</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Como você se sentiu hoje?</div>
-      ${renderMoodSlider(modalState.mood)}
+    <div class="form-group">
+      <label class="form-label">Data</label>
+      <div class="input-row" style="margin-bottom:0"><input type="date" id="m-date" value="${modalState.date}" max="${todayISO()}"></div>
     </div>
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div class="card-label" style="margin-bottom:0">Quantidade de rolas</div>
-        <div class="counter">
-          <button class="minus" data-mact="rolls:-1">−</button>
-          <span class="value">${modalState.rollCount}</span>
-          <button class="plus" data-mact="rolls:+1">+</button>
+    <div class="form-group">
+      <label class="form-label">Duração <span class="mono" style="color:var(--text-2);letter-spacing:0.5px;text-transform:none;font-size:11px">(min)</span></label>
+      <div class="duration-row">${durationChips}</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Rolas</label>
+      <div class="duration-row">${rollChips}</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Como se sentiu</label>
+      <div class="mood-stepper">
+        <button type="button" class="mood-btn" data-mact="mood-dec" ${mood <= 0 ? 'disabled' : ''}>−</button>
+        <div class="mood-display">
+          <div class="mood-value-big">${mood}</div>
+          <div class="mood-scale">
+            ${Array.from({length: 11}, (_, i) => `<div class="mood-tick ${i <= mood ? 'filled' : ''} ${i === mood ? 'current' : ''}"></div>`).join('')}
+          </div>
+          <div class="mood-scale-labels"><span>0</span><span>5</span><span>10</span></div>
         </div>
+        <button type="button" class="mood-btn" data-mact="mood-inc" ${mood >= 10 ? 'disabled' : ''}>+</button>
       </div>
-      <p style="font-size:10px;color:var(--text-3);margin-top:4px">Cada rola vira um card abaixo. Toque pra preencher.</p>
     </div>
 
-    ${rollsHtml || '<div class="empty" style="padding:20px"><p>Aumente a quantidade de rolas pra começar</p></div>'}
+    ${partners.length > 0 ? `<div class="form-group">
+      <label class="form-label">Parceiros</label>
+      <div class="form-chips">${partnerChipsHtml}<button class="chip" data-mact="new-partner-from-session">+ Novo</button></div>
+    </div>` : `<div class="form-group">
+      <label class="form-label">Parceiros</label>
+      <button class="btn-dashed" data-mact="new-partner-from-session"><span style="vertical-align:-1px">${icon('plus', 12)}</span> Cadastrar parceiro</button>
+    </div>`}
 
-    <div class="card">
-      <div class="card-label">Observações gerais do treino (opcional)</div>
-      <textarea id="m-notes" rows="2" placeholder="Como foi o treino no geral...">${escapeHtml(modalState.notes)}</textarea>
+    <div class="collapse-section">
+      <button class="collapse-header" data-mact="toggle-details">
+        <span><span style="vertical-align:-2px;margin-right:6px">${icon('target', 16)}</span>Detalhar finalizações<span class="badge" data-details-badge style="${totalApplied + totalSuffered > 0 ? '' : 'display:none'}">${totalApplied}+${totalSuffered}</span></span>
+        <span style="color:var(--text-3)">${icon(modalState._showDetails ? 'chevron-up' : 'chevron-down', 16)}</span>
+      </button>
+      ${modalState._showDetails ? `<div class="collapse-body">
+        <div style="margin-bottom:16px">
+          <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Aplicadas</span>
+            <span style="color:var(--primary);font-size:11px" data-subs-total="applied">${totalApplied}</span>
+          </label>
+          <div data-subs-list="applied">${appliedItemsHtml}</div>
+          <select class="input-row" data-mact="add-applied-picker" style="margin-top:6px;padding:12px 14px">
+            <option value="">+ Adicionar finalização aplicada</option>
+            ${subs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Sofridas</span>
+            <span style="color:var(--primary);font-size:11px" data-subs-total="suffered">${totalSuffered}</span>
+          </label>
+          <div data-subs-list="suffered">${sufferedItemsHtml}</div>
+          <select class="input-row" data-mact="add-suffered-picker" style="margin-top:6px;padding:12px 14px">
+            <option value="">+ Adicionar finalização sofrida</option>
+            ${subs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
+          </select>
+        </div>
+      </div>` : ''}
     </div>
 
-    <button class="btn-primary" data-mact="save-session"><i class="ti ti-check" style="vertical-align:-2px"></i> ${modalState._editingId ? 'Salvar alterações' : 'Salvar treino'}</button>
+    <div class="collapse-section">
+      <button class="collapse-header" data-mact="toggle-notes">
+        <span><span style="vertical-align:-2px;margin-right:6px">${icon('note', 16)}</span>Notas${modalState.notes ? '<span class="badge">✓</span>' : ''}</span>
+        <span style="color:var(--text-3)">${icon(modalState._showNotes ? 'chevron-up' : 'chevron-down', 16)}</span>
+      </button>
+      ${modalState._showNotes ? `<div class="collapse-body">
+        <textarea id="m-notes" rows="3" placeholder="Como foi o treino? Alguma técnica nova?" style="border-radius:12px">${escapeHtml(modalState.notes)}</textarea>
+      </div>` : ''}
+    </div>
+
+    <button class="btn-primary" data-mact="save-session"><span style="vertical-align:-2px">${icon('check', 16)}</span> ${modalState._editingId ? 'Salvar alterações' : 'Salvar treino'}</button>
     <div style="height:20px"></div>
   `);
-  attachModalListeners();
-  document.querySelectorAll('[data-roll-notes]').forEach(el => {
-    el.addEventListener('input', () => {
-      const idx = parseInt(el.dataset.rollNotes);
-      modalState.rolls[idx].notes = el.value;
-    });
-  });
-  // Date guard: clamp future dates immediately
+
+  // Date guard
   const dateEl = document.getElementById('m-date');
   if (dateEl) {
     dateEl.addEventListener('change', () => {
@@ -2207,28 +4096,16 @@ function renderSessionModal() {
         dateEl.value = todayISO();
         modalState.date = todayISO();
         showToast('Não é possível registrar treino futuro', 'error');
+      } else {
+        modalState.date = dateEl.value;
       }
     });
   }
-  // Mood slider: update emoji + score live without full re-render
-  const moodEl = document.getElementById('m-mood');
-  if (moodEl) {
-    const updateMoodUI = () => {
-      const v = parseInt(moodEl.value);
-      modalState.mood = v;
-      moodEl.style.accentColor = moodColor(v);
-      moodEl.style.opacity = '1';
-      const emojiEl = document.getElementById('mood-emoji');
-      const scoreEl = document.getElementById('mood-score');
-      if (emojiEl) emojiEl.textContent = moodEmoji(v);
-      if (scoreEl) {
-        scoreEl.innerHTML = `${v}<span style="font-size:18px;opacity:0.6">/10</span>`;
-        scoreEl.style.color = moodColor(v);
-      }
-    };
-    moodEl.addEventListener('input', updateMoodUI);
-    // Mobile-friendly: also listen to change for some browsers
-    moodEl.addEventListener('change', updateMoodUI);
+
+  // Notes
+  const notesEl = document.getElementById('m-notes');
+  if (notesEl) {
+    notesEl.addEventListener('input', () => { modalState.notes = notesEl.value; });
   }
 }
 
@@ -2236,80 +4113,120 @@ function handleModalAction(a, val) {
   const [cmd, ...rest] = a.split(':');
   const arg = rest.join(':');
   switch (cmd) {
-    case 'close': closeModal(); break;
-    case 'm-mode':
-      syncSessionInputs();
-      modalState.mode = arg;
-      renderSessionModal();
-      break;
-    case 'rolls':
-      syncSessionInputs();
-      adjustRollCount(modalState.rollCount + parseInt(arg));
-      renderSessionModal();
-      break;
-    case 'toggle-roll':
-      syncSessionInputs();
-      const ti = parseInt(arg);
-      modalState.expandedRoll = (modalState.expandedRoll === ti) ? -1 : ti;
-      renderSessionModal();
-      break;
-    case 'set-roll-partner':
-      modalState.rolls[parseInt(arg)].partnerId = val;
-      break;
-    case 'new-partner-for-roll':
-      syncSessionInputs();
-      modalState._newPartnerForRollIdx = parseInt(arg);
-      // Save session modal state aside and open partner modal
-      window._savedSessionModal = JSON.parse(JSON.stringify(modalState));
-      openPartnerModal((newPartnerId) => {
-        // Restore session modal and auto-assign new partner to that roll
+    case 'close':
+      // Se estava criando parceiro dentro do modal de treino, restaura o treino
+      if (modalState && modalState._kind !== 'session' && window._savedSessionModal) {
         modalState = window._savedSessionModal;
         delete window._savedSessionModal;
-        if (newPartnerId !== undefined && modalState._newPartnerForRollIdx !== null) {
-          modalState.rolls[modalState._newPartnerForRollIdx].partnerId = newPartnerId;
-        }
-        modalState._newPartnerForRollIdx = null;
+        renderSessionModal();
+      } else {
+        closeModal();
+      }
+      break;
+    case 'set-streak-goal':
+      const newGoal = parseInt(arg);
+      if (newGoal >= 1 && newGoal <= 7) {
+        state.data.profile.streakGoal = newGoal;
+        persistUser();
+        updateStreakRecord();
+        closeModal();
+        showToast(`Meta atualizada: ${newGoal}× por semana`);
+        render();
+      }
+      break;
+    case 'm-mode':
+      // In-place: só troca classe active nos 2 chips de modo
+      modalState.mode = arg;
+      document.querySelectorAll('[data-mact^="m-mode:"]').forEach(el => {
+        el.classList.toggle('active', el.dataset.mact === 'm-mode:' + arg);
+      });
+      break;
+    case 'mood-inc':
+      modalState.mood = Math.min(10, (modalState.mood == null ? 7 : modalState.mood) + 1);
+      updateMoodDisplay();
+      break;
+    case 'mood-dec':
+      modalState.mood = Math.max(0, (modalState.mood == null ? 7 : modalState.mood) - 1);
+      updateMoodDisplay();
+      break;
+    case 'set-duration':
+      // In-place: só troca classe active nos duration-btn
+      modalState.duration = parseInt(arg);
+      document.querySelectorAll('[data-mact^="set-duration:"]').forEach(el => {
+        el.classList.toggle('active', el.dataset.mact === 'set-duration:' + arg);
+      });
+      break;
+    case 'set-rollcount':
+      // In-place: só troca classe active nos rollcount buttons
+      modalState.rollCount = parseInt(arg);
+      document.querySelectorAll('[data-mact^="set-rollcount:"]').forEach(el => {
+        el.classList.toggle('active', el.dataset.mact === 'set-rollcount:' + arg);
+      });
+      break;
+    case 'toggle-details':
+      modalState._showDetails = !modalState._showDetails;
+      renderSessionModal(); // aqui SIM re-render, muda muito conteúdo
+      break;
+    case 'toggle-notes':
+      modalState._showNotes = !modalState._showNotes;
+      renderSessionModal();
+      break;
+    case 'inc-applied':
+      modalState.appliedCounts[arg] = (modalState.appliedCounts[arg] || 0) + 1;
+      updateSubsList('applied');
+      break;
+    case 'dec-applied':
+      if (modalState.appliedCounts[arg] > 1) modalState.appliedCounts[arg]--;
+      else delete modalState.appliedCounts[arg];
+      updateSubsList('applied');
+      break;
+    case 'inc-suffered':
+      modalState.sufferedCounts[arg] = (modalState.sufferedCounts[arg] || 0) + 1;
+      updateSubsList('suffered');
+      break;
+    case 'dec-suffered':
+      if (modalState.sufferedCounts[arg] > 1) modalState.sufferedCounts[arg]--;
+      else delete modalState.sufferedCounts[arg];
+      updateSubsList('suffered');
+      break;
+    case 'add-applied-picker':
+      if (val) {
+        modalState.appliedCounts[val] = (modalState.appliedCounts[val] || 0) + 1;
+        updateSubsList('applied');
+        // Reset o select pra "+ Adicionar" default
+        const sel = document.querySelector('[data-mact="add-applied-picker"]');
+        if (sel) sel.value = '';
+      }
+      break;
+    case 'add-suffered-picker':
+      if (val) {
+        modalState.sufferedCounts[val] = (modalState.sufferedCounts[val] || 0) + 1;
+        updateSubsList('suffered');
+        const sel = document.querySelector('[data-mact="add-suffered-picker"]');
+        if (sel) sel.value = '';
+      }
+      break;
+    case 'toggle-partner':
+      // In-place: toggle da classe active no partner chip específico
+      if (modalState.partnerIds.includes(arg)) {
+        modalState.partnerIds = modalState.partnerIds.filter(x => x !== arg);
+      } else {
+        modalState.partnerIds.push(arg);
+      }
+      const partnerEl = document.querySelector(`[data-mact="toggle-partner:${arg}"]`);
+      if (partnerEl) partnerEl.classList.toggle('active');
+      break;
+    case 'new-partner-from-session':
+      window._savedSessionModal = JSON.parse(JSON.stringify(modalState));
+      openPartnerModal((newPartnerId) => {
+        modalState = window._savedSessionModal;
+        delete window._savedSessionModal;
+        if (newPartnerId !== undefined) modalState.partnerIds.push(newPartnerId);
         renderSessionModal();
       });
       break;
-    case 'add-applied': {
-      syncSessionInputs();
-      modalState.rolls[parseInt(arg)].applied.push({ position: '', submission: '' });
-      renderSessionModal();
-      break;
-    }
-    case 'rm-applied': {
-      syncSessionInputs();
-      const [ri, ai] = arg.split('|').map(n => parseInt(n));
-      modalState.rolls[ri].applied.splice(ai, 1);
-      renderSessionModal();
-      break;
-    }
-    case 'set-applied': {
-      const [ri, ai, field] = arg.split('|');
-      modalState.rolls[parseInt(ri)].applied[parseInt(ai)][field] = val;
-      break;
-    }
-    case 'add-suffered': {
-      syncSessionInputs();
-      modalState.rolls[parseInt(arg)].suffered.push({ position: '', submission: '' });
-      renderSessionModal();
-      break;
-    }
-    case 'rm-suffered': {
-      syncSessionInputs();
-      const [ri, si] = arg.split('|').map(n => parseInt(n));
-      modalState.rolls[ri].suffered.splice(si, 1);
-      renderSessionModal();
-      break;
-    }
-    case 'set-suffered': {
-      const [ri, si, field] = arg.split('|');
-      modalState.rolls[parseInt(ri)].suffered[parseInt(si)][field] = val;
-      break;
-    }
+    case '_deprecated_m-mode':
     case 'save-session':
-      syncSessionInputs();
       saveSession();
       break;
     // COMP actions
@@ -2345,6 +4262,12 @@ function handleModalAction(a, val) {
     case 'save-partner':
       savePartner();
       break;
+    case 'delete-partner':
+      if (modalState._editingId) {
+        const pid = modalState._editingId;
+        openConfirmModal('Deletar parceiro', 'Os treinos existentes vão manter a referência.', 'Deletar', () => { state.data.partners = state.data.partners.filter(p => p.id !== pid); persistUser(); closeModal(); showToast('Parceiro removido'); render(); });
+      }
+      break;
     // Profile
     case 'save-profile':
       saveProfile();
@@ -2360,43 +4283,27 @@ function handleModalAction(a, val) {
 }
 
 function syncSessionInputs() {
-  if (modalState._kind !== 'session') return;
-  const dateEl = document.getElementById('m-date');
-  const durEl = document.getElementById('m-duration');
-  const notesEl = document.getElementById('m-notes');
-  if (dateEl) {
-    let v = dateEl.value;
-    // Defensive: even if browser allowed future date, clamp to today
-    if (v && v > todayISO()) {
-      v = todayISO();
-      dateEl.value = v;
-    }
-    modalState.date = v;
-  }
-  if (durEl) modalState.duration = parseInt(durEl.value) || 0;
-  if (notesEl) modalState.notes = notesEl.value;
-  document.querySelectorAll('[data-roll-notes]').forEach(el => {
-    const i = parseInt(el.dataset.rollNotes);
-    if (modalState.rolls[i]) modalState.rolls[i].notes = el.value;
-  });
+  // Legado - o novo modal atualiza modalState via input listeners diretamente
+  // Mantido só pra não quebrar chamadas restantes
 }
 
 function saveSession() {
   if (!modalState.date) { alert('Selecione uma data'); return; }
   if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
-  // Flatten roll data into legacy `applied` and `suffered` arrays for stats compatibility
+  // Converter contadores agregados em array de finalizações (uma por count)
   const allApplied = [];
-  const allSuffered = [];
-  const partnerSet = new Set();
-  modalState.rolls.forEach(roll => {
-    if (roll.partnerId) partnerSet.add(roll.partnerId);
-    (roll.applied || []).filter(a => a.position && a.submission).forEach(a => {
-      allApplied.push({ position: a.position, submission: a.submission, partnerId: roll.partnerId || '' });
-    });
-    (roll.suffered || []).filter(x => x.position && x.submission).forEach(x => {
-      allSuffered.push({ position: x.position, submission: x.submission, partnerId: roll.partnerId || '' });
-    });
+  Object.entries(modalState.appliedCounts || {}).forEach(([sub, count]) => {
+    for (let i = 0; i < count; i++) {
+      allApplied.push({ position: '', submission: sub, partnerId: '' });
+    }
   });
+  const allSuffered = [];
+  Object.entries(modalState.sufferedCounts || {}).forEach(([sub, count]) => {
+    for (let i = 0; i < count; i++) {
+      allSuffered.push({ position: '', submission: sub, partnerId: '' });
+    }
+  });
+
   const isEdit = !!modalState._editingId;
   const sessionData = {
     id: modalState._editingId || uid(),
@@ -2404,11 +4311,11 @@ function saveSession() {
     mode: modalState.mode,
     duration: modalState.duration,
     rolls: modalState.rollCount,
-    partners: Array.from(partnerSet),
+    partners: (modalState.partnerIds || []).slice(),
     applied: allApplied,
     suffered: allSuffered,
-    rollDetails: modalState.rolls.map(r => ({ partnerId: r.partnerId, applied: r.applied, suffered: r.suffered, notes: r.notes })),
-    notes: modalState.notes,
+    rollDetails: null, // Novo formato agregado não usa rolls detalhados
+    notes: modalState.notes || '',
     mood: modalState.mood
   };
   if (isEdit) {
@@ -2417,9 +4324,23 @@ function saveSession() {
   } else {
     state.data.sessions.push(sessionData);
   }
+  // Atualiza recorde de streak se aplicável
+  const wkBefore = currentWeekStatus();
+  const streakBefore = computeCurrentStreak();
   persistUser();
+  updateStreakRecord();
+  const wkAfter = currentWeekStatus();
+  const streakAfter = computeCurrentStreak();
+
   closeModal();
-  showToast(isEdit ? 'Treino atualizado!' : 'Treino salvo!');
+  // Toast especial se acabou de bater a meta da semana
+  if (!isEdit && !wkBefore.metGoal && wkAfter.metGoal) {
+    showToast(`🔥 Meta da semana batida! Streak: ${streakAfter}`);
+  } else if (!isEdit && streakAfter > streakBefore) {
+    showToast(`🔥 Streak: ${streakAfter} ${streakAfter === 1 ? 'semana' : 'semanas'}!`);
+  } else {
+    showToast(isEdit ? 'Treino atualizado!' : 'Treino salvo!');
+  }
   render();
 }
 
@@ -2444,7 +4365,7 @@ function renderCompModal() {
   const matchesHtml = modalState.matches.map((m, i) => `<div class="sub-card">
     <div class="sub-card-head">
       <span class="num" style="${m.result === 'win' ? '' : '--accent: var(--red)'}">Luta ${i+1}</span>
-      <button data-mact="rm-match:${i}"><i class="ti ti-trash" style="font-size:14px;color:var(--text-3)"></i></button>
+      <button data-mact="rm-match:${i}"><span style="color:var(--text-3)">${icon('trash', 14)}</span></button>
     </div>
     <div class="input-grid-2" style="margin-bottom:8px">
       <div class="input-row"><label>Fase</label>
@@ -2483,11 +4404,11 @@ function renderCompModal() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Registrar competição</div>
-      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
     </div>
 
     <div class="toggle">
-      <button class="${modalState.mode === 'gi' ? 'active' : ''}" data-mact="comp-mode:gi"><i class="ti ti-shirt" style="font-size:13px;vertical-align:-2px"></i> Gi</button>
+      <button class="${modalState.mode === 'gi' ? 'active' : ''}" data-mact="comp-mode:gi"><span style="vertical-align:-2px">${icon('shirt', 13)}</span> Gi</button>
       <button class="${modalState.mode === 'no-gi' ? 'active' : ''}" data-mact="comp-mode:no-gi">No-Gi</button>
     </div>
 
@@ -2529,10 +4450,10 @@ function renderCompModal() {
         <span class="pill pill-green">${modalState.matches.length}</span>
       </div>
       ${matchesHtml}
-      <button class="btn-dashed" data-mact="add-match"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> Adicionar luta</button>
+      <button class="btn-dashed" data-mact="add-match"><span style="vertical-align:-1px">${icon('plus', 12)}</span> Adicionar luta</button>
     </div>
 
-    <button class="btn-primary" data-mact="save-comp"><i class="ti ti-check" style="vertical-align:-2px"></i> Salvar competição</button>
+    <button class="btn-primary" data-mact="save-comp"><span style="vertical-align:-2px">${icon('check', 16)}</span> Salvar competição</button>
     <div style="height:20px"></div>
   `);
   attachModalListeners();
@@ -2617,26 +4538,42 @@ function renderPartnerModal() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${isEdit ? 'Editar parceiro' : 'Novo parceiro'}</div>
-      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
     </div>
-    <div class="card">
-      <div class="input-row"><label>Nome</label><input type="text" id="p-name" placeholder="Nome do parceiro" value="${escapeHtml(modalState.name)}"></div>
-      <div class="input-grid-2">
-        <div class="input-row"><label>Faixa</label>
-          <select id="p-belt">
-            <optgroup label="Adulto">
-              ${BELTS_ADULT.map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
-            </optgroup>
-            <optgroup label="Kids (menor de 16)">
-              ${BELTS_KIDS.slice(1).map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
-            </optgroup>
-          </select>
-        </div>
-        <div class="input-row"><label>Peso (kg)</label><input type="number" id="p-weight" value="${modalState.weight}" min="30" max="200"></div>
+
+    <div class="form-group">
+      <label class="form-label">Nome</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="p-name" placeholder="Nome do parceiro" value="${escapeHtml(modalState.name)}"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Faixa</label>
+      <div class="input-row" style="margin-bottom:0">
+        <select id="p-belt">
+          <optgroup label="Adulto">
+            ${BELTS_ADULT.map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
+          </optgroup>
+          <optgroup label="Kids (menor de 16)">
+            ${BELTS_KIDS.slice(1).map(b => `<option ${b === modalState.belt ? 'selected' : ''}>${b}</option>`).join('')}
+          </optgroup>
+        </select>
       </div>
-      <div class="input-row"><label>Academia (opcional)</label><input type="text" id="p-gym" placeholder="Nome da academia" value="${escapeHtml(modalState.gym || '')}"></div>
     </div>
-    <button class="btn-primary" data-mact="save-partner"><i class="ti ti-check" style="vertical-align:-2px"></i> ${isEdit ? 'Salvar alterações' : 'Salvar parceiro'}</button>
+
+    <div class="form-group">
+      <label class="form-label">Peso (kg)</label>
+      <div class="input-row" style="margin-bottom:0"><input type="number" id="p-weight" value="${modalState.weight}" min="30" max="200"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Academia (opcional)</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="p-gym" placeholder="Nome da academia" value="${escapeHtml(modalState.gym || '')}"></div>
+    </div>
+
+    <button class="btn-primary" data-mact="save-partner">${isEdit ? 'Salvar alterações' : 'Salvar parceiro'}</button>
+
+    ${isEdit ? `<button class="btn-secondary" style="margin-top:8px;color:var(--primary);border-color:var(--primary)" data-mact="delete-partner">Deletar parceiro</button>` : ''}
+
     <div style="height:20px"></div>
   `);
   attachModalListeners();
@@ -2679,60 +4616,78 @@ function openProfileModal() {
 
 function renderProfileModal() {
   const beltsList = getBelts(modalState.age);
-  // If user changes age and current belt isn't valid, fallback to Branca
   const validBelt = beltsList.includes(modalState.belt) ? modalState.belt : 'Branca';
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Editar perfil</div>
-      <button class="close-btn" data-mact="close"><i class="ti ti-x" style="font-size:16px"></i></button>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
     </div>
-    <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0 24px">
       <div style="position:relative">
-        <div id="photo-preview" style="width:88px;height:88px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:30px;border:3px solid var(--primary);overflow:hidden">
+        <div id="photo-preview" style="width:96px;height:96px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif';font-size:34px;border:1px solid var(--border);overflow:hidden;color:var(--text)">
           ${modalState.photo
             ? `<img src="${modalState.photo}" style="width:100%;height:100%;object-fit:cover" alt="foto">`
             : escapeHtml(initials(modalState.name || 'A'))}
         </div>
-        <label style="position:absolute;bottom:-4px;right:-4px;width:30px;height:30px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--bg)">
-          <i class="ti ti-camera" style="font-size:14px;color:#fff"></i>
+        <label style="position:absolute;bottom:-2px;right:-2px;width:32px;height:32px;background:var(--text);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:3px solid var(--bg)">
+          <span style="color:var(--bg)">${icon('camera', 14)}</span>
           <input type="file" id="pr-photo" accept="image/*" style="display:none">
         </label>
       </div>
-      ${modalState.photo ? `<button class="btn-dashed" style="max-width:140px;font-size:11px;padding:6px" data-mact="rm-photo"><i class="ti ti-trash" style="font-size:11px;vertical-align:-1px"></i> Remover foto</button>` : ''}
+      ${modalState.photo ? `<button style="background:none;border:1px solid var(--border);color:var(--primary);font-size:12px;cursor:pointer;padding:8px 16px;border-radius:20px;display:inline-flex;align-items:center;gap:6px" data-mact="rm-photo">${icon('trash', 12)} Excluir foto</button>` : ''}
     </div>
-    <div class="card">
-      <div class="input-row"><label>Nome</label><input type="text" id="pr-name" value="${escapeHtml(modalState.name)}"></div>
+
+    <div class="form-group">
+      <label class="form-label">Nome</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="pr-name" value="${escapeHtml(modalState.name)}"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Dados básicos</label>
       <div class="input-grid-3">
-        <div class="input-row"><label>Idade</label><input type="number" id="pr-age" value="${modalState.age || ''}" min="3" max="99" data-mact="age-change"></div>
-        <div class="input-row"><label>Gênero</label>
+        <div class="input-row" style="margin-bottom:0"><label>Idade</label><input type="number" id="pr-age" value="${modalState.age || ''}" min="3" max="99" data-mact="age-change"></div>
+        <div class="input-row" style="margin-bottom:0"><label>Sexo</label>
           <select id="pr-gender">
-            <option value="male" ${modalState.gender === 'male' ? 'selected' : ''}>Masculino</option>
-            <option value="female" ${modalState.gender === 'female' ? 'selected' : ''}>Feminino</option>
+            <option value="male" ${modalState.gender === 'male' ? 'selected' : ''}>M</option>
+            <option value="female" ${modalState.gender === 'female' ? 'selected' : ''}>F</option>
           </select>
         </div>
-        <div class="input-row"><label>Peso (kg)</label><input type="number" id="pr-weight" value="${modalState.weight}" min="20" max="200"></div>
+        <div class="input-row" style="margin-bottom:0"><label>Peso</label><input type="number" id="pr-weight" value="${modalState.weight}" min="20" max="200"></div>
       </div>
-      ${modalState.age && modalState.age < 16 ? `<p style="font-size:10px;color:var(--text-3);margin:-4px 0 8px;text-align:center"><i class="ti ti-info-circle" style="font-size:10px;vertical-align:-1px"></i> Sistema de faixas IBJJF Kids ativado</p>` : ''}
+      ${modalState.age && modalState.age < 16 ? `<p style="font-size:10px;color:var(--text-3);margin-top:8px;text-align:center">Sistema de faixas IBJJF Kids ativado</p>` : ''}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Graduação</label>
       <div class="input-grid-2">
-        <div class="input-row"><label>Faixa</label>
+        <div class="input-row" style="margin-bottom:0"><label>Faixa</label>
           <select id="pr-belt">
             ${beltsList.map(b => `<option ${validBelt === b ? 'selected' : ''}>${b}</option>`).join('')}
           </select>
         </div>
-        <div class="input-row"><label>Graus</label>
+        <div class="input-row" style="margin-bottom:0"><label>Graus</label>
           <select id="pr-degrees">
             ${[0,1,2,3,4].map(d => `<option ${modalState.degrees === d ? 'selected' : ''} value="${d}">${d}</option>`).join('')}
           </select>
         </div>
       </div>
-      <div class="input-row"><label>Academia</label><input type="text" id="pr-gym" value="${escapeHtml(modalState.gym)}" placeholder="Nome da academia"></div>
-      <div class="input-row"><label>Começou em</label><input type="number" id="pr-started" value="${modalState.startedAt}" min="1980" max="${new Date().getFullYear()}"></div>
     </div>
-    <button class="btn-primary" data-mact="save-profile"><i class="ti ti-check" style="vertical-align:-2px"></i> Salvar</button>
+
+    <div class="form-group">
+      <label class="form-label">Academia</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="pr-gym" value="${escapeHtml(modalState.gym)}" placeholder="Nome da academia"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Praticando desde</label>
+      <div class="input-row" style="margin-bottom:0"><input type="number" id="pr-started" value="${modalState.startedAt}" min="1980" max="${new Date().getFullYear()}"></div>
+    </div>
+
+    <button class="btn-primary" data-mact="save-profile">Salvar</button>
     <div style="height:20px"></div>
   `);
   attachModalListeners();
-  // Handle photo input + age live-update
   const photoInput = document.getElementById('pr-photo');
   if (photoInput) photoInput.addEventListener('change', handlePhotoSelect);
   const ageInput = document.getElementById('pr-age');
@@ -2756,31 +4711,48 @@ function syncProfileInputs() {
 async function handlePhotoSelect(e) {
   const file = e.target.files[0];
   if (!file) return;
-  // Read + resize to ~300px, jpeg 0.85 quality
-  const dataUrl = await new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-  const img = new Image();
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = dataUrl; });
-  // Crop center square + downscale
-  const size = 300;
-  const min = Math.min(img.width, img.height);
-  const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
-  const canvas = document.createElement('canvas');
-  canvas.width = size; canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-  syncProfileInputs();
-  modalState.photo = canvas.toDataURL('image/jpeg', 0.85);
-  renderProfileModal();
+  try {
+    // Read + resize to 200px, jpeg 0.75 quality — mantém pequeno o suficiente pro localStorage
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = dataUrl; });
+    // Crop center square + downscale
+    const size = 200;
+    const min = Math.min(img.width, img.height);
+    const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+    syncProfileInputs();
+    const photoData = canvas.toDataURL('image/jpeg', 0.75);
+    // Testar se dá pra salvar (verifica quota antes)
+    const testKey = 'jjtracker_photo_test';
+    try {
+      localStorage.setItem(testKey, photoData);
+      localStorage.removeItem(testKey);
+    } catch (quotaErr) {
+      showToast('Foto grande demais. Tente uma menor.', 'error');
+      return;
+    }
+    modalState.photo = photoData;
+    renderProfileModal();
+  } catch (err) {
+    console.error('Erro ao processar foto:', err);
+    showToast('Erro ao processar foto', 'error');
+  }
 }
 
 function saveProfile() {
   syncProfileInputs();
+  const hadPhoto = !!state.data.profile.photo;
   state.data.profile = {
+    ...state.data.profile, // preserva theme, streakGoal etc
     name: (modalState.name || '').trim() || 'Atleta',
     gender: modalState.gender || 'male',
     age: parseInt(modalState.age) || null,
@@ -2793,7 +4765,8 @@ function saveProfile() {
   };
   persistUser();
   closeModal();
-  showToast('Perfil atualizado!');
+  const gotPhoto = !hadPhoto && state.data.profile.photo;
+  showToast(gotPhoto ? '🎉 Foto adicionada! +1 freeze desbloqueado' : 'Perfil atualizado!');
   render();
 }
 
