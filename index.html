@@ -1740,6 +1740,49 @@ async function hashPassword(pw) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+// =================== BACKUP ===================
+function exportBackup() {
+  const payload = { app: 'tatame', version: 1, exportedAt: new Date().toISOString(), data: state.data };
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `tatame-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast('Backup exportado');
+}
+
+function importBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try { parsed = JSON.parse(reader.result); } catch { showToast('Arquivo inválido', 'error'); return; }
+      const data = parsed && parsed.app === 'tatame' ? parsed.data : null;
+      if (!data || !data.profile || !Array.isArray(data.sessions) || !Array.isArray(data.comps) || !Array.isArray(data.partners)) {
+        showToast('Backup inválido', 'error');
+        return;
+      }
+      openConfirmModal('Importar backup', 'Isso substitui todos os dados atuais desta conta.', 'Importar', () => {
+        migrate(data);
+        state.data = data;
+        persistUser();
+        render();
+        showToast('Backup importado');
+      });
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 function newUserData() {
   return {
     profile: { name: '', gender: 'male', age: 28, belt: 'Branca', degrees: 0, weight: 80, gym: '', startedAt: new Date().getFullYear() - 1, photo: null },
@@ -2367,6 +2410,8 @@ function render() {
 // ---------- AUTH SCREEN ----------
 let authMode = 'landing'; // 'landing' | 'login' | 'register'
 let authError = '';
+let authEmail = '';
+let authName = '';
 function renderAuth() {
   if (authMode === 'landing') {
     return `
@@ -2390,8 +2435,8 @@ function renderAuth() {
       <div class="auth-form">
         <h2>${isLogin ? 'Entrar' : 'Criar conta'}</h2>
         <div class="subtitle">${isLogin ? 'Acesse sua conta' : 'Comece a registrar seus treinos'}</div>
-        ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" placeholder="Como podemos te chamar?"></div>` : ''}
-        <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" placeholder="seu@email.com"></div>
+        ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" value="${escapeHtml(authName)}" placeholder="Como podemos te chamar?"></div>` : ''}
+        <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" value="${escapeHtml(authEmail)}" placeholder="seu@email.com"></div>
         <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
         ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
         <button class="btn-primary" id="auth-submit">${isLogin ? 'Entrar' : 'Criar conta'}</button>
@@ -2406,13 +2451,15 @@ function attachAuthListeners() {
   const goLogin = document.getElementById('auth-go-login');
   const goRegister = document.getElementById('auth-go-register');
   const back = document.getElementById('auth-back');
-  if (goLogin) goLogin.onclick = () => { authMode = 'login'; authError = ''; render(); };
-  if (goRegister) goRegister.onclick = () => { authMode = 'register'; authError = ''; render(); };
+  if (goLogin) goLogin.onclick = () => { authMode = 'login'; authError = ''; authEmail = ''; authName = ''; render(); };
+  if (goRegister) goRegister.onclick = () => { authMode = 'register'; authError = ''; authEmail = ''; authName = ''; render(); };
   if (back) back.onclick = () => { authMode = 'landing'; authError = ''; render(); };
   const submit = document.getElementById('auth-submit');
   if (submit) submit.onclick = async () => {
     const email = document.getElementById('auth-email').value.trim().toLowerCase();
     const pw = document.getElementById('auth-pw').value;
+    authEmail = email;
+    authName = authMode === 'register' ? document.getElementById('auth-name').value.trim() : '';
     if (!email || !pw) { authError = 'Preencha email e senha'; render(); return; }
     let res;
     if (authMode === 'login') {
@@ -2422,7 +2469,7 @@ function attachAuthListeners() {
       res = await tryRegister(email, pw, name);
     }
     if (res.error) { authError = res.error; render(); }
-    else { authError = ''; authMode = 'landing'; state.currentTab = 'home'; render(); }
+    else { authError = ''; authEmail = ''; authName = ''; authMode = 'landing'; state.currentTab = 'home'; render(); }
   };
   // Enter submit
   ['auth-email','auth-pw','auth-name'].forEach(id => {
@@ -2586,7 +2633,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v15</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v16</p>
   </div>`;
 }
 
@@ -3259,6 +3306,20 @@ function renderSettings() {
     </div>
 
     <div class="settings-group">
+      <div class="settings-group-label">Dados</div>
+      <div class="settings-list">
+        <div class="settings-item" data-action="export-data">
+          <span class="label">Exportar backup</span>
+          <span class="value">${icon('chevron-right', 16)}</span>
+        </div>
+        <div class="settings-item" data-action="import-data">
+          <span class="label">Importar backup</span>
+          <span class="value">${icon('chevron-right', 16)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
       <div class="settings-group-label">Conta</div>
       <div class="settings-list">
         <div class="settings-item" data-action="open:edit-profile">
@@ -3272,7 +3333,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v15</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v16</p>
   </div>`;
 }
 
@@ -3385,6 +3446,8 @@ function handleAction(a) {
         logout();
       });
       break;
+    case 'export-data': exportBackup(); break;
+    case 'import-data': importBackup(); break;
     case 'notify-interest':
       showToast('Obrigado! Vamos avisar quando estiver pronto.');
       break;
@@ -4288,7 +4351,7 @@ function syncSessionInputs() {
 }
 
 function saveSession() {
-  if (!modalState.date) { alert('Selecione uma data'); return; }
+  if (!modalState.date) { showToast('Selecione uma data', 'error'); return; }
   if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
   // Converter contadores agregados em array de finalizações (uma por count)
   const allApplied = [];
@@ -4493,9 +4556,9 @@ function syncCompInputs() {
 }
 
 function saveComp() {
-  if (!modalState.date) { alert('Selecione uma data'); return; }
+  if (!modalState.date) { showToast('Selecione uma data', 'error'); return; }
   if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
-  if (!modalState.name) { alert('Adicione o nome do evento'); return; }
+  if (!modalState.name) { showToast('Adicione o nome do evento', 'error'); return; }
   const comp = {
     id: uid(),
     date: modalState.date,
@@ -4584,7 +4647,7 @@ function savePartner() {
   const belt = document.getElementById('p-belt').value;
   const weight = parseInt(document.getElementById('p-weight').value) || 80;
   const gym = document.getElementById('p-gym').value.trim();
-  if (!name) { alert('Informe o nome'); return; }
+  if (!name) { showToast('Informe o nome', 'error'); return; }
   const isEdit = !!modalState._editingId;
   let id;
   if (isEdit) {
