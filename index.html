@@ -1491,11 +1491,63 @@
     padding: 4px;
     cursor: pointer;
   }
+
+  /* ===== MIGRAÇÃO (slides "o app evoluiu") ===== */
+  .mig { min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: pan-y;
+    padding: calc(16px + env(safe-area-inset-top)) 28px calc(26px + env(safe-area-inset-bottom)); }
+  .mig-top { display: flex; align-items: center; justify-content: space-between; min-height: 34px; }
+  .mig-dots { display: flex; gap: 6px; }
+  .mig-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--border-2); transition: all .35s ease; }
+  .mig-dots i.past { background: var(--text-3); }
+  .mig-dots i.on { width: 22px; background: var(--primary); }
+  .mig-skip { color: var(--text-3); font-size: 12px; padding: 8px 0 8px 14px; }
+  .mig-stage { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .mig-slide { width: 100%; max-width: 340px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
+    animation: migIn .6s cubic-bezier(.2,.8,.2,1) both; }
+  .mig-slide.back { animation-name: migInBack; }
+  @keyframes migIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+  @keyframes migInBack { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+  .mig-kicker { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); font-weight: 600; animation: migUp .5s .1s both; }
+  .mig-title { font-family: 'Instrument Serif', serif; font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; font-weight: 400; animation: migUp .5s .18s both; }
+  .mig-title em { font-style: italic; color: var(--primary); }
+  .mig-text { color: var(--text-2); font-size: 14px; line-height: 1.55; max-width: 310px; animation: migUp .5s .26s both; }
+  @keyframes migUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .mig-art { min-height: 150px; display: flex; align-items: center; justify-content: center; color: var(--text); animation: migUp .6s both; }
+  .mig-brand { position: relative; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 58px; letter-spacing: -0.03em; line-height: 1; }
+  .mig-brand b { color: var(--primary); display: inline-block; animation: migPulse 1.6s ease-in-out infinite; }
+  .mig-brand i { position: absolute; right: -6px; bottom: 6px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--primary); animation: migRing 1.6s ease-out infinite; }
+  @keyframes migPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+  @keyframes migRing { from { transform: scale(.6); opacity: .9; } to { transform: scale(3.2); opacity: 0; } }
+  .mig-flow { stroke-dasharray: 5 6; animation: migDash 1.1s linear infinite; }
+  .mig-flow.d2 { animation-delay: -.55s; }
+  @keyframes migDash { to { stroke-dashoffset: -22; } }
+  .mig-draw { stroke-dasharray: 420; stroke-dashoffset: 420; animation: migDraw 1.1s .2s ease forwards; }
+  .mig-check { stroke-dasharray: 70; stroke-dashoffset: 70; animation: migDraw .6s 1.1s ease forwards; }
+  @keyframes migDraw { to { stroke-dashoffset: 0; } }
+  .mig-stats { display: flex; gap: 10px; width: 100%; }
+  .mig-stats > div { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 6px; }
+  .mig-stats b { display: block; font-family: 'Instrument Serif', serif; font-size: 38px; font-weight: 400; line-height: 1; color: var(--primary); }
+  .mig-stats span { display: block; margin-top: 6px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-3); }
+  .mig-actions { width: 100%; max-width: 340px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; padding-top: 18px; }
+  .mig-form { width: 100%; text-align: left; margin-top: 4px; }
+  .mig-link { background: none; color: var(--text-2); font-size: 12px; padding: 8px; text-align: center; font-weight: 500; }
+  .mig-hint { font-size: 11px; color: var(--text-3); text-align: center; margin-top: 2px; }
+  .mig-ok { width: 74px; height: 74px; border-radius: 50%; background: var(--green-bg); display: flex; align-items: center; justify-content: center; animation: migPop .5s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes migPop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+  .mig-banner { width: 100%; text-align: left; background: var(--primary-soft); border: 1px solid var(--primary); color: var(--text); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .mig-banner b { font-size: 13px; font-weight: 600; }
+  .mig-banner span { font-size: 12px; color: var(--text-2); }
+  @media (prefers-reduced-motion: reduce) {
+    .mig *, .mig-slide { animation: none !important; }
+    .mig-draw, .mig-check { stroke-dashoffset: 0; }
+  }
 </style>
 </head>
 <body>
 <div id="app"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>window.supabase || document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"><\/script>')</script>
 <script>
 // =================== ICONS (SVG inline) ===================
 const ICONS = {
@@ -1706,7 +1758,9 @@ const RESULT_TYPES = ['Vitória por finalização','Vitória por pontos','Vitór
 
 // Application state
 let state = {
-  currentUser: null,
+  currentUser: null, // email
+  userId: null,
+  cloudUpdatedAt: null,
   data: null, // { profile, partners, sessions, comps, plan }
   currentTab: 'home', // home | calendar | stats | comps | partners | profile
   mode: 'gi', // gi | no-gi
@@ -1719,27 +1773,19 @@ let state = {
 function loadAll() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { users: {}, currentEmail: null };
+    if (!raw) return { users: {}, currentEmail: null };
+    try {
+      const db = JSON.parse(raw);
+      if (!db || typeof db !== 'object' || !db.users) throw new Error('formato inválido');
+      return db;
+    } catch (err) {
+      // Preserva o blob corrompido antes que uma gravação o sobrescreva
+      try { localStorage.setItem(STORAGE_KEY + '_corrupt_' + Date.now(), raw); } catch {}
+      console.error('Dados corrompidos, cópia preservada:', err);
+      return { users: {}, currentEmail: null };
+    }
   } catch { return { users: {}, currentEmail: null }; }
 }
-function saveAll(db) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-    return true;
-  } catch (err) {
-    console.error('Erro ao salvar em localStorage:', err);
-    showToast('Erro ao salvar. Verifique o espaço do navegador.', 'error');
-    return false;
-  }
-}
-
-// Simple password hash (NOT cryptographically secure - for local-only demo)
-async function hashPassword(pw) {
-  const enc = new TextEncoder().encode(pw + ':tatame-salt-2026');
-  const buf = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
 // =================== BACKUP ===================
 function exportBackup() {
   const payload = { app: 'tatame', version: 1, exportedAt: new Date().toISOString(), data: state.data };
@@ -1793,65 +1839,412 @@ function newUserData() {
   };
 }
 
-// =================== AUTH ===================
-async function tryLogin(email, password) {
+// =================== CLOUD (Supabase) ===================
+const SUPABASE_URL = 'https://cyaqglcwjpyncrqrdfyc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_b3hHXaDX1f6qH7cCRXp39w_7IOobXYW'; // chave pública; o acesso é protegido por RLS
+const CACHE_KEY = 'tatame_cloud_v1';      // { [userId]: { email, data, dirty, cloudUpdatedAt } }
+const LAST_USER_KEY = 'tatame_last_user'; // { id, email } — permite abrir offline com a sessão expirada
+
+const IS_RECOVERY = /type=recovery/.test(window.location.hash); // link de "esqueci a senha"
+const MIGRATED_KEY = 'tatame_migrated_v1';        // { [emailLegado]: iso } contas locais já levadas para a nuvem
+const PENDING_KEY = 'tatame_pending_migration';   // { [emailNuvem]: emailLegado } migração aguardando login
+
+const sb = (window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } })
+  : null;
+
+let syncStatus = 'synced'; // synced | pending | syncing | error | offline
+let syncTimer = null;
+let syncing = false;
+let syncAgain = false;
+let localRev = 0;      // incrementa a cada alteração local; evita marcar como sincronizado algo editado durante o envio
+let loggingOut = false;
+let authInfo = '';
+
+const SYNC_LABELS = {
+  synced: 'Sincronizado',
+  pending: 'Pendente…',
+  syncing: 'Sincronizando…',
+  error: 'Erro — tentando de novo',
+  offline: 'Offline — salvo no aparelho'
+};
+function syncLabel() { return SYNC_LABELS[syncStatus] || ''; }
+function setSyncStatus(st) {
+  syncStatus = st;
+  const el = document.getElementById('sync-status');
+  if (el) el.textContent = syncLabel();
+}
+
+function loadCache() {
+  let raw = null;
+  try {
+    raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return {};
+    const c = JSON.parse(raw);
+    if (!c || typeof c !== 'object') throw new Error('formato inválido');
+    return c;
+  } catch (err) {
+    // Preserva o blob corrompido antes que uma gravação o sobrescreva
+    if (raw) { try { localStorage.setItem(CACHE_KEY + '_corrupt_' + Date.now(), raw); } catch {} }
+    console.error('Cache local corrompido:', err);
+    return {};
+  }
+}
+function cacheEntry(userId) { return loadCache()[userId] || null; }
+function writeCacheEntry(userId, entry) {
+  try {
+    const c = loadCache();
+    c[userId] = entry;
+    localStorage.setItem(CACHE_KEY, JSON.stringify(c));
+    return true;
+  } catch (err) {
+    console.error('Erro ao salvar cache local:', err);
+    showToast('Erro ao salvar no aparelho. Verifique o espaço do navegador.', 'error');
+    return false;
+  }
+}
+function removeCacheEntry(userId) {
+  try {
+    const c = loadCache();
+    delete c[userId];
+    localStorage.setItem(CACHE_KEY, JSON.stringify(c));
+  } catch {}
+}
+function getLastUser() {
+  try { return JSON.parse(localStorage.getItem(LAST_USER_KEY)); } catch { return null; }
+}
+function setLastUser(u) {
+  try { u ? localStorage.setItem(LAST_USER_KEY, JSON.stringify(u)) : localStorage.removeItem(LAST_USER_KEY); } catch {}
+}
+
+function isValidData(d) {
+  return !!d && typeof d === 'object' && !!d.profile && Array.isArray(d.sessions) && Array.isArray(d.comps) && Array.isArray(d.partners);
+}
+function isEmptyData(d) {
+  return !d.sessions.length && !d.comps.length && !d.partners.length;
+}
+
+// Salva no aparelho na hora e agenda o envio para a nuvem
+function persistUser() {
+  if (!state.userId) return false;
+  localRev++;
+  const ok = writeCacheEntry(state.userId, {
+    email: state.currentUser,
+    data: state.data,
+    dirty: true,
+    cloudUpdatedAt: state.cloudUpdatedAt || null
+  });
+  scheduleSync();
+  return ok;
+}
+
+function scheduleSync(delay = 1500) {
+  clearTimeout(syncTimer);
+  if (!sb || !state.userId) return;
+  if (!navigator.onLine) { setSyncStatus('offline'); return; }
+  setSyncStatus('pending');
+  syncTimer = setTimeout(() => { syncNow(); }, delay);
+}
+
+// Envia os dados atuais para o servidor. Retorna true se ficou sincronizado.
+async function syncNow() {
+  if (!sb || !state.userId) return false;
+  if (syncing) { syncAgain = true; return false; }
+  if (!navigator.onLine) { setSyncStatus('offline'); return false; }
+  clearTimeout(syncTimer);
+  syncing = true;
+  setSyncStatus('syncing');
+  const rev = localRev;
+  const userId = state.userId;
+  const email = state.currentUser;
+  const snapshot = state.data;
+  let ok = false;
+  let merged = false;
+  try {
+    // Outro aparelho gravou depois da última leitura? Então mescla em vez de sobrescrever.
+    const meta = await sb.from('user_data').select('updated_at').eq('user_id', userId).maybeSingle();
+    if (meta.error) throw meta.error;
+    if (meta.data && Date.parse(meta.data.updated_at) !== Date.parse(state.cloudUpdatedAt || 0)) {
+      const remote = await fetchCloud(userId);
+      if (remote && isValidData(remote.data)) { mergeInto(snapshot, remote.data); merged = true; }
+    }
+    const updatedAt = new Date().toISOString();
+    const { error } = await sb.from('user_data').upsert({ user_id: userId, data: snapshot, updated_at: updatedAt });
+    if (error) throw error;
+    ok = true;
+    if (state.userId === userId) {
+      state.cloudUpdatedAt = updatedAt;
+      if (merged && !document.querySelector('.modal-overlay')) render();
+      if (rev === localRev) {
+        writeCacheEntry(userId, { email, data: snapshot, dirty: false, cloudUpdatedAt: updatedAt });
+        setSyncStatus('synced');
+      } else {
+        syncAgain = true; // houve edição durante o envio
+      }
+    }
+  } catch (err) {
+    console.error('Erro ao sincronizar:', err);
+    setSyncStatus(navigator.onLine ? 'error' : 'offline');
+    if (navigator.onLine) { clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, 30000); }
+  } finally {
+    syncing = false;
+    if (syncAgain) { syncAgain = false; scheduleSync(300); }
+  }
+  return ok;
+}
+
+// União por id (o que existe em qualquer um dos lados fica); em conflito no mesmo id, vale o local
+function mergeInto(local, remote) {
+  ['sessions', 'comps', 'partners'].forEach(k => {
+    const have = new Set((local[k] || []).map(x => x.id));
+    (remote[k] || []).forEach(x => { if (!have.has(x.id)) local[k].push(x); });
+  });
+  ['weekPlans', 'recapsDismissed'].forEach(k => {
+    local[k] = Object.assign({}, remote[k] || {}, local[k] || {});
+  });
+  migrate(local);
+}
+
+// Ao voltar para o app, traz mudanças feitas em outro aparelho (se não houver nada pendente aqui)
+async function refreshFromCloud() {
+  if (!sb || !state.userId || syncing || !navigator.onLine) return;
+  if (syncStatus === 'pending' || syncStatus === 'error') return;
+  const userId = state.userId;
+  const entry = cacheEntry(userId);
+  if (entry && entry.dirty) return;
+  const rev = localRev;
+  try {
+    const cloud = await fetchCloud(userId);
+    if (!cloud || !isValidData(cloud.data)) return;
+    if (Date.parse(cloud.updated_at) === Date.parse(state.cloudUpdatedAt || 0)) return;
+    if (rev !== localRev || state.userId !== userId || syncing) return; // editou enquanto buscava
+    migrate(cloud.data);
+    state.data = cloud.data;
+    state.cloudUpdatedAt = cloud.updated_at;
+    writeCacheEntry(userId, { email: state.currentUser, data: cloud.data, dirty: false, cloudUpdatedAt: cloud.updated_at });
+    if (!document.querySelector('.modal-overlay')) render();
+  } catch (err) { console.error('Erro ao atualizar da nuvem:', err); }
+}
+
+async function fetchCloud(userId) {
+  const { data, error } = await sb.from('user_data').select('data, updated_at').eq('user_id', userId).maybeSingle();
+  if (error) throw error;
+  return data; // null | { data, updated_at }
+}
+
+// ===== Migração das contas antigas (salvas só neste aparelho) =====
+function readJSON(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
+function writeJSON(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
+function markMigrated(email) { const m = readJSON(MIGRATED_KEY); m[email] = new Date().toISOString(); writeJSON(MIGRATED_KEY, m); }
+function setPendingMigration(cloudEmail, legacyEmail) { const m = readJSON(PENDING_KEY); m[cloudEmail] = legacyEmail; writeJSON(PENDING_KEY, m); }
+
+// O blob antigo (jjtracker_v1) nunca é apagado: continua como cópia de segurança neste aparelho.
+function getLegacyAccounts() {
   const db = loadAll();
-  const u = db.users[email];
-  if (!u) return { error: 'Conta não encontrada' };
-  const hash = await hashPassword(password);
-  if (u.passwordHash !== hash) return { error: 'Senha incorreta' };
-  db.currentEmail = email;
-  saveAll(db);
+  const done = readJSON(MIGRATED_KEY);
+  const list = Object.keys(db.users || {})
+    .filter(e => !done[e])
+    .map(e => ({ email: e, data: db.users[e] && db.users[e].data }))
+    .filter(a => isValidData(a.data) && !isEmptyData(a.data));
+  list.sort((a, b) => (b.email === db.currentEmail) - (a.email === db.currentEmail));
+  return list;
+}
+function findLegacyData(email) {
+  const a = getLegacyAccounts().find(x => x.email === email);
+  return a ? a.data : null;
+}
+function legacyCounts(d) { return { sessions: d.sessions.length, comps: d.comps.length, partners: d.partners.length }; }
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+// Copia a conta antiga para a conta logada e envia para a nuvem
+function importLegacyNow(legacyEmail) {
+  const legacy = findLegacyData(legacyEmail);
+  if (!legacy) return false;
+  const copy = JSON.parse(JSON.stringify(legacy));
+  migrate(copy);
+  state.data = copy;
+  persistUser();
+  markMigrated(legacyEmail);
+  render();
+  showToast('Seus treinos foram enviados para a nuvem');
+  return true;
+}
+// Pergunta antes quando a ligação entre a conta antiga e a da nuvem não foi confirmada pelo usuário
+function offerLegacyUpload(email) {
+  const legacy = findLegacyData(email);
+  if (!legacy) return;
+  openConfirmModal(
+    'Enviar dados deste aparelho?',
+    `Encontramos ${plural(legacy.sessions.length, 'treino salvo', 'treinos salvos')} neste aparelho para ${email}. Enviar para a nuvem e usar na sua conta?`,
+    'Enviar',
+    () => importLegacyNow(email)
+  );
+}
+function afterLogin(res) {
+  if (!res || !res.offerLegacy) return;
+  const email = state.currentUser;
+  const pending = readJSON(PENDING_KEY);
+  const from = pending[email];
+  if (from && findLegacyData(from)) {
+    delete pending[email]; writeJSON(PENDING_KEY, pending);
+    importLegacyNow(from); // migração iniciada pelo próprio usuário nos slides: sem perguntar de novo
+  } else {
+    offerLegacyUpload(email);
+  }
+}
+
+async function flushSync() {
+  for (let i = 0; i < 50 && syncing; i++) await new Promise(r => setTimeout(r, 100));
+  return syncNow();
+}
+
+// Fluxo dos slides: cria (ou entra na) conta na nuvem e envia os dados antigos
+async function migrateToCloud(acc, email, password) {
+  if (!sb) return { error: NO_CLOUD_MSG };
+  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name: acc.data.profile.name || '' } } });
+  const exists = (error && /already registered/i.test(error.message || '')) ||
+    (!error && data.user && data.user.identities && data.user.identities.length === 0);
+  if (error && !exists) return { error: translateAuthError(error) };
+  let user;
+  if (exists) {
+    const r = await sb.auth.signInWithPassword({ email, password });
+    if (r.error) return { error: 'Este email já tem conta na nuvem com outra senha. Digite a senha dela ou toque em “Já tenho conta na nuvem”.' };
+    user = r.data.user;
+  } else if (!data.session) {
+    setPendingMigration(email, acc.email); // confirmação de email ligada: finaliza no primeiro login
+    return { needsConfirm: true, email };
+  } else {
+    user = data.user;
+  }
+  const res = await startSession(user);
+  if (res.error) return res;
+  const counts = legacyCounts(acc.data);
+  if (!res.offerLegacy) { // a conta na nuvem já tinha dados: não sobrescreve
+    markMigrated(acc.email);
+    return { ok: true, kept: true, counts, synced: true };
+  }
+  const copy = JSON.parse(JSON.stringify(acc.data));
+  migrate(copy);
+  state.data = copy;
+  persistUser();
+  markMigrated(acc.email);
+  const synced = await flushSync();
+  return { ok: true, counts, synced };
+}
+
+// Carrega os dados da conta (cache local + nuvem) depois de autenticar
+async function startSession(user, opts = {}) {
+  const userId = user.id;
+  const email = (user.email || '').toLowerCase();
+  const name = opts.name || (user.user_metadata && user.user_metadata.name) || '';
+  const cached = cacheEntry(userId);
+  let cloud = null;
+  let cloudOk = true;
+  try { cloud = await fetchCloud(userId); } catch (err) { cloudOk = false; console.error('Erro ao buscar dados na nuvem:', err); }
+
+  let data, dirty = false, offerLegacy = false, cloudUpdatedAt = null;
+  if (cached && cached.dirty && isValidData(cached.data)) {
+    data = cached.data; dirty = true; cloudUpdatedAt = cached.cloudUpdatedAt || null; // alterações locais ainda não enviadas têm prioridade
+  } else if (cloud) {
+    if (!isValidData(cloud.data)) return { error: 'Os dados da conta na nuvem estão em formato inválido. Contate o suporte' };
+    data = cloud.data; cloudUpdatedAt = cloud.updated_at;
+    offerLegacy = isEmptyData(data);
+  } else if (cached && isValidData(cached.data)) {
+    data = cached.data; cloudUpdatedAt = cached.cloudUpdatedAt || null;
+    dirty = cloudOk; // nuvem respondeu sem registro: reenvia a cópia do aparelho; sem conexão: só usa a cópia
+  } else if (!cloudOk) {
+    return { error: 'Sem conexão e sem dados salvos neste aparelho. Conecte-se à internet para carregar sua conta' };
+  } else {
+    data = newUserData();
+    data.profile.name = name || email.split('@')[0];
+    dirty = true; offerLegacy = true;
+  }
+  migrate(data);
+
+  state.userId = userId;
   state.currentUser = email;
-  state.data = u.data;
-  migrate(state.data);
-  return { ok: true };
+  state.data = data;
+  state.cloudUpdatedAt = cloudUpdatedAt;
+  setLastUser({ id: userId, email });
+  writeCacheEntry(userId, { email, data, dirty, cloudUpdatedAt });
+  localRev++;
+  if (dirty) scheduleSync(0); else setSyncStatus(cloudOk ? 'synced' : 'offline');
+  return { ok: true, offerLegacy };
+}
+
+function translateAuthError(err) {
+  const m = ((err && err.message) || '').toLowerCase();
+  if (m.includes('invalid login')) return 'Email ou senha incorretos';
+  if (m.includes('already registered')) return 'Email já cadastrado';
+  if (m.includes('not confirmed')) return 'Confirme seu email pelo link que enviamos antes de entrar';
+  if (m.includes('rate limit') || (err && err.status === 429)) return 'Muitas tentativas. Aguarde um pouco';
+  if (m.includes('password')) return 'Senha deve ter 6+ caracteres';
+  if (m.includes('fetch') || m.includes('network')) return 'Sem conexão. Verifique a internet';
+  return 'Não foi possível concluir. Tente novamente';
+}
+
+const NO_CLOUD_MSG = 'Não foi possível carregar o serviço de contas. Verifique a internet e recarregue a página';
+
+async function tryUpdatePassword(password) {
+  if (!sb) return { error: NO_CLOUD_MSG };
+  if (password.length < 6) return { error: 'Senha deve ter 6+ caracteres' };
+  const { data, error } = await sb.auth.updateUser({ password });
+  if (error) return { error: translateAuthError(error) };
+  try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+  return startSession(data.user);
+}
+
+async function tryLogin(email, password) {
+  if (!sb) return { error: NO_CLOUD_MSG };
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) return { error: translateAuthError(error) };
+  return startSession(data.user);
 }
 
 async function tryRegister(email, password, name) {
+  if (!sb) return { error: NO_CLOUD_MSG };
   if (!email.includes('@')) return { error: 'Email inválido' };
   if (password.length < 6) return { error: 'Senha deve ter 6+ caracteres' };
-  const db = loadAll();
-  if (db.users[email]) return { error: 'Email já cadastrado' };
-  const hash = await hashPassword(password);
-  const data = newUserData();
-  data.profile.name = name || email.split('@')[0];
-  migrate(data);
-  db.users[email] = { passwordHash: hash, data };
-  db.currentEmail = email;
-  saveAll(db);
-  state.currentUser = email;
-  state.data = data;
-  return { ok: true };
+  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name } } });
+  if (error) return { error: translateAuthError(error) };
+  // Com confirmação de email ligada, um email já existente volta sem identidades
+  if (data.user && data.user.identities && data.user.identities.length === 0) return { error: 'Email já cadastrado' };
+  if (!data.session) return { needsConfirm: true };
+  return startSession(data.user, { name });
 }
 
-function logout() {
+async function logout() {
   // Fecha qualquer modal aberto
   const overlay = document.querySelector('.modal-overlay');
   if (overlay) overlay.remove();
   modalState = null;
-  // Limpa sessão
-  const db = loadAll();
-  db.currentEmail = null;
-  saveAll(db);
+  loggingOut = true;
+  const userId = state.userId;
+  try {
+    // Tenta enviar o que estiver pendente; se falhar, mantém a cópia local para não perder dados
+    clearTimeout(syncTimer);
+    const synced = await syncNow();
+    const entry = userId ? cacheEntry(userId) : null;
+    if (userId && (synced || (entry && !entry.dirty))) removeCacheEntry(userId);
+    else if (userId) showToast('Alterações não enviadas ficaram salvas neste aparelho', 'error');
+    if (sb) await sb.auth.signOut({ scope: 'local' });
+  } catch (err) {
+    console.error('Erro ao sair:', err);
+  }
+  setLastUser(null);
   state.currentUser = null;
+  state.userId = null;
   state.data = null;
+  state.cloudUpdatedAt = null;
   state.currentTab = 'home';
+  loggingOut = false;
   // Reset auth ui state
   authMode = 'landing';
   authError = '';
+  authInfo = '';
   // Aplica tema light padrão (sem user logado)
   document.documentElement.setAttribute('data-theme', 'light');
   render();
-}
-
-function persistUser() {
-  if (!state.currentUser) return;
-  const db = loadAll();
-  if (db.users[state.currentUser]) {
-    db.users[state.currentUser].data = state.data;
-    saveAll(db);
-  }
 }
 
 function migrate(data) {
@@ -1878,17 +2271,6 @@ function migrate(data) {
     if (!s.rollDetails) s.rollDetails = null;
     if (s.mood === undefined) s.mood = null;
   });
-}
-
-function tryAutoLogin() {
-  const db = loadAll();
-  if (db.currentEmail && db.users[db.currentEmail]) {
-    state.currentUser = db.currentEmail;
-    state.data = db.users[db.currentEmail].data;
-    migrate(state.data);
-    return true;
-  }
-  return false;
 }
 
 // =================== HELPERS ===================
@@ -2390,7 +2772,10 @@ function applyTheme() {
 function render() {
   applyTheme();
   const root = document.getElementById('app');
-  if (!state.currentUser) { root.innerHTML = renderAuth(); attachAuthListeners(); return; }
+  if (!state.currentUser) {
+    if (migState && migState.active) { root.innerHTML = renderMigration(); attachMigrationListeners(); return; }
+    root.innerHTML = renderAuth(); attachAuthListeners(); return;
+  }
   let content = '';
   switch (state.currentTab) {
     case 'home': content = renderHome(); break;
@@ -2407,6 +2792,192 @@ function render() {
   attachListeners();
 }
 
+// ---------- MIGRAÇÃO (slides) ----------
+let migState = null; // { active, step, dir, accounts, selected, busy, result }
+const MIG_LAST_INFO_STEP = 3;
+const MIG_FORM_STEP = 4;
+
+function startMigration(step = 0) {
+  const accounts = getLegacyAccounts();
+  if (!accounts.length) { migState = null; return false; }
+  migState = { active: true, step, dir: 1, accounts, selected: accounts[0].email, busy: false, result: null };
+  return true;
+}
+function closeMigration(nextAuthMode) {
+  migState = null;
+  if (nextAuthMode) authMode = nextAuthMode;
+  render();
+}
+function migAccount() { return migState.accounts.find(a => a.email === migState.selected) || migState.accounts[0]; }
+
+function migArt(step) {
+  if (step === 0) return `<div class="mig-art"><div class="mig-brand">tatame<b>.</b><i></i></div></div>`;
+  if (step === 1) return `<div class="mig-art"><svg viewBox="0 0 260 150" width="260" height="150" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="14" y="66" width="40" height="72" rx="8"/><path d="M29 128h10"/>
+      <rect x="192" y="80" width="58" height="38" rx="5"/><path d="M184 126h74"/>
+      <path d="M100 70h40a18 18 0 0 0 2-36a24 24 0 0 0-46 6a15 15 0 0 0 4 30z" transform="translate(16 0)" stroke="var(--primary)"/>
+      <path class="mig-flow" d="M34 60C54 30 80 40 104 56" stroke="var(--primary)"/>
+      <path class="mig-flow d2" d="M158 56C182 38 210 50 220 76" stroke="var(--primary)"/></svg></div>`;
+  if (step === 2) return `<div class="mig-art"><svg viewBox="0 0 160 120" width="200" height="150" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path class="mig-draw" d="M40 90h70a28 28 0 0 0 4-56a40 40 0 0 0-76 10a24 24 0 0 0 2 46z" stroke="var(--primary)"/>
+      <path class="mig-check" d="M62 62l14 14 26-28" stroke="var(--green)"/></svg></div>`;
+  return '';
+}
+
+function renderMigration() {
+  const m = migState;
+  const acc = migAccount();
+  const c = legacyCounts(acc.data);
+  const inResult = m.step > MIG_FORM_STEP;
+  const dots = [0, 1, 2, 3, 4].map(i => `<i class="${inResult || i < m.step ? 'past' : i === m.step ? 'on' : ''}"></i>`).join('');
+  const top = `<div class="mig-top"><div class="mig-dots">${dots}</div>${inResult ? '<span></span>' : '<button class="mig-skip" id="mig-skip">Agora não</button>'}</div>`;
+  const cls = 'mig-slide' + (m.dir < 0 ? ' back' : '');
+  let body = '', actions = '';
+
+  if (m.step === 0) {
+    body = `${migArt(0)}<div class="mig-kicker">Novidade</div>
+      <h1 class="mig-title">O tatame. <em>evoluiu.</em></h1>
+      <p class="mig-text">Reconstruímos a experiência para você treinar, registrar e evoluir sem se preocupar com mais nada além do tatame.</p>`;
+    actions = `<button class="btn-primary" id="mig-next">Ver o que mudou</button>`;
+  } else if (m.step === 1) {
+    body = `${migArt(1)}<div class="mig-kicker">Em qualquer lugar</div>
+      <h1 class="mig-title">Sua conta, <em>em qualquer aparelho</em></h1>
+      <p class="mig-text">Entre pelo celular, tablet ou computador e continue exatamente de onde parou.</p>`;
+    actions = `<button class="btn-primary" id="mig-next">Continuar</button>`;
+  } else if (m.step === 2) {
+    body = `${migArt(2)}<div class="mig-kicker">Sempre seguro</div>
+      <h1 class="mig-title">Backup <em>automático</em></h1>
+      <p class="mig-text">Seus treinos são salvos na nuvem a cada alteração. Trocou de celular ou limpou o navegador? Seus dados continuam com você, e o app segue funcionando sem internet.</p>`;
+    actions = `<button class="btn-primary" id="mig-next">Continuar</button>`;
+  } else if (m.step === 3) {
+    body = `<div class="mig-kicker">Nada se perde</div>
+      <h1 class="mig-title">Seus dados <em>vão com você</em></h1>
+      <div class="mig-stats">
+        <div><b data-count="${c.sessions}">0</b><span>${c.sessions === 1 ? 'treino' : 'treinos'}</span></div>
+        <div><b data-count="${c.comps}">0</b><span>${c.comps === 1 ? 'campeonato' : 'campeonatos'}</span></div>
+        <div><b data-count="${c.partners}">0</b><span>${c.partners === 1 ? 'parceiro' : 'parceiros'}</span></div>
+      </div>
+      <p class="mig-text">Tudo o que você registrou até aqui será levado para a sua nova conta.</p>`;
+    actions = `<button class="btn-primary" id="mig-next">Continuar</button>`;
+  } else if (m.step === MIG_FORM_STEP) {
+    const multi = m.accounts.length > 1;
+    body = `<div class="mig-kicker">Último passo</div>
+      <h1 class="mig-title">Leve seus dados <em>para a nuvem</em></h1>
+      <p class="mig-text">Leva poucos segundos. Seu email já está preenchido: é só criar uma senha (pode ser a mesma de antes).</p>
+      <div class="mig-form">
+        ${multi ? `<div class="input-row"><label>Conta neste aparelho</label><select id="mig-account">${m.accounts.map(a => `<option value="${escapeHtml(a.email)}"${a.email === m.selected ? ' selected' : ''}>${escapeHtml(a.email)}</option>`).join('')}</select></div>` : ''}
+        <div class="input-row"><label>Email</label><input type="email" id="mig-email" autocomplete="email" value="${escapeHtml(acc.email)}"></div>
+        <div class="input-row"><label>Senha</label><input type="password" id="mig-pw" autocomplete="new-password" placeholder="Mín. 6 caracteres"></div>
+        <div class="error-msg" id="mig-error" hidden></div>
+      </div>`;
+    actions = `<button class="btn-primary" id="mig-submit">Exportar dados para a nuvem</button>
+      <button class="mig-link" id="mig-existing">Já tenho conta na nuvem</button>`;
+  } else {
+    const r = m.result || {};
+    if (r.needsConfirm) {
+      body = `<div class="mig-kicker">Quase lá</div>
+        <h1 class="mig-title">Confirme seu <em>email</em></h1>
+        <p class="mig-text">Enviamos um link para ${escapeHtml(r.email)}. Depois de confirmar, é só entrar: seus dados serão enviados automaticamente.</p>`;
+      actions = `<button class="btn-primary" id="mig-login">Ir para o login</button>`;
+    } else {
+      const n = r.counts || { sessions: 0, comps: 0, partners: 0 };
+      body = `<div class="mig-ok"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path class="mig-check" d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <div class="mig-kicker">Pronto</div>
+        <h1 class="mig-title">Tudo na <em>nuvem</em></h1>
+        <p class="mig-text">${r.kept ? 'Sua conta na nuvem já tinha dados, então mantivemos os dela. Os dados deste aparelho continuam guardados aqui.'
+          : `${plural(n.sessions, 'treino', 'treinos')}, ${plural(n.comps, 'campeonato', 'campeonatos')} e ${plural(n.partners, 'parceiro', 'parceiros')} agora estão seguros. ${r.synced ? '' : 'Eles serão enviados assim que a conexão voltar.'}`}</p>`;
+      actions = `<button class="btn-primary" id="mig-start">Começar</button>`;
+    }
+  }
+  return `<div class="mig" id="mig">${top}<div class="mig-stage"><div class="${cls}">${body}</div></div><div class="mig-actions">${actions}</div></div>`;
+}
+
+function setMigError(msg) {
+  const el = document.getElementById('mig-error');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.hidden = !msg;
+}
+function setMigBusy(busy) {
+  const b = document.getElementById('mig-submit');
+  if (!b) return;
+  b.disabled = busy;
+  b.textContent = busy ? 'Enviando…' : 'Exportar dados para a nuvem';
+}
+function migGo(step) {
+  migState.dir = step >= migState.step ? 1 : -1;
+  migState.step = Math.max(0, Math.min(MIG_FORM_STEP, step));
+  render();
+}
+
+async function submitMigration() {
+  const m = migState;
+  if (!m || m.busy) return;
+  const email = document.getElementById('mig-email').value.trim().toLowerCase();
+  const pw = document.getElementById('mig-pw').value;
+  if (!email.includes('@')) { setMigError('Informe um email válido'); return; }
+  if (pw.length < 6) { setMigError('Crie uma senha com 6+ caracteres'); return; }
+  setMigError('');
+  m.busy = true;
+  setMigBusy(true);
+  let res;
+  try { res = await migrateToCloud(migAccount(), email, pw); }
+  catch (err) { console.error('Erro na migração:', err); res = { error: translateAuthError(err) }; }
+  m.busy = false;
+  if (res.error) { setMigBusy(false); setMigError(res.error); return; }
+  m.result = res;
+  m.dir = 1;
+  m.step = MIG_FORM_STEP + 1;
+  render();
+}
+
+function animateCounters() {
+  const els = document.querySelectorAll('.mig-stats [data-count]');
+  els.forEach(el => {
+    const target = parseInt(el.dataset.count) || 0;
+    if (!target || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = target; return; }
+    const t0 = performance.now(), dur = 1100;
+    const tick = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      if (k < 1 && document.body.contains(el)) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function attachMigrationListeners() {
+  const m = migState;
+  const $ = id => document.getElementById(id);
+  if ($('mig-next')) $('mig-next').onclick = () => migGo(m.step + 1);
+  if ($('mig-skip')) $('mig-skip').onclick = () => closeMigration('landing');
+  if ($('mig-submit')) $('mig-submit').onclick = submitMigration;
+  if ($('mig-existing')) $('mig-existing').onclick = () => { authEmail = $('mig-email').value.trim().toLowerCase(); closeMigration('login'); };
+  if ($('mig-login')) $('mig-login').onclick = () => {
+    authEmail = (m.result && m.result.email) || '';
+    authInfo = 'Confirme seu email e depois entre. Seus dados serão enviados automaticamente.';
+    closeMigration('login');
+  };
+  if ($('mig-start')) $('mig-start').onclick = () => { migState = null; state.currentTab = 'home'; render(); };
+  if ($('mig-account')) $('mig-account').onchange = e => { m.selected = e.target.value; $('mig-email').value = m.selected; };
+  ['mig-email', 'mig-pw'].forEach(id => {
+    if ($(id)) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') submitMigration(); });
+  });
+  if (m.step === MIG_LAST_INFO_STEP) animateCounters();
+  // Deslizar para avançar/voltar
+  const root = $('mig');
+  let x0 = null;
+  root.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  root.addEventListener('touchend', e => {
+    if (x0 === null || m.step > MIG_FORM_STEP) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) < 60) return;
+    if (dx < 0 && m.step < MIG_FORM_STEP) migGo(m.step + 1);
+    else if (dx > 0 && m.step > 0) migGo(m.step - 1);
+  }, { passive: true });
+}
+
 // ---------- AUTH SCREEN ----------
 let authMode = 'landing'; // 'landing' | 'login' | 'register'
 let authError = '';
@@ -2421,9 +2992,25 @@ function renderAuth() {
         <div class="auth-tagline">A new way to live jiu jitsu</div>
       </div>
       <div class="auth-actions">
+        ${getLegacyAccounts().length ? `<button class="mig-banner" id="auth-migrate"><b>Você tem dados salvos neste aparelho</b><span>Toque para levá-los para a nuvem</span></button>` : ''}
         <button class="btn-solid" id="auth-go-login">Entrar</button>
         <button class="btn-secondary" id="auth-go-register">Criar conta</button>
-        <div class="auth-footer">Seus dados ficam neste dispositivo</div>
+        <div class="auth-footer">Sua conta fica salva na nuvem e neste dispositivo</div>
+      </div>
+    </div>`;
+  }
+  if (authMode === 'recovery') {
+    return `
+    <div class="auth-container">
+      <div class="auth-center">
+        <div class="wordmark md">tatame<span class="dot">.</span></div>
+        <div class="auth-form">
+          <h2>Nova senha</h2>
+          <div class="subtitle">Escolha a senha da sua conta</div>
+          <div class="input-row"><label>Nova senha</label><input type="password" id="auth-pw" autocomplete="new-password" placeholder="Mín. 6 caracteres"></div>
+          ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
+          <button class="btn-primary" id="auth-submit">Salvar senha</button>
+        </div>
       </div>
     </div>`;
   }
@@ -2439,11 +3026,13 @@ function renderAuth() {
         <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" value="${escapeHtml(authEmail)}" placeholder="seu@email.com"></div>
         <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
         ${authError ? `<div class="error-msg">${escapeHtml(authError)}</div>` : ''}
+        ${authInfo ? `<div class="error-msg" style="color:var(--green)">${escapeHtml(authInfo)}</div>` : ''}
         <button class="btn-primary" id="auth-submit">${isLogin ? 'Entrar' : 'Criar conta'}</button>
+        ${isLogin ? '<button class="auth-back" id="auth-forgot">Esqueci minha senha</button>' : ''}
         <button class="auth-back" id="auth-back">← Voltar</button>
       </div>
     </div>
-    <div class="auth-footer">Seus dados ficam neste dispositivo</div>
+    <div class="auth-footer">${isLogin ? 'Sua conta fica salva na nuvem. Entre de qualquer aparelho' : 'Já usava o app neste aparelho? Crie a conta com o mesmo email para trazer seus treinos'}</div>
   </div>`;
 }
 
@@ -2451,25 +3040,66 @@ function attachAuthListeners() {
   const goLogin = document.getElementById('auth-go-login');
   const goRegister = document.getElementById('auth-go-register');
   const back = document.getElementById('auth-back');
-  if (goLogin) goLogin.onclick = () => { authMode = 'login'; authError = ''; authEmail = ''; authName = ''; render(); };
-  if (goRegister) goRegister.onclick = () => { authMode = 'register'; authError = ''; authEmail = ''; authName = ''; render(); };
-  if (back) back.onclick = () => { authMode = 'landing'; authError = ''; render(); };
+  if (goLogin) goLogin.onclick = () => { authMode = 'login'; authError = ''; authInfo = ''; authEmail = ''; authName = ''; render(); };
+  if (goRegister) goRegister.onclick = () => { authMode = 'register'; authError = ''; authInfo = ''; authEmail = ''; authName = ''; render(); };
+  if (back) back.onclick = () => { authMode = 'landing'; authError = ''; authInfo = ''; render(); };
+  const migrateBtn = document.getElementById('auth-migrate');
+  if (migrateBtn) migrateBtn.onclick = () => { if (startMigration(MIG_FORM_STEP)) render(); };
+  const forgot = document.getElementById('auth-forgot');
+  if (forgot) forgot.onclick = async () => {
+    const email = document.getElementById('auth-email').value.trim().toLowerCase();
+    authEmail = email;
+    if (!email.includes('@')) { authError = 'Digite seu email acima para receber o link'; authInfo = ''; render(); return; }
+    if (!sb) { authError = NO_CLOUD_MSG; authInfo = ''; render(); return; }
+    forgot.disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+    if (error) { authError = translateAuthError(error); authInfo = ''; }
+    else { authError = ''; authInfo = 'Se existir uma conta com esse email, enviamos um link para redefinir a senha.'; }
+    render();
+  };
   const submit = document.getElementById('auth-submit');
   if (submit) submit.onclick = async () => {
+    if (authMode === 'recovery') {
+      const pw1 = document.getElementById('auth-pw').value;
+      submit.disabled = true;
+      let r;
+      try { r = await tryUpdatePassword(pw1); } catch (err) { r = { error: translateAuthError(err) }; }
+      if (r.error) { authError = r.error; render(); return; }
+      authError = ''; authMode = 'landing'; state.currentTab = 'home';
+      render();
+      afterLogin(r);
+      return;
+    }
     const email = document.getElementById('auth-email').value.trim().toLowerCase();
     const pw = document.getElementById('auth-pw').value;
     authEmail = email;
     authName = authMode === 'register' ? document.getElementById('auth-name').value.trim() : '';
-    if (!email || !pw) { authError = 'Preencha email e senha'; render(); return; }
+    if (!email || !pw) { authError = 'Preencha email e senha'; authInfo = ''; render(); return; }
+    submit.disabled = true;
+    submit.textContent = 'Aguarde…';
     let res;
-    if (authMode === 'login') {
-      res = await tryLogin(email, pw);
-    } else {
-      const name = document.getElementById('auth-name').value.trim();
-      res = await tryRegister(email, pw, name);
+    try {
+      if (authMode === 'login') {
+        res = await tryLogin(email, pw);
+      } else {
+        const name = document.getElementById('auth-name').value.trim();
+        res = await tryRegister(email, pw, name);
+      }
+    } catch (err) {
+      console.error('Erro de autenticação:', err);
+      res = { error: translateAuthError(err) };
     }
-    if (res.error) { authError = res.error; render(); }
-    else { authError = ''; authEmail = ''; authName = ''; authMode = 'landing'; state.currentTab = 'home'; render(); }
+    if (res.error) { authError = res.error; authInfo = ''; render(); }
+    else if (res.needsConfirm) {
+      authError = '';
+      authInfo = 'Enviamos um link de confirmação para ' + email + '. Confirme e depois entre.';
+      authMode = 'login'; authName = '';
+      render();
+    } else {
+      authError = ''; authInfo = ''; authEmail = ''; authName = ''; authMode = 'landing'; state.currentTab = 'home';
+      render();
+      afterLogin(res);
+    }
   };
   // Enter submit
   ['auth-email','auth-pw','auth-name'].forEach(id => {
@@ -2633,7 +3263,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v16</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v19</p>
   </div>`;
 }
 
@@ -3308,6 +3938,10 @@ function renderSettings() {
     <div class="settings-group">
       <div class="settings-group-label">Dados</div>
       <div class="settings-list">
+        <div class="settings-item" data-action="sync-now">
+          <span class="label">Sincronização</span>
+          <span class="value" id="sync-status">${syncLabel()}</span>
+        </div>
         <div class="settings-item" data-action="export-data">
           <span class="label">Exportar backup</span>
           <span class="value">${icon('chevron-right', 16)}</span>
@@ -3333,7 +3967,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v16</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v19</p>
   </div>`;
 }
 
@@ -3445,6 +4079,10 @@ function handleAction(a) {
       openConfirmModal('Sair da conta?', 'Você vai precisar entrar de novo.', 'Sair', () => {
         logout();
       });
+      break;
+    case 'sync-now':
+      if (!sb) showToast(NO_CLOUD_MSG, 'error');
+      else syncNow().then(ok => { if (ok) showToast('Sincronizado'); });
       break;
     case 'export-data': exportBackup(); break;
     case 'import-data': importBackup(); break;
@@ -4834,11 +5472,56 @@ function saveProfile() {
 }
 
 // =================== INIT ===================
-initDelegation();
-if (tryAutoLogin()) {
-  state.currentTab = 'home';
+async function initApp() {
+  initDelegation();
+  window.addEventListener('online', () => { if (state.userId) syncNow(); });
+  window.addEventListener('offline', () => { if (state.userId) setSyncStatus('offline'); });
+  document.addEventListener('visibilitychange', () => {
+    if (!state.userId) return;
+    if (document.visibilityState === 'hidden') { if (syncStatus === 'pending') syncNow(); }
+    else refreshFromCloud();
+  });
+  if (sb) {
+    sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' && state.userId && !loggingOut) {
+        showToast('Sessão expirada. Entre de novo; seus dados ficaram salvos neste aparelho', 'error');
+        setSyncStatus('error');
+      }
+    });
+  }
+  document.getElementById('app').innerHTML = '<div style="padding:80px 20px;text-align:center;color:var(--text-3);font-size:12px;letter-spacing:1.5px">CARREGANDO…</div>';
+  let res = null;
+  try {
+    let session = null;
+    if (sb) {
+      const r = await sb.auth.getSession();
+      session = r.data && r.data.session;
+    }
+    if (IS_RECOVERY && session) { authMode = 'recovery'; render(); return; }
+    if (session && session.user) {
+      res = await startSession(session.user);
+    } else {
+      // Sessão expirada sem conexão: abre com a cópia local da última conta
+      const last = getLastUser();
+      const entry = last && cacheEntry(last.id);
+      if (last && entry && isValidData(entry.data) && !navigator.onLine) {
+        res = await startSession({ id: last.id, email: last.email });
+      }
+    }
+  } catch (err) {
+    console.error('Erro ao restaurar sessão:', err);
+  }
+  if (res && res.ok) {
+    state.currentTab = 'home';
+    render();
+    afterLogin(res);
+    return;
+  }
+  if (res && res.error) authError = res.error;
+  else if (!res) startMigration(0); // conta antiga neste aparelho e sem sessão: mostra os slides
+  render();
 }
-render();
+initApp();
 </script>
 <!-- Vercel Analytics -->
 <script>
