@@ -2009,6 +2009,7 @@ function mergeInto(local, remote) {
 async function refreshFromCloud() {
   if (!sb || !state.userId || syncing || !navigator.onLine) return;
   if (syncStatus === 'pending' || syncStatus === 'error') return;
+  if (document.querySelector('.modal-overlay')) return; // usuário está editando
   const userId = state.userId;
   const entry = cacheEntry(userId);
   if (entry && entry.dirty) return;
@@ -3263,7 +3264,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v19</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v20</p>
   </div>`;
 }
 
@@ -3967,7 +3968,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v19</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v20</p>
   </div>`;
 }
 
@@ -4502,6 +4503,16 @@ function closeModal() {
   modalState = {};
 }
 
+// Reconstrói, na hora, as opções dos seletores de finalização conforme o modo (Gi / No-Gi) do modal
+function refreshSubmissionPickers() {
+  const subs = modalState.mode === 'gi' ? SUBMISSIONS_GI : SUBMISSIONS_NOGI;
+  const opts = subs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  [['applied', '+ Adicionar finalização aplicada'], ['suffered', '+ Adicionar finalização sofrida']].forEach(([kind, label]) => {
+    const sel = document.querySelector(`[data-mact="add-${kind}-picker"]`);
+    if (sel) { sel.innerHTML = `<option value="">${label}</option>${opts}`; sel.value = ''; }
+  });
+}
+
 // Update in-place da lista de finalizações (sem re-render do modal)
 function updateSubsList(kind) {
   const counts = kind === 'applied' ? modalState.appliedCounts : modalState.sufferedCounts;
@@ -4841,6 +4852,7 @@ function handleModalAction(a, val) {
       document.querySelectorAll('[data-mact^="m-mode:"]').forEach(el => {
         el.classList.toggle('active', el.dataset.mact === 'm-mode:' + arg);
       });
+      refreshSubmissionPickers(); // as listas de finalizações dependem do modo
       break;
     case 'mood-inc':
       modalState.mood = Math.min(10, (modalState.mood == null ? 7 : modalState.mood) + 1);
@@ -5019,20 +5031,22 @@ function saveSession() {
     notes: modalState.notes || '',
     mood: modalState.mood
   };
+  // Estado de streak ANTES de gravar (para o aviso de meta batida); falha aqui nunca pode impedir o salvamento
+  let wkBefore = { metGoal: false }, streakBefore = 0;
+  try { wkBefore = currentWeekStatus(); streakBefore = computeCurrentStreak(); } catch (err) { console.error('Streak (antes):', err); }
   if (isEdit) {
     const idx = state.data.sessions.findIndex(s => s.id === modalState._editingId);
     if (idx >= 0) state.data.sessions[idx] = sessionData;
+    else state.data.sessions.push(sessionData); // o treino editado sumiu (ex.: removido em outro aparelho): não perde a edição
   } else {
     state.data.sessions.push(sessionData);
   }
-  // Atualiza recorde de streak se aplicável
-  const wkBefore = currentWeekStatus();
-  const streakBefore = computeCurrentStreak();
-  persistUser();
-  updateStreakRecord();
-  const wkAfter = currentWeekStatus();
-  const streakAfter = computeCurrentStreak();
+  let wkAfter = wkBefore, streakAfter = streakBefore;
+  try { updateStreakRecord(); wkAfter = currentWeekStatus(); streakAfter = computeCurrentStreak(); } catch (err) { console.error('Streak (depois):', err); }
+  persistUser(); // depois do recorde, para ele ir junto na gravação
 
+  // As telas filtram por Gi/No-Gi: mostra o modo em que o treino foi salvo, senão ele "some" da tela
+  state.mode = sessionData.mode;
   closeModal();
   // Toast especial se acabou de bater a meta da semana
   if (!isEdit && !wkBefore.metGoal && wkAfter.metGoal) {
@@ -5209,6 +5223,7 @@ function saveComp() {
   };
   state.data.comps.push(comp);
   persistUser();
+  state.mode = comp.mode; // mostra o modo em que foi salva
   closeModal();
   showToast('Competição salva!');
   render();
