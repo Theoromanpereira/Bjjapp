@@ -3264,7 +3264,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v21</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v22</p>
   </div>`;
 }
 
@@ -3968,7 +3968,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v21</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v22</p>
   </div>`;
 }
 
@@ -5498,6 +5498,23 @@ function saveProfile() {
 }
 
 // =================== INIT ===================
+// Qualquer erro inesperado aparece na tela (e fica guardado) em vez de falhar em silêncio
+let _lastErrToast = 0;
+function reportError(kind, msg) {
+  console.error(kind + ':', msg);
+  try {
+    const list = JSON.parse(localStorage.getItem('tatame_last_errors') || '[]');
+    list.push({ at: new Date().toISOString(), kind, msg: String(msg).slice(0, 300), build: 'v22' });
+    localStorage.setItem('tatame_last_errors', JSON.stringify(list.slice(-10)));
+  } catch {}
+  if (Date.now() - _lastErrToast > 3000) {
+    _lastErrToast = Date.now();
+    showToast('Erro: ' + String(msg).slice(0, 90), 'error');
+  }
+}
+window.addEventListener('error', e => reportError('erro', e.message));
+window.addEventListener('unhandledrejection', e => reportError('promessa', (e.reason && e.reason.message) || e.reason));
+
 async function initApp() {
   initDelegation();
   window.addEventListener('online', () => { if (state.userId) syncNow(); });
