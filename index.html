@@ -1552,6 +1552,40 @@
   .mig-banner { width: 100%; text-align: left; background: var(--primary-soft); border: 1px solid var(--primary); color: var(--text); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
   .mig-banner b { font-size: 13px; font-weight: 600; }
   .mig-banner span { font-size: 12px; color: var(--text-2); }
+  /* ===== COMUNIDADE ===== */
+  .comm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .comm-actions button { padding: 14px 8px; font-size: 13px; }
+  .comm-card { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 10px; }
+  .comm-card .info { flex: 1; min-width: 0; }
+  .comm-card .name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .comm-card .meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .comm-photo { width: 52px; height: 52px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--text-2); }
+  .comm-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .comm-photo.lg { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 12px; font-size: 30px; }
+  .comm-empty { padding: 24px 16px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); color: var(--text-3); font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+  .comm-code-box { background: var(--surface); border: 1px dashed var(--border-2); border-radius: var(--radius-lg); padding: 16px; text-align: center; margin-bottom: 16px; }
+  .comm-code-box .lbl { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); }
+  .comm-code-box .code { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; letter-spacing: 4px; margin: 6px 0 12px; }
+  .comm-code-box .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .comm-code-box .btns button { padding: 11px 6px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .rank-title { font-size: 12px; color: var(--text-2); margin: 14px 0 2px; }
+  .rank-week { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .rank-week button { color: var(--text-2); display: inline-flex; align-items: center; gap: 4px; font-size: 11px; letter-spacing: 0; text-transform: none; }
+  .rank-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 8px; }
+  .rank-row.me { border-color: var(--primary); background: var(--primary-soft); }
+  .rank-row.zero .rank-val { opacity: .45; }
+  .rank-pos { width: 24px; text-align: center; font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--text-3); }
+  .rank-pos.p1 { color: #e6b422; } .rank-pos.p2 { color: #a8b0b8; } .rank-pos.p3 { color: #c98a52; }
+  .rank-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-2); flex-shrink: 0; }
+  .rank-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .rank-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rank-me { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--primary); font-weight: 600; margin-left: 4px; }
+  .rank-val { text-align: right; line-height: 1.1; }
+  .rank-val b { display: block; font-family: 'Instrument Serif', serif; font-size: 26px; font-weight: 400; }
+  .rank-val span { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-3); }
+  .comm-tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 3px; margin: 4px 0 2px; }
+  .comm-tabs button { flex: 1; padding: 9px 4px; border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--text-2); }
+  .comm-tabs button.active { background: var(--text); color: var(--bg); }
   @media (prefers-reduced-motion: reduce) {
     .mig *, .mig-slide { animation: none !important; }
     .mig-draw, .mig-check { stroke-dashoffset: 0; }
@@ -1597,6 +1631,9 @@ const ICONS = {
   'calendar-off': '<path d="M4 5m0 2a2 2 0 0 1 2 -2h1"/><path d="M16 3v3"/><path d="M8 3v3"/><path d="M3 3l18 18"/><path d="M20 8v11a2 2 0 0 1 -2 2h-11"/>',
   'photo': '<path d="M15 8h.01"/><path d="M4 4m0 3a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3z"/><path d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l5 5"/><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l2 2"/>',
   'crown': '<path d="M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4z"/>',
+  'copy': '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/>',
+  'link': '<path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/>',
+  'refresh': '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
   'sparkles': '<path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2z"/><path d="M16 6a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2z"/><path d="M9.5 15a5.5 5.5 0 0 1 5.5 -5.5a5.5 5.5 0 0 1 -5.5 -5.5a5.5 5.5 0 0 1 -5.5 5.5a5.5 5.5 0 0 1 5.5 5.5z"/>',
 };
 function icon(name, size = 16) {
@@ -1778,6 +1815,7 @@ let state = {
   cloudUpdatedAt: null,
   data: null, // { profile, partners, sessions, comps, plan }
   currentTab: 'home', // home | calendar | stats | comps | partners | profile
+  comm: newCommState(),
   filter: 'all', // Home/Calendário: all | gi | no-gi (Stats/Competições seguem usando 'mode')
   mode: 'gi', // gi | no-gi
   selectedDate: null,
@@ -1988,6 +2026,7 @@ async function syncNow() {
     const { error } = await sb.from('user_data').upsert({ user_id: userId, data: snapshot, updated_at: updatedAt });
     if (error) throw error;
     ok = true;
+    pushCommunityStatsSoon();
     if (state.userId === userId) {
       state.cloudUpdatedAt = updatedAt;
       if (merged && !document.querySelector('.modal-overlay')) render();
@@ -2098,16 +2137,20 @@ function offerLegacyUpload(email) {
   );
 }
 function afterLogin(res) {
-  if (!res || !res.offerLegacy) return;
-  const email = state.currentUser;
-  const pending = readJSON(PENDING_KEY);
-  const from = pending[email];
-  if (from && findLegacyData(from)) {
-    delete pending[email]; writeJSON(PENDING_KEY, pending);
-    importLegacyNow(from); // migração iniciada pelo próprio usuário nos slides: sem perguntar de novo
-  } else {
-    offerLegacyUpload(email);
+  if (res && res.offerLegacy) {
+    const email = state.currentUser;
+    const pending = readJSON(PENDING_KEY);
+    const from = pending[email];
+    if (from && findLegacyData(from)) {
+      delete pending[email]; writeJSON(PENDING_KEY, pending);
+      importLegacyNow(from); // migração iniciada pelo próprio usuário nos slides: sem perguntar de novo
+    } else {
+      offerLegacyUpload(email);
+    }
   }
+  // Convite por link: entra na comunidade logo depois do login; senão só atualiza a lista (e o ranking)
+  if (getPendingInvite()) processPendingJoin();
+  else refreshCommunities();
 }
 
 async function flushSync() {
@@ -2253,6 +2296,8 @@ async function logout() {
   state.userId = null;
   state.data = null;
   state.cloudUpdatedAt = null;
+  state.comm = newCommState();
+  commProfileSig = '';
   state.currentTab = 'home';
   loggingOut = false;
   // Reset auth ui state
@@ -2815,13 +2860,437 @@ function render() {
     case 'day': content = renderDay(); break;
     case 'stats': content = renderStats(); break;
     case 'comps': content = renderComps(); break;
-    case 'partners': content = renderPartners(); break;
+    case 'partners': content = renderPartners(); ensureCommunities(); break;
+    case 'community': content = renderCommunity(); break;
     case 'profile': content = renderProfile(); break;
     case 'settings': content = renderSettings(); break;
     default: content = renderHome();
   }
   root.innerHTML = content + renderNav();
   attachListeners();
+}
+
+// =================== COMUNIDADE ===================
+const COMM_PENDING_KEY = 'tatame_pending_join'; // código vindo de um link de convite, aguardando o login
+
+function newCommState() {
+  return { list: null, loading: false, error: '', openId: null, tab: 'trainings', board: null, boardLoading: false, boardError: '', _p: null };
+}
+function normalizeCode(c) {
+  let v = String(c || '');
+  const m = v.match(/[?&]join=([A-Za-z0-9]+)/); // aceita o link inteiro colado
+  if (m) v = m[1];
+  return v.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+}
+function inviteLink(code) { return window.location.origin + window.location.pathname + '?join=' + code; }
+function getPendingInvite() { try { return localStorage.getItem(COMM_PENDING_KEY) || ''; } catch { return ''; } }
+function clearPendingInvite() { try { localStorage.removeItem(COMM_PENDING_KEY); } catch {} }
+
+// Link de convite: guarda o código e limpa a URL (um refresh não repete)
+function captureInviteFromUrl() {
+  try {
+    const u = new URL(window.location.href);
+    const code = normalizeCode(u.searchParams.get('join'));
+    if (!code) return;
+    localStorage.setItem(COMM_PENDING_KEY, code);
+    u.searchParams.delete('join');
+    window.history.replaceState(null, '', u.pathname + u.search + u.hash);
+  } catch {}
+}
+
+function currentWeekStartISO() { return localISO(mondayOf(new Date())); }
+function weekRangeLabel(startISO) {
+  const a = parseLocalISO(startISO), b = new Date(a);
+  b.setDate(a.getDate() + 6);
+  const f = d => d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }).replace('.', '');
+  return `${f(a)} a ${f(b)}`;
+}
+// Totais da semana (segunda a domingo) que são compartilhados com a comunidade
+function myWeekStats() {
+  const start = currentWeekStartISO();
+  const endD = parseLocalISO(start); endD.setDate(endD.getDate() + 6);
+  const end = localISO(endD);
+  let trainings = 0, applied = 0, suffered = 0;
+  (state.data.sessions || []).forEach(s => {
+    if (s.date >= start && s.date <= end) {
+      trainings++;
+      applied += (s.applied || []).length;
+      suffered += (s.suffered || []).length;
+    }
+  });
+  return { trainings, applied, suffered };
+}
+
+function loadImage(src) { return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = src; }); }
+function squareJpeg(img, size, quality) {
+  const min = Math.min(img.width, img.height);
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  cv.getContext('2d').drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, size, size);
+  return cv.toDataURL('image/jpeg', quality);
+}
+async function fileToSquareJpeg(file, size = 200, quality = 0.75) {
+  const data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+  return squareJpeg(await loadImage(data), size, quality);
+}
+async function makeThumb(dataUrl, size = 64) {
+  try { return squareJpeg(await loadImage(dataUrl), size, 0.7); } catch { return null; }
+}
+
+function commErrorMsg(err) {
+  const m = String((err && err.message) || err || '').toLowerCase();
+  if (m.includes('code_not_found')) return 'Código não encontrado. Confira e tente de novo';
+  if (m.includes('community_full')) return 'Essa comunidade está cheia';
+  if (m.includes('too_many')) return 'Você já participa do máximo de comunidades (20)';
+  if (m.includes('invalid_name')) return 'Dê um nome à comunidade (mín. 2 letras)';
+  if (m.includes('not_member')) return 'Você não faz parte dessa comunidade';
+  if (m.includes('fetch') || m.includes('network') || !navigator.onLine) return 'Sem conexão. Verifique a internet';
+  if (m.includes('could not find') || m.includes('does not exist') || m.includes('permission denied') || m.includes('schema cache')) return 'Comunidades ainda não estão configuradas no servidor';
+  return 'Não foi possível concluir. Tente de novo';
+}
+
+// ----- servidor -----
+async function refreshCommunities() {
+  const c = state.comm;
+  if (!sb || !state.userId) return;
+  if (c._p) { try { await c._p; } catch {} }
+  c.loading = true; c.error = '';
+  c._p = (async () => {
+    try {
+      const { data, error } = await sb.rpc('my_communities');
+      if (error) throw error;
+      c.list = data || [];
+      pushCommunityStatsSoon();
+    } catch (err) {
+      console.error('Erro ao listar comunidades:', err);
+      c.error = commErrorMsg(err);
+    }
+    c.loading = false;
+    c._p = null;
+    if ((state.currentTab === 'partners' || state.currentTab === 'community') && !document.querySelector('.modal-overlay')) render();
+  })();
+  return c._p;
+}
+function ensureCommunities() {
+  const c = state.comm;
+  if (c.list === null && !c.loading && !c.error) refreshCommunities();
+}
+
+let commPushTimer = null;
+let commProfileSig = '';
+function pushCommunityStatsSoon(delay = 1500) {
+  if (!state.comm.list || !state.comm.list.length) return; // só compartilha quem participa de alguma comunidade
+  clearTimeout(commPushTimer);
+  commPushTimer = setTimeout(pushCommunityStats, delay);
+}
+async function pushCommunityStats() {
+  if (!sb || !state.userId || !state.data || !(state.comm.list || []).length || !navigator.onLine) return false;
+  const uid = state.userId;
+  try {
+    const st = myWeekStats();
+    let r = await sb.from('member_stats').upsert({ user_id: uid, week_start: currentWeekStartISO(), trainings: st.trainings, applied: st.applied, suffered: st.suffered, updated_at: new Date().toISOString() });
+    if (r.error) throw r.error;
+    const prof = state.data.profile || {};
+    const sig = uid + '|' + (prof.name || '') + '|' + (prof.photo ? prof.photo.length : 0);
+    if (sig !== commProfileSig) {
+      const avatar = prof.photo ? await makeThumb(prof.photo, 64) : null;
+      r = await sb.from('community_profiles').upsert({ user_id: uid, name: String(prof.name || 'Atleta').slice(0, 40), avatar, updated_at: new Date().toISOString() });
+      if (r.error) throw r.error;
+      commProfileSig = sig;
+    }
+    return true;
+  } catch (err) {
+    console.error('Erro ao atualizar o ranking:', err);
+    return false;
+  }
+}
+
+async function loadBoard(id) {
+  const c = state.comm;
+  if (!sb) return;
+  c.boardLoading = true; c.boardError = '';
+  await pushCommunityStats(); // garante que a sua linha esteja em dia antes de ver o ranking
+  try {
+    const week = currentWeekStartISO();
+    const { data, error } = await sb.rpc('community_leaderboard', { p_community: id, p_week: week });
+    if (error) throw error;
+    if (c.openId === id) c.board = { id, week, rows: data || [] };
+  } catch (err) {
+    console.error('Erro ao carregar o ranking:', err);
+    if (c.openId === id) c.boardError = commErrorMsg(err);
+  }
+  c.boardLoading = false;
+  if (state.currentTab === 'community' && c.openId === id && !document.querySelector('.modal-overlay')) render();
+}
+
+function openCommunity(id) {
+  const c = state.comm;
+  c.openId = id; c.board = null; c.boardError = ''; c.tab = 'trainings';
+  state.currentTab = 'community';
+  render();
+  loadBoard(id);
+}
+
+// Link de convite: entra sozinho depois do login
+let joiningPending = false;
+async function processPendingJoin() {
+  const code = getPendingInvite();
+  if (!code || !sb || !state.userId || joiningPending) return;
+  joiningPending = true;
+  try {
+    const { data, error } = await sb.rpc('join_community', { p_code: code });
+    if (error) throw error;
+    clearPendingInvite();
+    await refreshCommunities();
+    const comm = (state.comm.list || []).find(x => x.id === data);
+    showToast('Você entrou em ' + (comm ? comm.name : 'a comunidade') + '!');
+    openCommunity(data);
+  } catch (err) {
+    console.error('Erro ao entrar pelo convite:', err);
+    const m = String((err && err.message) || '').toLowerCase();
+    if (!(m.includes('fetch') || m.includes('network') || !navigator.onLine)) { // sem rede: mantém para tentar de novo
+      clearPendingInvite();
+      showToast(commErrorMsg(err), 'error');
+    }
+  }
+  joiningPending = false;
+}
+
+// ----- compartilhar -----
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch { return false; }
+}
+async function copyCommunityCode() {
+  const comm = (state.comm.list || []).find(x => x.id === state.comm.openId);
+  if (!comm) return;
+  const ok = await copyText(comm.code);
+  showToast(ok ? 'Código copiado!' : 'Não foi possível copiar', ok ? 'success' : 'error');
+}
+async function shareCommunityLink() {
+  const comm = (state.comm.list || []).find(x => x.id === state.comm.openId);
+  if (!comm) return;
+  const url = inviteLink(comm.code);
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Tatame', text: 'Entre na comunidade ' + comm.name + ' no Tatame', url }); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  if (await copyText(url)) showToast('Link de convite copiado!');
+  else showToast('Não foi possível copiar o link', 'error');
+}
+
+// ----- telas -----
+function renderCommunityCard(c) {
+  const n = Number(c.member_count) || 1;
+  return `<button class="comm-card" data-action="comm-open:${c.id}">
+    <div class="comm-photo">${c.photo ? `<img src="${escapeHtml(c.photo)}" alt="">` : escapeHtml(initials(c.name))}</div>
+    <div class="info"><div class="name">${escapeHtml(c.name)}</div><div class="meta">${plural(n, 'membro', 'membros')}</div></div>
+    <span style="color:var(--text-3)">${icon('chevron-right', 18)}</span>
+  </button>`;
+}
+function renderCommunitiesSection() {
+  const c = state.comm;
+  if (!sb) return `<div class="comm-empty">Não foi possível carregar o serviço de contas. Recarregue a página.</div>`;
+  if (c.error && c.list === null) return `<div class="comm-empty">${escapeHtml(c.error)}<br><button class="btn-secondary" style="width:auto;display:inline-block;margin-top:10px;padding:9px 18px;font-size:12px" data-action="comm-reload">Tentar de novo</button></div>`;
+  if (c.list === null) return `<div class="comm-empty">Carregando comunidades…</div>`;
+  if (!c.list.length) return `<div class="comm-empty">Você ainda não participa de nenhuma comunidade.<br>Crie a sua ou entre com um código.</div>`;
+  return c.list.map(renderCommunityCard).join('');
+}
+
+function renderCommunity() {
+  const c = state.comm;
+  const comm = (c.list || []).find(x => x.id === c.openId);
+  const head = `<div class="day-header"><button class="back" data-action="goto:partners">${icon('arrow-left', 18)}</button><h2>Comunidade</h2><div style="width:32px"></div></div>`;
+  if (!comm) return `<div class="screen">${head}<div class="comm-empty">${c.list === null ? 'Carregando…' : 'Comunidade não encontrada.'}</div></div>`;
+
+  const TABS = [['trainings', 'Treinos'], ['applied', 'Aplicadas'], ['suffered', 'Sofridas']];
+  const TITLES = { trainings: 'Quem mais treinou na semana', applied: 'Mais finalizações aplicadas na semana', suffered: 'Mais finalizações sofridas na semana' };
+  const UNITS = { trainings: ['treino', 'treinos'], applied: ['aplicada', 'aplicadas'], suffered: ['sofrida', 'sofridas'] };
+  const metric = c.tab;
+  const board = c.board && c.board.id === comm.id ? c.board : null;
+
+  let list;
+  if (!board && c.boardError) {
+    list = `<div class="comm-empty">${escapeHtml(c.boardError)}<br><button class="btn-secondary" style="width:auto;display:inline-block;margin-top:10px;padding:9px 18px;font-size:12px" data-action="comm-refresh">Tentar de novo</button></div>`;
+  } else if (!board) {
+    list = `<div class="comm-empty">Carregando ranking…</div>`;
+  } else {
+    const rows = board.rows.slice().sort((a, b) => (b[metric] - a[metric]) || String(a.name).localeCompare(String(b.name)));
+    list = rows.map((r, i) => {
+      const val = Number(r[metric]) || 0;
+      const first = rows.findIndex(x => (Number(x[metric]) || 0) === val); // empate divide a posição
+      const rank = first + 1;
+      const unit = val === 1 ? UNITS[metric][0] : UNITS[metric][1];
+      return `<div class="rank-row ${r.is_me ? 'me' : ''} ${val === 0 ? 'zero' : ''}">
+        <div class="rank-pos ${rank <= 3 && val > 0 ? 'p' + rank : ''}">${rank}</div>
+        <div class="rank-avatar">${r.avatar ? `<img src="${escapeHtml(r.avatar)}" alt="">` : escapeHtml(initials(r.name))}</div>
+        <div class="rank-name">${escapeHtml(r.name)}${r.is_me ? '<span class="rank-me">você</span>' : ''}</div>
+        <div class="rank-val"><b>${val}</b><span>${unit}</span></div>
+      </div>`;
+    }).join('') || `<div class="comm-empty">Ninguém por aqui ainda.</div>`;
+  }
+
+  return `
+  <div class="screen">
+    ${head}
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="comm-photo lg">${comm.photo ? `<img src="${escapeHtml(comm.photo)}" alt="">` : escapeHtml(initials(comm.name))}</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:26px;letter-spacing:-0.01em">${escapeHtml(comm.name)}</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:2px">${plural(Number(comm.member_count) || 1, 'membro', 'membros')}</div>
+    </div>
+
+    <div class="comm-code-box">
+      <div class="lbl">Código da comunidade</div>
+      <div class="code">${escapeHtml(comm.code)}</div>
+      <div class="btns">
+        <button class="btn-secondary" data-action="comm-copy-code">${icon('copy', 14)} Copiar código</button>
+        <button class="btn-secondary" data-action="comm-share">${icon('link', 14)} Compartilhar link</button>
+      </div>
+    </div>
+
+    <div class="comm-tabs">
+      ${TABS.map(([id, label]) => `<button class="${metric === id ? 'active' : ''}" data-action="comm-tab:${id}">${label}</button>`).join('')}
+    </div>
+    <div class="rank-title">${TITLES[metric]}</div>
+    <div class="rank-week"><span>Semana de ${board ? weekRangeLabel(board.week) : weekRangeLabel(currentWeekStartISO())}</span><button data-action="comm-refresh">${icon('refresh', 12)} Atualizar</button></div>
+    ${list}
+
+    <button class="btn-secondary" style="margin-top:14px;color:var(--primary)" data-action="comm-leave">Sair da comunidade</button>
+  </div>`;
+}
+
+// ----- modais -----
+function setModalError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg || '';
+  el.hidden = !msg;
+}
+function openCommunityCreateModal() {
+  modalState = { _kind: 'comm-create', name: '', photo: null, busy: false };
+  renderCommunityCreateModal();
+}
+function renderCommunityCreateModal() {
+  const m = modalState;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Criar comunidade</div>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
+    </div>
+    <div style="text-align:center;margin-bottom:18px">
+      <div class="comm-photo lg">${m.photo ? `<img src="${escapeHtml(m.photo)}" alt="Foto">` : icon('camera', 28)}</div>
+      <input type="file" id="cm-photo" accept="image/*" style="display:none">
+      <button class="chip" data-mact="comm-photo-pick">${m.photo ? 'Trocar foto' : 'Adicionar foto'}</button>
+      ${m.photo ? `<button class="chip" data-mact="comm-photo-rm">Remover</button>` : ''}
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome da comunidade</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="cm-name" maxlength="40" autocomplete="off" placeholder="Ex.: Time da academia" value="${escapeHtml(m.name)}"></div>
+    </div>
+    <div class="error-msg" id="cm-error" hidden></div>
+    <button class="btn-primary" id="cm-save" data-mact="comm-create-save" style="margin-top:12px">Criar comunidade</button>
+    <div style="height:20px"></div>`);
+  const nameEl = document.getElementById('cm-name');
+  nameEl.addEventListener('input', () => { m.name = nameEl.value; });
+  nameEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitCommunityCreate(); } });
+  document.getElementById('cm-photo').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try { m.photo = await fileToSquareJpeg(file, 200, 0.75); renderCommunityCreateModal(); }
+    catch (err) { console.error(err); showToast('Erro ao processar a foto', 'error'); }
+  });
+}
+async function submitCommunityCreate() {
+  const m = modalState;
+  if (!m || m._kind !== 'comm-create' || m.busy) return;
+  const name = (document.getElementById('cm-name').value || '').trim();
+  m.name = name;
+  if (name.length < 2) { setModalError('cm-error', 'Dê um nome à comunidade (mín. 2 letras)'); return; }
+  if (!sb || !state.userId) { setModalError('cm-error', NO_CLOUD_MSG); return; }
+  setModalError('cm-error', '');
+  m.busy = true;
+  const btn = document.getElementById('cm-save'); if (btn) { btn.disabled = true; btn.textContent = 'Criando…'; }
+  try {
+    const { data, error } = await sb.rpc('create_community', { p_name: name, p_photo: m.photo });
+    if (error) throw error;
+    await refreshCommunities();
+    closeModal();
+    showToast('Comunidade criada!');
+    openCommunity(data);
+  } catch (err) {
+    console.error('Erro ao criar comunidade:', err);
+    m.busy = false;
+    if (btn) { btn.disabled = false; btn.textContent = 'Criar comunidade'; }
+    setModalError('cm-error', commErrorMsg(err));
+  }
+}
+
+function openCommunityJoinModal(prefill) {
+  modalState = { _kind: 'comm-join', busy: false };
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Entrar em uma comunidade</div>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:16px">Digite o código que o administrador ou um amigo compartilhou com você.</p>
+    <div class="form-group">
+      <label class="form-label">Código</label>
+      <div class="input-row" style="margin-bottom:0"><input type="text" id="cj-code" maxlength="60" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="Ex.: K7M2QX9P" value="${escapeHtml(prefill || '')}" style="font-family:'JetBrains Mono',monospace;letter-spacing:3px;text-transform:uppercase"></div>
+    </div>
+    <div class="error-msg" id="cj-error" hidden></div>
+    <button class="btn-primary" id="cj-save" data-mact="comm-join-save" style="margin-top:12px">Entrar</button>
+    <div style="height:20px"></div>`);
+  const el = document.getElementById('cj-code');
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitCommunityJoin(); } });
+  setTimeout(() => el.focus(), 50);
+}
+async function submitCommunityJoin() {
+  const m = modalState;
+  if (!m || m._kind !== 'comm-join' || m.busy) return;
+  const code = normalizeCode(document.getElementById('cj-code').value);
+  if (code.length < 4) { setModalError('cj-error', 'Digite o código da comunidade'); return; }
+  if (!sb || !state.userId) { setModalError('cj-error', NO_CLOUD_MSG); return; }
+  setModalError('cj-error', '');
+  m.busy = true;
+  const btn = document.getElementById('cj-save'); if (btn) { btn.disabled = true; btn.textContent = 'Entrando…'; }
+  try {
+    const { data, error } = await sb.rpc('join_community', { p_code: code });
+    if (error) throw error;
+    await refreshCommunities();
+    const comm = (state.comm.list || []).find(x => x.id === data);
+    closeModal();
+    showToast('Você entrou em ' + (comm ? comm.name : 'a comunidade') + '!');
+    openCommunity(data);
+  } catch (err) {
+    console.error('Erro ao entrar na comunidade:', err);
+    m.busy = false;
+    if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+    setModalError('cj-error', commErrorMsg(err));
+  }
+}
+
+function leaveCurrentCommunity() {
+  const c = state.comm;
+  const comm = (c.list || []).find(x => x.id === c.openId);
+  if (!comm) return;
+  openConfirmModal('Sair da comunidade', 'Você deixa de ver e de aparecer no ranking de ' + comm.name + '. Para voltar, precisa do código.', 'Sair', async () => {
+    try {
+      const { error } = await sb.rpc('leave_community', { p_id: comm.id });
+      if (error) throw error;
+      c.openId = null; c.board = null;
+      state.currentTab = 'partners';
+      showToast('Você saiu da comunidade');
+      await refreshCommunities();
+      render();
+    } catch (err) { showToast(commErrorMsg(err), 'error'); }
+  });
 }
 
 // ---------- MIGRAÇÃO (slides) ----------
@@ -2990,7 +3459,7 @@ function attachMigrationListeners() {
     authInfo = 'Confirme seu email e depois entre. Seus dados serão enviados automaticamente.';
     closeMigration('login');
   };
-  if ($('mig-start')) $('mig-start').onclick = () => { migState = null; state.currentTab = 'home'; render(); };
+  if ($('mig-start')) $('mig-start').onclick = () => { migState = null; state.currentTab = 'home'; render(); afterLogin(null); };
   if ($('mig-account')) $('mig-account').onchange = e => { m.selected = e.target.value; $('mig-email').value = m.selected; };
   ['mig-email', 'mig-pw'].forEach(id => {
     if ($(id)) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') submitMigration(); });
@@ -3024,6 +3493,7 @@ function renderAuth() {
         <div class="auth-tagline">A new way to live jiu jitsu</div>
       </div>
       <div class="auth-actions">
+        ${getPendingInvite() ? `<div class="mig-banner" style="cursor:default"><b>Você recebeu um convite para uma comunidade</b><span>Entre ou crie sua conta e você entra nela automaticamente</span></div>` : ''}
         ${getLegacyAccounts().length ? `<button class="mig-banner" id="auth-migrate"><b>Você tem dados salvos neste aparelho</b><span>Toque para levá-los para a nuvem</span></button>` : ''}
         <button class="btn-solid" id="auth-go-login">Entrar</button>
         <button class="btn-secondary" id="auth-go-register">Criar conta</button>
@@ -3054,6 +3524,7 @@ function renderAuth() {
       <div class="auth-form">
         <h2>${isLogin ? 'Entrar' : 'Criar conta'}</h2>
         <div class="subtitle">${isLogin ? 'Acesse sua conta' : 'Comece a registrar seus treinos'}</div>
+        ${getPendingInvite() ? `<div class="mig-hint" style="margin:-6px 0 8px;color:var(--primary)">Depois de entrar, você será levado para a comunidade</div>` : ''}
         ${!isLogin ? `<div class="input-row"><label>Nome</label><input type="text" id="auth-name" value="${escapeHtml(authName)}" placeholder="Como podemos te chamar?"></div>` : ''}
         <div class="input-row"><label>Email</label><input type="email" id="auth-email" autocomplete="email" value="${escapeHtml(authEmail)}" placeholder="seu@email.com"></div>
         <div class="input-row"><label>Senha</label><input type="password" id="auth-pw" autocomplete="${isLogin ? 'current' : 'new'}-password" placeholder="${isLogin ? 'Sua senha' : 'Mín. 6 caracteres'}"></div>
@@ -3292,7 +3763,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v25</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v26</p>
   </div>`;
 }
 
@@ -3796,14 +4267,16 @@ function renderPartners() {
       ${headerAvatar()}
     </div>
 
-    <div style="background:linear-gradient(135deg, var(--primary-soft), var(--surface));border:1px dashed var(--primary);border-radius:var(--radius-lg);padding:22px 20px;text-align:center;margin-bottom:24px">
-      <div style="color:var(--primary);margin-bottom:10px">${icon('sparkles', 32)}</div>
-      <div style="font-family:'Instrument Serif',serif;font-size:22px;letter-spacing:-0.01em;margin-bottom:8px;color:var(--text)">Grupos em breve</div>
-      <p style="font-size:12px;color:var(--text-2);line-height:1.5;max-width:280px;margin:0 auto 14px">
-        Em breve você vai poder criar grupos da sua academia, convidar amigos com código e ver um ranking semanal de quem treinou mais.
-      </p>
-      <button class="btn-secondary" style="font-size:12px;padding:10px 18px;width:auto;display:inline-block" data-action="notify-interest">Me avisar quando estiver pronto</button>
+    <div class="comm-actions">
+      <button class="btn-primary" data-action="open:new-community"><span style="vertical-align:-2px">${icon('plus', 15)}</span> Criar comunidade</button>
+      <button class="btn-secondary" data-action="open:join-community">Entrar em uma comunidade</button>
     </div>
+
+    <div class="section-header">
+      <h3>Minhas comunidades</h3>
+      <span class="link">${state.comm.list && state.comm.list.length ? state.comm.list.length : ''}</span>
+    </div>
+    ${renderCommunitiesSection()}
 
     <div class="section-header">
       <h3>Meus parceiros</h3>
@@ -3993,7 +4466,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v25</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v26</p>
   </div>`;
 }
 
@@ -4006,7 +4479,7 @@ function renderNav() {
     { id: 'partners', icon: 'users', label: 'Comunidade' },
     { id: 'profile', icon: 'user', label: 'Perfil' },
   ];
-  const active = state.currentTab === 'day' ? 'calendar' : (state.currentTab === 'comps' || state.currentTab === 'settings') ? 'profile' : state.currentTab;
+  const active = state.currentTab === 'day' ? 'calendar' : (state.currentTab === 'comps' || state.currentTab === 'settings') ? 'profile' : state.currentTab === 'community' ? 'partners' : state.currentTab;
   return `<div class="nav-bottom">
     ${tabs.map(t => `<button class="nav-item ${active === t.id ? 'active' : ''}" data-action="tab:${t.id}">
       ${icon(t.icon, 20)}<span>${t.label}</span>
@@ -4069,6 +4542,13 @@ function handleAction(a) {
     case 'goto': state.currentTab = arg; render(); break;
     case 'mode': state.mode = arg; render(); break;
     case 'filter': state.filter = arg; render(); break;
+    case 'comm-open': openCommunity(arg); break;
+    case 'comm-tab': state.comm.tab = arg; render(); break;
+    case 'comm-reload': state.comm.error = ''; state.comm.list = null; render(); break;
+    case 'comm-refresh': if (state.comm.openId) { state.comm.board = null; state.comm.boardError = ''; render(); loadBoard(state.comm.openId); } break;
+    case 'comm-copy-code': copyCommunityCode(); break;
+    case 'comm-share': shareCommunityLink(); break;
+    case 'comm-leave': leaveCurrentCommunity(); break;
     case 'period': statsPeriod = parseInt(arg); render(); break;
     case 'chart': statsChart = arg; render(); break;
     case 'recap-open':
@@ -4165,6 +4645,8 @@ function handleOpen(arg) {
   if (arg === 'new-session' || type === 'new-session') openSessionModal(param || todayISO());
   else if (arg === 'new-comp') openCompModal();
   else if (arg === 'new-partner') openPartnerModal();
+  else if (arg === 'new-community') openCommunityCreateModal();
+  else if (arg === 'join-community') openCommunityJoinModal();
   else if (arg === 'edit-profile') openProfileModal();
   else if (arg === 'streak-modal') openStreakModal();
 }
@@ -5037,6 +5519,10 @@ function handleModalAction(a, val) {
       });
       break;
     case '_deprecated_m-mode':
+    case 'comm-photo-pick': { const f = document.getElementById('cm-photo'); if (f) f.click(); break; }
+    case 'comm-photo-rm': modalState.photo = null; renderCommunityCreateModal(); break;
+    case 'comm-create-save': submitCommunityCreate(); break;
+    case 'comm-join-save': submitCommunityJoin(); break;
     case 'save-session':
       try { saveSession(); }
       catch (err) { console.error('Erro ao salvar treino:', err); showToast('Erro ao salvar o treino. Tente de novo.', 'error'); }
@@ -5615,6 +6101,7 @@ window.addEventListener('unhandledrejection', e => reportError('promessa', (e.re
 
 async function initApp() {
   initDelegation();
+  captureInviteFromUrl();
   window.addEventListener('online', () => { if (state.userId) syncNow(); });
   window.addEventListener('offline', () => { if (state.userId) setSyncStatus('offline'); });
   document.addEventListener('visibilitychange', () => {
