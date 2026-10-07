@@ -3264,7 +3264,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v20</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v21</p>
   </div>`;
 }
 
@@ -3968,7 +3968,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v20</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v21</p>
   </div>`;
 }
 
@@ -4016,6 +4016,11 @@ function initDelegation() {
       e.stopPropagation();
       handleModalAction(mactTarget.dataset.mact, mactTarget.value);
     }
+  });
+  // Botões do modal não roubam o foco do campo de texto. Sem isso, no celular o 1º toque em "Salvar"
+  // fecha o teclado, o modal (ancorado no rodapé) se move e o toque se perde: "não registra".
+  document.addEventListener('mousedown', (e) => {
+    if (e.target.closest && e.target.closest('.modal-overlay') && e.target.closest('button')) e.preventDefault();
   });
   // Select changes (for modal dropdowns)
   document.addEventListener('change', (e) => {
@@ -4940,12 +4945,13 @@ function handleModalAction(a, val) {
       break;
     case '_deprecated_m-mode':
     case 'save-session':
-      saveSession();
+      try { saveSession(); }
+      catch (err) { console.error('Erro ao salvar treino:', err); showToast('Erro ao salvar o treino. Tente de novo.', 'error'); }
       break;
     // COMP actions
     case 'save-comp':
-      syncCompInputs();
-      saveComp();
+      try { syncCompInputs(); saveComp(); }
+      catch (err) { console.error('Erro ao salvar competição:', err); showToast('Erro ao salvar. Tente de novo.', 'error'); }
       break;
     case 'comp-result':
       modalState.result = arg;
@@ -5001,6 +5007,11 @@ function syncSessionInputs() {
 }
 
 function saveSession() {
+  // Lê direto da tela: o autocorreto/ditado do celular nem sempre dispara 'input' antes do toque em salvar
+  const notesEl = document.getElementById('m-notes');
+  if (notesEl) modalState.notes = notesEl.value;
+  const dateEl = document.getElementById('m-date');
+  if (dateEl && dateEl.value) modalState.date = dateEl.value;
   if (!modalState.date) { showToast('Selecione uma data', 'error'); return; }
   if (modalState.date > todayISO()) { showToast('Data futura não permitida', 'error'); return; }
   // Converter contadores agregados em array de finalizações (uma por count)
