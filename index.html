@@ -3264,7 +3264,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v22</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v23</p>
   </div>`;
 }
 
@@ -3968,7 +3968,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v22</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v23</p>
   </div>`;
 }
 
@@ -5057,6 +5057,7 @@ function saveSession() {
   persistUser(); // depois do recorde, para ele ir junto na gravação
 
   // As telas filtram por Gi/No-Gi: mostra o modo em que o treino foi salvo, senão ele "some" da tela
+  const modeChanged = sessionData.mode !== state.mode;
   state.mode = sessionData.mode;
   closeModal();
   // Toast especial se acabou de bater a meta da semana
@@ -5065,7 +5066,8 @@ function saveSession() {
   } else if (!isEdit && streakAfter > streakBefore) {
     showToast(`🔥 Streak: ${streakAfter} ${streakAfter === 1 ? 'semana' : 'semanas'}!`);
   } else {
-    showToast(isEdit ? 'Treino atualizado!' : 'Treino salvo!');
+    const modeLabel = sessionData.mode === 'gi' ? 'Gi' : 'No-Gi';
+    showToast((isEdit ? 'Treino atualizado' : 'Treino salvo') + (modeChanged ? ` em ${modeLabel}` : '') + '!');
   }
   render();
 }
