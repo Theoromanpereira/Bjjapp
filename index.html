@@ -2614,8 +2614,9 @@ function computeStats(periodDays = 90) {
     });
     (s.suffered || []).forEach(x => {
       totalSuffered++;
-      if (x.position && x.submission) {
-        const k = `${x.position} → ${x.submission}`;
+      // O registro atual guarda só a finalização (sem posição): conta por ela; com posição, mantém "posição → finalização"
+      if (x.submission) {
+        const k = x.position ? `${x.position} → ${x.submission}` : x.submission;
         sufferedCombos[k] = (sufferedCombos[k] || 0) + 1;
       }
     });
@@ -2668,8 +2669,8 @@ function computeMonthlyRecap(year, month) {
       }
     });
     (s.suffered || []).forEach(x => {
-      if (x.position && x.submission) {
-        const k = `${x.position} → ${x.submission}`;
+      if (x.submission) {
+        const k = x.position ? `${x.position} → ${x.submission}` : x.submission;
         sufferedCombos[k] = (sufferedCombos[k] || 0) + 1;
       }
     });
@@ -3264,7 +3265,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v23</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v24</p>
   </div>`;
 }
 
@@ -3968,7 +3969,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v23</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v24</p>
   </div>`;
 }
 
@@ -4309,14 +4310,16 @@ function buildRecapSlides(recap) {
 
   // Slide 6: Vulnerabilidade (onde mais caiu)
   if (recap.topVulnerability) {
-    const [pos, sub] = recap.topVulnerability[0].split(' → ');
+    const vParts = recap.topVulnerability[0].split(' → ');
+    const sub = vParts[vParts.length - 1];
+    const pos = vParts.length > 1 ? vParts[0] : '';
     slides.push({
       title: 'Onde você caiu',
       render: () => `
         <div class="recap-content">
           <div class="recap-emoji">🛡️</div>
           <div class="recap-label">Sua kryptonita</div>
-          <div class="recap-headline">${escapeHtml(pos)}<br><span style="font-size:24px;opacity:0.8">→ ${escapeHtml(sub)}</span></div>
+          <div class="recap-headline">${pos ? `${escapeHtml(pos)}<br><span style="font-size:24px;opacity:0.8">→ ${escapeHtml(sub)}</span>` : escapeHtml(sub)}</div>
           <div class="recap-body">Sofreu <b>${recap.topVulnerability[1]}×</b> esse mês.<br>Mês que vem, vamos trabalhar essa defesa?</div>
         </div>`
     });
