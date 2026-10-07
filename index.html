@@ -568,6 +568,21 @@
     color: var(--bg);
     border-color: var(--text);
   }
+  .duration-btn.plus-chip { color: var(--primary); font-weight: 600; font-size: 16px; }
+  /* Campo numérico que substitui o "+" (abre o teclado numérico no celular) */
+  .duration-row .duration-input {
+    flex: 1;
+    min-width: 72px;
+    width: auto;
+    padding: 12px 4px;
+    text-align: center;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--primary);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+  }
 
   /* Bottom nav */
   .nav-bottom {
@@ -1763,6 +1778,7 @@ let state = {
   cloudUpdatedAt: null,
   data: null, // { profile, partners, sessions, comps, plan }
   currentTab: 'home', // home | calendar | stats | comps | partners | profile
+  filter: 'all', // Home/Calendário: all | gi | no-gi (Stats/Competições seguem usando 'mode')
   mode: 'gi', // gi | no-gi
   selectedDate: null,
   selectedSessionId: null,
@@ -2537,10 +2553,22 @@ function renderBeltBadge(beltName, degrees = 0) {
 }
 
 function getSessionsForMode() { return state.data.sessions.filter(s => s.mode === state.mode); }
+// Home e Calendário: tudo junto por padrão, com filtro Todos / Gi / No-Gi
+function viewFilter() { return state.filter === 'gi' || state.filter === 'no-gi' ? state.filter : 'all'; }
+function getSessionsForView() { const f = viewFilter(); return f === 'all' ? state.data.sessions : state.data.sessions.filter(s => s.mode === f); }
+function getCompsForView() { const f = viewFilter(); return f === 'all' ? state.data.comps : state.data.comps.filter(c => c.mode === f); }
+function filterToggleHtml() {
+  const f = viewFilter();
+  return `<div class="toggle" style="margin-bottom:0">
+        <button class="${f === 'all' ? 'active' : ''}" data-action="filter:all">Todos</button>
+        <button class="${f === 'gi' ? 'active' : ''}" data-action="filter:gi">Gi</button>
+        <button class="${f === 'no-gi' ? 'active' : ''}" data-action="filter:no-gi">No-Gi</button>
+      </div>`;
+}
 function getCompsForMode() { return state.data.comps.filter(c => c.mode === state.mode); }
 
 function getMonthStats(year, month) {
-  const sessions = getSessionsForMode().filter(s => {
+  const sessions = getSessionsForView().filter(s => {
     const d = parseLocalISO(s.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
@@ -2578,7 +2606,7 @@ function getCurrentWeekProgress() {
     const d = new Date(monday); d.setDate(monday.getDate() + i);
     days.push(d);
   }
-  const sessions = state.data.sessions.filter(s => s.mode === state.mode);
+  const sessions = getSessionsForView();
   const sessionsByDay = days.map(d => {
     const iso = localISO(d);
     return sessions.some(s => s.date === iso);
@@ -2589,7 +2617,9 @@ function getCurrentWeekProgress() {
   if (Array.isArray(state.data.weekPlans[weekKey])) {
     state.data.weekPlans[weekKey] = { gi: state.data.weekPlans[weekKey].slice(), 'no-gi': [false,false,false,false,false,false,false] };
   }
-  const plan = state.data.weekPlans[weekKey][state.mode];
+  // Em "Todos", o dia conta como planejado se estiver planejado em Gi ou em No-Gi
+  const wkPlans = state.data.weekPlans[weekKey];
+  const plan = viewFilter() === 'all' ? wkPlans.gi.map((g, i) => g || wkPlans['no-gi'][i]) : wkPlans[viewFilter()];
   // Total marked = days that are either planned OR trained (union)
   const markedDays = plan.map((p, i) => p || sessionsByDay[i]);
   const goal = markedDays.filter(Boolean).length;
@@ -2597,9 +2627,9 @@ function getCurrentWeekProgress() {
   return { days, sessionsByDay, plan, weekKey, done, goal, now };
 }
 
-function computeStats(periodDays = 90) {
+function computeStats(periodDays = 90, scope = 'mode') {
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - periodDays);
-  const sessions = getSessionsForMode().filter(s => parseLocalISO(s.date) >= cutoff);
+  const sessions = (scope === 'view' ? getSessionsForView() : getSessionsForMode()).filter(s => parseLocalISO(s.date) >= cutoff);
   const positionCount = {}, subCount = {}, comboCount = {}, sufferedCombos = {};
   let totalApplied = 0, totalSuffered = 0;
   sessions.forEach(s => {
@@ -3115,7 +3145,7 @@ function renderHome() {
   const p = state.data.profile;
   const week = getCurrentWeekProgress();
   const month = getMonthStats(new Date().getFullYear(), new Date().getMonth());
-  const stats = computeStats(30);
+  const stats = computeStats(30, 'view');
   const now = new Date();
   const dayLbl = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' })
     .replace(/^./, c => c.toUpperCase());
@@ -3153,10 +3183,7 @@ function renderHome() {
     </div>
 
     <div style="margin-bottom:20px">
-      <div class="toggle" style="margin-bottom:0">
-        <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi">Gi</button>
-        <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
-      </div>
+      ${filterToggleHtml()}
     </div>
 
     ${(() => {
@@ -3265,7 +3292,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v24</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v25</p>
   </div>`;
 }
 
@@ -3282,8 +3309,8 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const startOffset = (firstDay.getDay() + 6) % 7;
-  const sessions = getSessionsForMode();
-  const compsList = getCompsForMode();
+  const sessions = getSessionsForView();
+  const compsList = getCompsForView();
   const sessionDates = new Set(sessions.map(s => s.date));
   const compDates = new Set(compsList.map(c => c.date));
   const today = new Date(); today.setHours(0,0,0,0);
@@ -3335,10 +3362,7 @@ function renderCalendar() {
     </div>
 
     <div style="margin-bottom:16px">
-      <div class="toggle" style="margin-bottom:0">
-        <button class="${state.mode === 'gi' ? 'active' : ''}" data-action="mode:gi">Gi</button>
-        <button class="${state.mode === 'no-gi' ? 'active' : ''}" data-action="mode:no-gi">No-Gi</button>
-      </div>
+      ${filterToggleHtml()}
     </div>
 
     <div class="cal-grid" style="margin-bottom:6px">
@@ -3381,8 +3405,8 @@ function renderCalendar() {
 // ---------- DAY DETAIL ----------
 function renderDay() {
   const date = state.selectedDate;
-  const sessions = getSessionsForMode().filter(s => s.date === date);
-  const comps = getCompsForMode().filter(c => c.date === date);
+  const sessions = getSessionsForView().filter(s => s.date === date);
+  const comps = getCompsForView().filter(c => c.date === date);
 
   let body = '';
   if (sessions.length === 0 && comps.length === 0) {
@@ -3969,7 +3993,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v24</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v25</p>
   </div>`;
 }
 
@@ -4044,6 +4068,7 @@ function handleAction(a) {
     case 'tab': state.currentTab = arg; render(); break;
     case 'goto': state.currentTab = arg; render(); break;
     case 'mode': state.mode = arg; render(); break;
+    case 'filter': state.filter = arg; render(); break;
     case 'period': statsPeriod = parseInt(arg); render(); break;
     case 'chart': statsChart = arg; render(); break;
     case 'recap-open':
@@ -4122,7 +4147,14 @@ function handleAction(a) {
       const idx = parseInt(arg);
       const wk = getCurrentWeekProgress();
       // getCurrentWeekProgress already migrates/initializes the structure
-      state.data.weekPlans[wk.weekKey][state.mode][idx] = !state.data.weekPlans[wk.weekKey][state.mode][idx];
+      const wp = state.data.weekPlans[wk.weekKey];
+      if (viewFilter() === 'all') {
+        // Em "Todos": se o dia está planejado em qualquer modo, limpa; senão planeja no modo padrão
+        if (wp.gi[idx] || wp['no-gi'][idx]) { wp.gi[idx] = false; wp['no-gi'][idx] = false; }
+        else wp[state.mode][idx] = true;
+      } else {
+        wp[viewFilter()][idx] = !wp[viewFilter()][idx];
+      }
       persistUser(); render();
       break;
   }
@@ -4604,7 +4636,7 @@ function openSessionModal(date) {
     _kind: 'session',
     _editingId: null,
     date: initDate,
-    mode: state.mode,
+    mode: viewFilter() !== 'all' ? viewFilter() : state.mode,
     duration: 60,
     rollCount: 3,
     // Novo formato agregado: contadores de finalização por técnica
@@ -4641,7 +4673,7 @@ function openEditSessionModal(sessionId) {
     date: s.date,
     mode: s.mode,
     duration: s.duration || 60,
-    rollCount: s.rolls || 3,
+    rollCount: typeof s.rolls === 'number' && s.rolls > 0 ? s.rolls : (Array.isArray(s.rolls) && s.rolls.length ? s.rolls.length : 3),
     appliedCounts,
     sufferedCounts,
     partnerIds: (s.partners || []).slice(),
@@ -4664,6 +4696,61 @@ function adjustRollCount(newCount) {
   newCount = Math.max(0, Math.min(50, newCount));
   modalState.rollCount = newCount;
 }
+
+// ---- Duração / Rolas: chips + "+" para digitar qualquer valor (teclado numérico) ----
+const PICKERS = {
+  duration: { field: 'duration', presets: [30, 45, 60, 75, 90, 120], min: 1, max: 600, unit: 'min', mact: 'set-duration' },
+  rolls: { field: 'rollCount', presets: [1, 2, 3, 4, 5, 6, 7, 8], min: 1, max: 99, unit: 'rolas', mact: 'set-rollcount' }
+};
+function pickerRowHtml(kind) {
+  const c = PICKERS[kind];
+  const v = Number(modalState[c.field]);
+  const custom = !!v && !c.presets.includes(v);
+  const chips = c.presets.map(n => `<button class="duration-btn ${v === n ? 'active' : ''}" data-mact="${c.mact}:${n}">${n}</button>`).join('');
+  if (modalState._customEdit === kind) {
+    return chips + `<input class="duration-input" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" maxlength="3" placeholder="${c.unit}" value="${custom ? v : ''}" data-picker-input="${kind}" aria-label="${c.unit}">`;
+  }
+  const customChip = custom ? `<button class="duration-btn active" data-mact="picker-edit:${kind}">${v}</button>` : '';
+  return chips + customChip + `<button class="duration-btn plus-chip" data-mact="picker-edit:${kind}" aria-label="Outro valor">+</button>`;
+}
+function syncPickerActive(kind) {
+  const c = PICKERS[kind];
+  const v = Number(modalState[c.field]);
+  document.querySelectorAll(`[data-mact^="${c.mact}:"]`).forEach(el => {
+    el.classList.toggle('active', el.dataset.mact === `${c.mact}:${v}`);
+  });
+}
+// Reconstrói só a linha (sem re-render do modal: mantém o scroll e o que já foi digitado)
+function refreshPicker(kind, focus) {
+  const row = document.querySelector(`[data-picker="${kind}"]`);
+  if (!row) return;
+  const c = PICKERS[kind];
+  row.innerHTML = pickerRowHtml(kind);
+  const inp = row.querySelector('[data-picker-input]');
+  if (!inp) return;
+  inp.addEventListener('input', () => {
+    const digits = inp.value.replace(/\D/g, '').slice(0, 3);
+    if (digits !== inp.value) inp.value = digits;
+    const n = parseInt(digits, 10);
+    if (n >= c.min && n <= c.max) { modalState[c.field] = n; syncPickerActive(kind); }
+  });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+  inp.addEventListener('blur', () => commitPicker(kind));
+  if (focus) { inp.focus(); inp.select(); }
+}
+// Fecha o campo numérico guardando o valor (limitado ao mínimo/máximo). Chamado no blur e antes de salvar.
+function commitPicker(kind) {
+  if (!modalState || modalState._customEdit !== kind) return;
+  const c = PICKERS[kind];
+  const inp = document.querySelector(`[data-picker-input="${kind}"]`);
+  if (inp) {
+    const n = parseInt(inp.value, 10);
+    if (Number.isFinite(n)) modalState[c.field] = Math.max(c.min, Math.min(c.max, n));
+  }
+  modalState._customEdit = null;
+  refreshPicker(kind);
+}
+function commitPickers() { commitPicker('duration'); commitPicker('rolls'); }
 
 function renderSessionModal() {
   const subs = modalState.mode === 'gi' ? SUBMISSIONS_GI : SUBMISSIONS_NOGI;
@@ -4696,13 +4783,6 @@ function renderSessionModal() {
       </div>
     </div>`).join('');
 
-  // Chips de duração e rolas
-  const durations = [30, 45, 60, 75, 90, 120];
-  const durationChips = durations.map(d => `<button class="duration-btn ${modalState.duration === d ? 'active' : ''}" data-mact="set-duration:${d}">${d}</button>`).join('');
-
-  const rollCounts = [1, 2, 3, 4, 5, 6, 7, 8];
-  const rollChips = rollCounts.map(n => `<button class="duration-btn ${modalState.rollCount === n ? 'active' : ''}" data-mact="set-rollcount:${n}">${n}</button>`).join('');
-
   // Chips de parceiros
   const partnerChipsHtml = partners.length > 0
     ? partners.map(p => `<button class="partner-chip ${modalState.partnerIds.includes(p.id) ? 'active' : ''}" data-mact="toggle-partner:${p.id}">
@@ -4732,12 +4812,12 @@ function renderSessionModal() {
 
     <div class="form-group">
       <label class="form-label">Duração <span class="mono" style="color:var(--text-2);letter-spacing:0.5px;text-transform:none;font-size:11px">(min)</span></label>
-      <div class="duration-row">${durationChips}</div>
+      <div class="duration-row" data-picker="duration">${pickerRowHtml('duration')}</div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Rolas</label>
-      <div class="duration-row">${rollChips}</div>
+      <div class="duration-row" data-picker="rolls">${pickerRowHtml('rolls')}</div>
     </div>
 
     <div class="form-group">
@@ -4808,6 +4888,10 @@ function renderSessionModal() {
     <div style="height:20px"></div>
   `);
 
+  // Se o campo numérico estava aberto durante um re-render, religa os eventos
+  refreshPicker('duration');
+  refreshPicker('rolls');
+
   // Date guard
   const dateEl = document.getElementById('m-date');
   if (dateEl) {
@@ -4873,22 +4957,27 @@ function handleModalAction(a, val) {
     case 'set-duration':
       // In-place: só troca classe active nos duration-btn
       modalState.duration = parseInt(arg);
-      document.querySelectorAll('[data-mact^="set-duration:"]').forEach(el => {
-        el.classList.toggle('active', el.dataset.mact === 'set-duration:' + arg);
-      });
+      modalState._customEdit = null;
+      refreshPicker('duration');
+      break;
+    case 'picker-edit':
+      commitPickers(); // fecha o outro campo, se estiver aberto
+      modalState._customEdit = arg;
+      refreshPicker(arg, true);
       break;
     case 'set-rollcount':
       // In-place: só troca classe active nos rollcount buttons
       modalState.rollCount = parseInt(arg);
-      document.querySelectorAll('[data-mact^="set-rollcount:"]').forEach(el => {
-        el.classList.toggle('active', el.dataset.mact === 'set-rollcount:' + arg);
-      });
+      modalState._customEdit = null;
+      refreshPicker('rolls');
       break;
     case 'toggle-details':
+      commitPickers();
       modalState._showDetails = !modalState._showDetails;
       renderSessionModal(); // aqui SIM re-render, muda muito conteúdo
       break;
     case 'toggle-notes':
+      commitPickers();
       modalState._showNotes = !modalState._showNotes;
       renderSessionModal();
       break;
@@ -4938,6 +5027,7 @@ function handleModalAction(a, val) {
       if (partnerEl) partnerEl.classList.toggle('active');
       break;
     case 'new-partner-from-session':
+      commitPickers();
       window._savedSessionModal = JSON.parse(JSON.stringify(modalState));
       openPartnerModal((newPartnerId) => {
         modalState = window._savedSessionModal;
@@ -5010,6 +5100,7 @@ function syncSessionInputs() {
 }
 
 function saveSession() {
+  commitPickers(); // valor digitado no "+" entra mesmo sem sair do campo
   // Lê direto da tela: o autocorreto/ditado do celular nem sempre dispara 'input' antes do toque em salvar
   const notesEl = document.getElementById('m-notes');
   if (notesEl) modalState.notes = notesEl.value;
@@ -5060,7 +5151,8 @@ function saveSession() {
   persistUser(); // depois do recorde, para ele ir junto na gravação
 
   // As telas filtram por Gi/No-Gi: mostra o modo em que o treino foi salvo, senão ele "some" da tela
-  const modeChanged = sessionData.mode !== state.mode;
+  const modeChanged = viewFilter() !== 'all' && viewFilter() !== sessionData.mode; // o filtro escondia o treino
+  if (modeChanged) state.filter = 'all';
   state.mode = sessionData.mode;
   closeModal();
   // Toast especial se acabou de bater a meta da semana
@@ -5070,7 +5162,7 @@ function saveSession() {
     showToast(`🔥 Streak: ${streakAfter} ${streakAfter === 1 ? 'semana' : 'semanas'}!`);
   } else {
     const modeLabel = sessionData.mode === 'gi' ? 'Gi' : 'No-Gi';
-    showToast((isEdit ? 'Treino atualizado' : 'Treino salvo') + (modeChanged ? ` em ${modeLabel}` : '') + '!');
+    showToast((isEdit ? 'Treino atualizado' : 'Treino salvo') + (modeChanged ? ` em ${modeLabel} (mostrando todos)` : '') + '!');
   }
   render();
 }
@@ -5239,6 +5331,7 @@ function saveComp() {
   };
   state.data.comps.push(comp);
   persistUser();
+  if (viewFilter() !== 'all' && viewFilter() !== comp.mode) state.filter = 'all'; // o filtro escondia a competição
   state.mode = comp.mode; // mostra o modo em que foi salva
   closeModal();
   showToast('Competição salva!');
