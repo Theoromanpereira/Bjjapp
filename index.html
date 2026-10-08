@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tatame · Performance Tracker</title>
+<meta name="theme-color" content="#0a0a0a">
+<meta name="application-name" content="Tatame">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tatame">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1552,6 +1561,20 @@
   .mig-banner { width: 100%; text-align: left; background: var(--primary-soft); border: 1px solid var(--primary); color: var(--text); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
   .mig-banner b { font-size: 13px; font-weight: 600; }
   .mig-banner span { font-size: 12px; color: var(--text-2); }
+  /* ===== INSTALAR O APP (PWA) ===== */
+  .install-card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 12px 12px 14px; margin-bottom: 16px; position: relative; }
+  .install-card img { width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0; }
+  .install-card .t { flex: 1; min-width: 0; }
+  .install-card .t b { display: block; font-size: 13px; font-weight: 600; }
+  .install-card .t span { display: block; font-size: 11px; color: var(--text-3); line-height: 1.35; margin-top: 2px; }
+  .install-card .go { background: var(--primary); color: #fff; font-size: 12px; font-weight: 600; padding: 9px 14px; border-radius: 12px; flex-shrink: 0; }
+  .install-card .x { position: absolute; top: 2px; right: 4px; color: var(--text-3); padding: 4px 7px; font-size: 16px; line-height: 1; }
+  .install-steps { list-style: none; padding: 0; margin: 0 0 16px; }
+  .install-steps li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.45; }
+  .install-steps li:last-child { border-bottom: none; }
+  .install-steps .n { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .install-steps b { font-weight: 600; }
+
   /* ===== RECOMPENSA (freeze) · estilo Duolingo ===== */
   .reward-overlay { position: fixed; inset: 0; z-index: 400; background: rgba(8,14,30,0.86); display: flex; align-items: center; justify-content: center; padding: 24px; overflow: hidden; animation: rwFade .3s ease both; }
   .reward-overlay.out { animation: rwFadeOut .25s ease both; }
@@ -2206,6 +2229,7 @@ function afterLogin(res) {
     }
   }
   if (!askedLegacy) { if (!startOnboardingIfNew()) maybeShowPhotoReward(); } // (se perguntamos sobre dados antigos, o perfil espera a resposta)
+  if (pendingAction === 'new-session' && !document.querySelector('.modal-overlay')) { pendingAction = null; openSessionModal(todayISO()); }
   // Convite por link: entra na comunidade logo depois do login; senão só atualiza a lista (e o ranking)
   if (getPendingInvite()) processPendingJoin();
   else refreshCommunities();
@@ -2902,6 +2926,8 @@ function getCurrentUnseenRecap() {
 function applyTheme() {
   const theme = (state.data && state.data.profile && state.data.profile.theme) || 'light';
   document.documentElement.setAttribute('data-theme', theme);
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if (tc) tc.setAttribute('content', theme === 'light' ? '#fafaf7' : '#0a0a0a');
 }
 
 function render() {
@@ -2926,6 +2952,103 @@ function render() {
   }
   root.innerHTML = content + renderNav();
   attachListeners();
+}
+
+// =================== PWA (instalar o app) ===================
+let deferredInstall = null; // evento do Chrome/Edge/Android que permite abrir o instalador
+const INSTALL_DISMISS_KEY = 'tatame_install_dismissed';
+function isStandalone() {
+  try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch { return false; }
+}
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+function isMacSafari() { const ua = navigator.userAgent; return /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|Edg|OPR/.test(ua) && !isIOS(); }
+function installDismissedRecently() {
+  try { const t = parseInt(localStorage.getItem(INSTALL_DISMISS_KEY) || '0', 10); return t && Date.now() - t < 14 * 86400000; } catch { return false; }
+}
+// O cartão da Home só aparece onde instalar é possível (Android/Chrome com o instalador, ou iPhone/iPad no Safari)
+function canOfferInstall() { return !isStandalone() && (!!deferredInstall || isIOS()); }
+function installBannerHtml() {
+  if (!canOfferInstall() || installDismissedRecently()) return '';
+  return `<div class="install-card">
+    <img src="/icons/icon-192.png" alt="">
+    <div class="t"><b>Instale o Tatame</b><span>Abre em tela cheia, sem o navegador, e funciona offline</span></div>
+    <button class="go" data-action="install-app">Instalar</button>
+    <button class="x" data-action="install-dismiss" aria-label="Fechar">×</button>
+  </div>`;
+}
+async function installApp() {
+  if (deferredInstall) {
+    const ev = deferredInstall;
+    deferredInstall = null;
+    try {
+      ev.prompt();
+      const choice = await ev.userChoice;
+      if (choice && choice.outcome === 'accepted') showToast('Instalando o app…');
+    } catch (err) { console.error('Instalação:', err); openInstallHelp(); }
+    if (state.currentUser) render();
+    return;
+  }
+  openInstallHelp();
+}
+function openInstallHelp() {
+  let steps;
+  if (isIOS()) {
+    steps = [
+      'Abra o Tatame no <b>Safari</b> (não funciona dentro de outros apps).',
+      'Toque no botão <b>Compartilhar</b> (o quadrado com uma seta para cima), na barra do Safari.',
+      'Role a lista e toque em <b>Adicionar à Tela de Início</b>.',
+      'Toque em <b>Adicionar</b>. O ícone do Tatame aparece na tela inicial.'
+    ];
+  } else if (isMacSafari()) {
+    steps = [
+      'No menu do Safari, abra <b>Arquivo</b>.',
+      'Escolha <b>Adicionar ao Dock…</b>.',
+      'Confirme em <b>Adicionar</b>. O Tatame passa a abrir como um aplicativo.'
+    ];
+  } else {
+    steps = [
+      'No menu do navegador (⋮ ou ⋯), procure <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.',
+      'Confirme. O ícone do Tatame aparece junto com os seus outros apps.'
+    ];
+  }
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Instalar o Tatame</div>
+      <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:6px">Abra em tela cheia, direto do ícone, e use mesmo sem internet.</p>
+    <ol class="install-steps">${steps.map((t, i) => `<li><span class="n">${i + 1}</span><span>${t}</span></li>`).join('')}</ol>
+    <button class="btn-primary" data-mact="close">Entendi</button>
+    <div style="height:20px"></div>`);
+}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  if (state.currentUser && state.currentTab === 'home' && !document.querySelector('.modal-overlay')) render();
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstall = null;
+  showToast('App instalado!');
+  if (state.currentUser) render();
+});
+// Service worker: guarda o app para abrir offline (só em http/https)
+let swReg = null;
+if ('serviceWorker' in navigator && /^https?:$/.test(window.location.protocol)) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => { swReg = reg; }).catch(err => console.error('Service worker:', err));
+  });
+}
+// Atalho do ícone ("Registrar treino"): ?action=new-session
+let pendingAction = null;
+function captureActionFromUrl() {
+  try {
+    const u = new URL(window.location.href);
+    const a = u.searchParams.get('action');
+    if (a !== 'new-session') return;
+    pendingAction = a;
+    u.searchParams.delete('action');
+    window.history.replaceState(null, '', u.pathname + u.search + u.hash);
+  } catch {}
 }
 
 // =================== COMUNIDADE ===================
@@ -3711,6 +3834,8 @@ function renderHome() {
       ${headerAvatar()}
     </div>
 
+    ${installBannerHtml()}
+
     <div style="margin-bottom:20px">
       ${filterToggleHtml()}
     </div>
@@ -3821,7 +3946,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v28</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v29</p>
   </div>`;
 }
 
@@ -4492,6 +4617,16 @@ function renderSettings() {
       </div>
     </div>
 
+    ${isStandalone() ? '' : `<div class="settings-group">
+      <div class="settings-group-label">App</div>
+      <div class="settings-list">
+        <div class="settings-item" data-action="install-app">
+          <span class="label">Instalar o app</span>
+          <span class="value">${icon('chevron-right', 16)}</span>
+        </div>
+      </div>
+    </div>`}
+
     <div class="settings-group">
       <div class="settings-group-label">Dados</div>
       <div class="settings-list">
@@ -4524,7 +4659,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v28</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v29</p>
   </div>`;
 }
 
@@ -4600,6 +4735,8 @@ function handleAction(a) {
     case 'goto': state.currentTab = arg; render(); break;
     case 'mode': state.mode = arg; render(); break;
     case 'filter': state.filter = arg; render(); break;
+    case 'install-app': installApp(); break;
+    case 'install-dismiss': try { localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now())); } catch {} render(); break;
     case 'comm-open': openCommunity(arg); break;
     case 'comm-tab': state.comm.tab = arg; render(); break;
     case 'comm-reload': state.comm.error = ''; state.comm.list = null; render(); break;
@@ -6208,6 +6345,7 @@ window.addEventListener('unhandledrejection', e => reportError('promessa', (e.re
 async function initApp() {
   initDelegation();
   captureInviteFromUrl();
+  captureActionFromUrl();
   window.addEventListener('online', () => { if (state.userId) syncNow(); });
   window.addEventListener('offline', () => { if (state.userId) setSyncStatus('offline'); });
   document.addEventListener('visibilitychange', () => {
