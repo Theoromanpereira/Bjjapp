@@ -2180,6 +2180,17 @@ function startOnboardingIfNew() {
   return true;
 }
 
+// Quem já ganhou o freeze (foto) antes da animação existir vê a recompensa uma única vez
+function maybeShowPhotoReward() {
+  const p = state.data && state.data.profile;
+  if (!p || !p.photo || p.freezeRewardSeen) return;
+  if (document.querySelector('.modal-overlay') || document.getElementById('reward-overlay')) return;
+  setTimeout(() => {
+    const q = state.data && state.data.profile;
+    if (q && q.photo && !q.freezeRewardSeen && !document.querySelector('.modal-overlay')) showFreezeReward();
+  }, 700);
+}
+
 function afterLogin(res) {
   let askedLegacy = false;
   if (res && res.offerLegacy) {
@@ -2194,7 +2205,7 @@ function afterLogin(res) {
       offerLegacyUpload(email);
     }
   }
-  if (!askedLegacy) startOnboardingIfNew(); // (se perguntamos sobre dados antigos, o perfil espera a resposta)
+  if (!askedLegacy) { if (!startOnboardingIfNew()) maybeShowPhotoReward(); } // (se perguntamos sobre dados antigos, o perfil espera a resposta)
   // Convite por link: entra na comunidade logo depois do login; senão só atualiza a lista (e o ranking)
   if (getPendingInvite()) processPendingJoin();
   else refreshCommunities();
@@ -3810,7 +3821,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v27</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v28</p>
   </div>`;
 }
 
@@ -4513,7 +4524,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v27</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v28</p>
   </div>`;
 }
 
@@ -6111,6 +6122,8 @@ async function handlePhotoSelect(e) {
 function showFreezeReward() {
   const old = document.getElementById('reward-overlay');
   if (old) old.remove();
+  // Guarda que a pessoa já viu: quem já tinha foto antes desta animação existir vê uma única vez
+  if (state.data && state.data.profile && !state.data.profile.freezeRewardSeen) { state.data.profile.freezeRewardSeen = true; persistUser(); }
   const total = getMaxFreezesPerMonth();
   const colors = ['#7fd4ff', '#2f80ff', '#ffffff', '#ffaa33', '#e63946', '#6ee06e'];
   const confetti = Array.from({ length: 34 }, () => {
