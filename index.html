@@ -1552,6 +1552,38 @@
   .mig-banner { width: 100%; text-align: left; background: var(--primary-soft); border: 1px solid var(--primary); color: var(--text); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
   .mig-banner b { font-size: 13px; font-weight: 600; }
   .mig-banner span { font-size: 12px; color: var(--text-2); }
+  /* ===== RECOMPENSA (freeze) · estilo Duolingo ===== */
+  .reward-overlay { position: fixed; inset: 0; z-index: 400; background: rgba(8,14,30,0.86); display: flex; align-items: center; justify-content: center; padding: 24px; overflow: hidden; animation: rwFade .3s ease both; }
+  .reward-overlay.out { animation: rwFadeOut .25s ease both; }
+  @keyframes rwFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rwFadeOut { to { opacity: 0; } }
+  .reward-card { position: relative; width: 100%; max-width: 340px; text-align: center; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .reward-badge { position: relative; width: 148px; height: 148px; margin-bottom: 6px; animation: rwDrop .9s cubic-bezier(.2,1.5,.4,1) .15s both; }
+  @keyframes rwDrop { 0% { transform: translateY(-260px) scale(.3) rotate(-25deg); opacity: 0; } 55% { transform: translateY(0) scale(1.18) rotate(8deg); opacity: 1; } 75% { transform: scale(.94) rotate(-4deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+  .reward-glow { position: absolute; inset: -34px; border-radius: 50%; background: radial-gradient(circle, rgba(94,190,255,.55), rgba(94,190,255,0) 68%); animation: rwGlow 1.8s ease-in-out .9s infinite; }
+  @keyframes rwGlow { 0%,100% { transform: scale(.9); opacity: .65; } 50% { transform: scale(1.12); opacity: 1; } }
+  .reward-disc { position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(145deg, #7fd4ff, #2f80ff); box-shadow: 0 10px 34px rgba(47,128,255,.55), inset 0 -8px 16px rgba(0,40,120,.25); display: flex; align-items: center; justify-content: center; }
+  .reward-disc svg { width: 82px; height: 82px; filter: drop-shadow(0 3px 5px rgba(0,40,120,.35)); animation: rwSpin 2.6s ease-in-out 1s infinite; }
+  @keyframes rwSpin { 0%,100% { transform: rotate(0); } 50% { transform: rotate(18deg); } }
+  .reward-plus { position: absolute; top: -10px; right: -18px; background: #ff5a5f; color: #fff; font-weight: 800; font-size: 20px; padding: 6px 12px; border-radius: 20px; border: 3px solid rgba(8,14,30,.9); animation: rwPop .5s cubic-bezier(.2,1.6,.4,1) 1s both; }
+  @keyframes rwPop { from { transform: scale(0) rotate(-20deg); opacity: 0; } to { transform: scale(1) rotate(6deg); opacity: 1; } }
+  .reward-card h2 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.1; letter-spacing: -0.02em; animation: rwUp .5s ease .85s both; }
+  .reward-card p { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.78); max-width: 290px; animation: rwUp .5s ease 1s both; }
+  .reward-count { margin: 6px 0 4px; padding: 10px 18px; border-radius: 14px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); font-size: 13px; animation: rwUp .5s ease 1.15s both; }
+  .reward-count b { font-family: 'Instrument Serif', serif; font-size: 24px; font-weight: 400; color: #7fd4ff; display: inline-block; }
+  .reward-count .to { animation: rwNum .6s cubic-bezier(.2,1.6,.4,1) 1.5s both; }
+  @keyframes rwNum { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .reward-card .btn-primary { margin-top: 10px; animation: rwUp .5s ease 1.3s both; }
+  @keyframes rwUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .reward-confetti i { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; opacity: 0; animation: rwFall linear forwards; }
+  @keyframes rwFall { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: .9; } }
+  @media (prefers-reduced-motion: reduce) {
+    .reward-overlay *, .reward-overlay { animation-duration: .01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+    .reward-confetti { display: none; }
+  }
+  .welcome-note { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--primary-soft), var(--surface)); border: 1px solid var(--primary); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.45; color: var(--text-2); }
+  .welcome-note b { color: var(--text); }
+
   /* ===== COMUNIDADE ===== */
   .comm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
   .comm-actions button { padding: 14px 8px; font-size: 13px; }
@@ -1885,7 +1917,7 @@ function importBackup() {
 
 function newUserData() {
   return {
-    profile: { name: '', gender: 'male', age: 28, belt: 'Branca', degrees: 0, weight: 80, gym: '', startedAt: new Date().getFullYear() - 1, photo: null },
+    profile: { name: '', gender: 'male', age: 28, belt: 'Branca', degrees: 0, weight: 80, gym: '', startedAt: new Date().getFullYear() - 1, photo: null, onboarded: false },
     weekPlans: {},
     partners: [],
     sessions: [],
@@ -2136,7 +2168,20 @@ function offerLegacyUpload(email) {
     () => importLegacyNow(email)
   );
 }
+// Conta nova: leva para o perfil com o formulário aberto (foto, faixa...). Acontece uma única vez.
+function startOnboardingIfNew() {
+  const p = state.data && state.data.profile;
+  if (!p || p.onboarded !== false) return false; // contas antigas não têm o campo: não passam por aqui
+  p.onboarded = true;
+  persistUser();
+  state.currentTab = 'profile';
+  render();
+  openProfileModal(true);
+  return true;
+}
+
 function afterLogin(res) {
+  let askedLegacy = false;
   if (res && res.offerLegacy) {
     const email = state.currentUser;
     const pending = readJSON(PENDING_KEY);
@@ -2145,9 +2190,11 @@ function afterLogin(res) {
       delete pending[email]; writeJSON(PENDING_KEY, pending);
       importLegacyNow(from); // migração iniciada pelo próprio usuário nos slides: sem perguntar de novo
     } else {
+      askedLegacy = !!findLegacyData(email);
       offerLegacyUpload(email);
     }
   }
+  if (!askedLegacy) startOnboardingIfNew(); // (se perguntamos sobre dados antigos, o perfil espera a resposta)
   // Convite por link: entra na comunidade logo depois do login; senão só atualiza a lista (e o ranking)
   if (getPendingInvite()) processPendingJoin();
   else refreshCommunities();
@@ -3763,7 +3810,7 @@ function renderHome() {
       </div>`}
     </div>
 
-    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v26</p>
+    <p style="text-align:center;font-size:9px;color:var(--text-3);margin-top:22px;letter-spacing:1px">tatame<span style="color:var(--primary)">.</span> · build v27</p>
   </div>`;
 }
 
@@ -4318,7 +4365,7 @@ function renderProfile() {
       <div style="color:var(--primary)">${icon('photo', 22)}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:500;color:var(--text)">Adicionar foto de perfil</div>
-        <div style="font-size:11px;color:var(--text-2);margin-top:2px">Ganhe +1 freeze semanal por mês (total: 3)</div>
+        <div style="font-size:11px;color:var(--text-2);margin-top:2px">Ganhe +1 freeze de ofensiva por mês (total: 3)</div>
       </div>
       ${icon('chevron-right', 16)}
     </button>` : ''}
@@ -4466,7 +4513,7 @@ function renderSettings() {
       </div>
     </div>
 
-    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v26</p>
+    <p style="text-align:center;font-size:10px;color:var(--text-3);margin-top:22px;letter-spacing:1.5px">tatame<span style="color:var(--primary)">.</span> · build v27</p>
   </div>`;
 }
 
@@ -5920,8 +5967,8 @@ function savePartner() {
 }
 
 // ---------- PROFILE MODAL ----------
-function openProfileModal() {
-  modalState = { ...state.data.profile };
+function openProfileModal(welcome) {
+  modalState = { ...state.data.profile, _welcome: !!welcome };
   renderProfileModal();
 }
 
@@ -5930,9 +5977,10 @@ function renderProfileModal() {
   const validBelt = beltsList.includes(modalState.belt) ? modalState.belt : 'Branca';
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">Editar perfil</div>
+      <div class="modal-title">${modalState._welcome ? 'Bem-vindo ao tatame!' : 'Editar perfil'}</div>
       <button class="close-btn" data-mact="close">${icon('x', 16)}</button>
     </div>
+    ${modalState._welcome ? `<div class="welcome-note"><span style="color:var(--primary)">${icon('camera', 22)}</span><div>Monte seu perfil em poucos segundos. <b>Adicione uma foto e ganhe +1 freeze de ofensiva</b> para proteger sua sequência.</div></div>` : ''}
 
     <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0 24px">
       <div style="position:relative">
@@ -5995,7 +6043,7 @@ function renderProfileModal() {
       <div class="input-row" style="margin-bottom:0"><input type="number" id="pr-started" value="${modalState.startedAt}" min="1980" max="${new Date().getFullYear()}"></div>
     </div>
 
-    <button class="btn-primary" data-mact="save-profile">Salvar</button>
+    <button class="btn-primary" data-mact="save-profile">${modalState._welcome ? 'Salvar e começar' : 'Salvar'}</button>
     <div style="height:20px"></div>
   `);
   attachModalListeners();
@@ -6059,6 +6107,50 @@ async function handlePhotoSelect(e) {
   }
 }
 
+// Animação de recompensa (estilo Duolingo): ganhou +1 freeze de ofensiva por adicionar a foto
+function showFreezeReward() {
+  const old = document.getElementById('reward-overlay');
+  if (old) old.remove();
+  const total = getMaxFreezesPerMonth();
+  const colors = ['#7fd4ff', '#2f80ff', '#ffffff', '#ffaa33', '#e63946', '#6ee06e'];
+  const confetti = Array.from({ length: 34 }, () => {
+    const left = Math.random() * 100, delay = (Math.random() * 1.4).toFixed(2), dur = (2.2 + Math.random() * 1.8).toFixed(2);
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    return `<i style="left:${left.toFixed(1)}%;background:${c};animation-delay:${delay}s;animation-duration:${dur}s"></i>`;
+  }).join('');
+  const arm = '<path d="M32 8v48"/><path d="M24 16l8 7 8-7"/><path d="M24 48l8-7 8 7"/>';
+  const el = document.createElement('div');
+  el.className = 'reward-overlay';
+  el.id = 'reward-overlay';
+  el.setAttribute('role', 'dialog');
+  el.innerHTML = `
+    <div class="reward-confetti">${confetti}</div>
+    <div class="reward-card">
+      <div class="reward-badge">
+        <div class="reward-glow"></div>
+        <div class="reward-disc">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${arm}<g transform="rotate(60 32 32)">${arm}</g><g transform="rotate(120 32 32)">${arm}</g></svg>
+        </div>
+        <div class="reward-plus">+1</div>
+      </div>
+      <h2>Você ganhou um freeze de ofensiva!</h2>
+      <p>Por adicionar sua foto. Ele protege sua sequência quando você perde uma semana de treino.</p>
+      <div class="reward-count">Freezes por mês: <b class="from">${total - 1}</b> → <b class="to">${total}</b></div>
+      <button class="btn-primary" id="reward-ok">Continuar</button>
+    </div>`;
+  document.body.appendChild(el);
+  const close = () => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 260);
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = e => { if (e.key === 'Escape' || e.key === 'Enter') close(); };
+  document.addEventListener('keydown', onKey);
+  el.querySelector('#reward-ok').addEventListener('click', close);
+  el.addEventListener('click', e => { if (e.target === el) close(); });
+  try { if (navigator.vibrate) navigator.vibrate([40, 60, 40]); } catch {}
+}
+
 function saveProfile() {
   syncProfileInputs();
   const hadPhoto = !!state.data.profile.photo;
@@ -6077,8 +6169,9 @@ function saveProfile() {
   persistUser();
   closeModal();
   const gotPhoto = !hadPhoto && state.data.profile.photo;
-  showToast(gotPhoto ? '🎉 Foto adicionada! +1 freeze desbloqueado' : 'Perfil atualizado!');
+  if (!gotPhoto) showToast('Perfil atualizado!');
   render();
+  if (gotPhoto) showFreezeReward();
 }
 
 // =================== INIT ===================
